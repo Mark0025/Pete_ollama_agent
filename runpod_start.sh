@@ -68,5 +68,9 @@ else
   uv pip install .
 fi
 
+# Ensure no previous instance is running
+echo "🧹 Ensuring no prior PeteOllama server is running..."
+pkill -f uvicorn 2>/dev/null || true
+
 echo "🏁 Starting your app..."
 python3 src/main.py
