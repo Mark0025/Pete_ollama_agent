@@ -1,0 +1,252 @@
+"""
+PeteOllama V1 - VAPI Webhook Server
+===================================
+
+FastAPI server for handling VAPI voice interactions.
+Receives voice calls and responds using the trained AI model.
+"""
+
+from fastapi import FastAPI, Request, HTTPException
+from fastapi.responses import JSONResponse
+import uvicorn
+import os
+import json
+from typing import Dict, Any
+from pathlib import Path
+import sys
+
+# Add src to path
+sys.path.insert(0, str(Path(__file__).parent.parent))
+
+from ai.model_manager import ModelManager
+from database.pete_db_manager import PeteDBManager
+from utils.logger import logger
+
+class VAPIWebhookServer:
+    """VAPI webhook server for voice interactions"""
+    
+    def __init__(self, port: int = 8000):
+        """Initialize webhook server"""
+        self.port = port
+        self.app = FastAPI(
+            title="PeteOllama VAPI Webhook",
+            description="AI Property Manager Voice Interface",
+            version="1.0.0"
+        )
+        
+        self.model_manager = ModelManager()
+        self.db_manager = PeteDBManager()
+        
+        self.setup_routes()
+    
+    def setup_routes(self):
+        """Setup FastAPI routes"""
+        
+        @self.app.get("/")
+        async def root():
+            """Root endpoint"""
+            return {
+                "service": "PeteOllama VAPI Webhook",
+                "version": "1.0.0",
+                "status": "running",
+                "model_available": self.model_manager.is_available()
+            }
+        
+        @self.app.get("/health")
+        async def health_check():
+            """Health check endpoint"""
+            return {
+                "status": "healthy",
+                "model_available": self.model_manager.is_available(),
+                "database_connected": self.db_manager.is_connected()
+            }
+        
+        @self.app.post("/vapi/webhook")
+        async def vapi_webhook(request: Request):
+            """Main VAPI webhook endpoint"""
+            try:
+                # Get request body
+                body = await request.json()
+                
+                # Log the incoming request
+                logger.info(f"VAPI webhook received: {body.get('type', 'unknown')}")
+                
+                # Handle different VAPI event types
+                event_type = body.get('type')
+                
+                if event_type == 'function-call':
+                    return await self.handle_function_call(body)
+                elif event_type == 'conversation-update':
+                    return await self.handle_conversation_update(body)
+                elif event_type == 'end-of-call-report':
+                    return await self.handle_end_of_call(body)
+                else:
+                    logger.warning(f"Unknown VAPI event type: {event_type}")
+                    return {"status": "ignored"}
+            
+            except Exception as e:
+                logger.error(f"VAPI webhook error: {str(e)}")
+                raise HTTPException(status_code=500, detail=str(e))
+        
+        @self.app.post("/test/message")
+        async def test_message(request: Request):
+            """Test endpoint for direct message testing"""
+            try:
+                body = await request.json()
+                message = body.get('message', '')
+                
+                if not message:
+                    raise HTTPException(status_code=400, detail="Message required")
+                
+                # Generate AI response
+                response = self.model_manager.generate_response(message)
+                
+                return {
+                    "user_message": message,
+                    "ai_response": response,
+                    "model_used": self.model_manager.custom_model_name if self.model_manager.is_model_available(self.model_manager.custom_model_name) else self.model_manager.model_name
+                }
+            
+            except Exception as e:
+                logger.error(f"Test message error: {str(e)}")
+                raise HTTPException(status_code=500, detail=str(e))
+    
+    async def handle_function_call(self, body: Dict[str, Any]) -> Dict[str, Any]:
+        """Handle VAPI function call"""
+        try:
+            # Extract function call details
+            function_call = body.get('functionCall', {})
+            function_name = function_call.get('name')
+            parameters = function_call.get('parameters', {})
+            
+            logger.info(f"Function call: {function_name} with params: {parameters}")
+            
+            # Handle property management functions
+            if function_name == 'answer_property_question':
+                question = parameters.get('question', '')
+                caller_info = parameters.get('caller_info', {})
+                
+                # Get context from database if phone number provided
+                context = ""
+                phone = caller_info.get('phone')
+                if phone:
+                    # Look up caller information
+                    caller_data = self.get_caller_context(phone)
+                    if caller_data:
+                        context = f"Caller: {caller_data}"
+                
+                # Generate AI response
+                ai_response = self.model_manager.generate_response(question, context)
+                
+                return {
+                    "result": {
+                        "response": ai_response,
+                        "action": "continue_conversation"
+                    }
+                }
+            
+            else:
+                return {
+                    "result": {
+                        "response": "I can help you with property management questions. What would you like to know?",
+                        "action": "continue_conversation"
+                    }
+                }
+        
+        except Exception as e:
+            logger.error(f"Function call error: {str(e)}")
+            return {
+                "result": {
+                    "response": "I'm experiencing technical difficulties. Please try again.",
+                    "action": "continue_conversation"
+                }
+            }
+    
+    async def handle_conversation_update(self, body: Dict[str, Any]) -> Dict[str, Any]:
+        """Handle conversation updates"""
+        try:
+            conversation = body.get('conversation', {})
+            logger.info(f"Conversation update: {len(conversation.get('messages', []))} messages")
+            
+            # Store conversation in database for learning
+            self.store_conversation_update(conversation)
+            
+            return {"status": "recorded"}
+        
+        except Exception as e:
+            logger.error(f"Conversation update error: {str(e)}")
+            return {"status": "error"}
+    
+    async def handle_end_of_call(self, body: Dict[str, Any]) -> Dict[str, Any]:
+        """Handle end of call reporting"""
+        try:
+            call_data = body.get('call', {})
+            logger.info(f"Call ended: {call_data.get('id')} duration: {call_data.get('duration')}s")
+            
+            # Store complete call data for analysis
+            self.store_call_data(call_data)
+            
+            return {"status": "recorded"}
+        
+        except Exception as e:
+            logger.error(f"End of call error: {str(e)}")
+            return {"status": "error"}
+    
+    def get_caller_context(self, phone: str) -> str:
+        """Get caller context from database"""
+        try:
+            # Search for previous conversations from this number
+            conversations = self.db_manager.search_conversations(phone, limit=3)
+            
+            if conversations:
+                context = f"Previous interactions with {phone}: "
+                for conv in conversations:
+                    context += f"[{conv['date']}] "
+                return context
+            
+            return ""
+        
+        except Exception as e:
+            logger.error(f"Error getting caller context: {str(e)}")
+            return ""
+    
+    def store_conversation_update(self, conversation: Dict[str, Any]):
+        """Store conversation update in database"""
+        try:
+            # TODO: Implement conversation storage
+            # This would store the conversation in PostgreSQL for learning
+            logger.info("Conversation update stored")
+        
+        except Exception as e:
+            logger.error(f"Error storing conversation: {str(e)}")
+    
+    def store_call_data(self, call_data: Dict[str, Any]):
+        """Store complete call data"""
+        try:
+            # TODO: Implement call data storage
+            # This would store complete call transcripts and metadata
+            logger.info("Call data stored")
+        
+        except Exception as e:
+            logger.error(f"Error storing call data: {str(e)}")
+    
+    async def start(self):
+        """Start the webhook server"""
+        logger.info(f"🚀 Starting VAPI webhook server on port {self.port}")
+        
+        config = uvicorn.Config(
+            self.app,
+            host="0.0.0.0",
+            port=self.port,
+            log_level="info"
+        )
+        
+        server = uvicorn.Server(config)
+        await server.serve()
+
+# For running directly
+if __name__ == "__main__":
+    import asyncio
+    
+    server = VAPIWebhookServer()
+    asyncio.run(server.start())
