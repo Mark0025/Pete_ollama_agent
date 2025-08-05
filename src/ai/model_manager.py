@@ -8,7 +8,7 @@ Manages interactions with the Ollama AI model for property management responses.
 import requests
 import json
 import os
-from typing import Dict, List, Optional, Any
+from typing import Dict, List, Optional, Any, Iterable
 from pathlib import Path
 
 class ModelManager:
@@ -124,6 +124,53 @@ class ModelManager:
         
         except Exception as e:
             return f"❌ Error: {str(e)}"
+
+    def generate_stream(self, prompt: str, context: str = None, model_name: str | None = None) -> Iterable[str]:
+        """Stream tokens back from Ollama as they are generated."""
+        # Prepare prompt
+        full_prompt = self._prepare_prompt(prompt, context)
+        # Choose model
+        if model_name:
+            model_to_use = model_name
+        else:
+            model_to_use = self.custom_model_name if self.is_model_available(self.custom_model_name) else self.model_name
+
+        if not self.is_model_available(model_to_use):
+            yield "❌ AI model not available. Please download the model first."
+            return
+
+        try:
+            with requests.post(
+                f"{self.base_url}/api/generate",
+                json={
+                    "model": model_to_use,
+                    "prompt": full_prompt,
+                    "stream": True,
+                    "options": {
+                        "temperature": self.temperature,
+                        "num_predict": self.max_tokens
+                    }
+                },
+                stream=True,
+                timeout=3600  # allow long streams
+            ) as resp:
+                for line in resp.iter_lines(decode_unicode=True):
+                    if not line:
+                        continue
+                    try:
+                        data = json.loads(line)
+                        # Ollama streams incremental messages in 'response' or in data['message']['content']
+                        token = data.get('response') or (data.get('message', {}) or {}).get('content', '')
+                        if token:
+                            yield token
+                        if data.get('done'):
+                            break
+                    except json.JSONDecodeError:
+                        # If chunk is plain text, just yield it
+                        yield line
+        except Exception as e:
+            yield f"❌ Error: {str(e)}"
+            return
     
     def _prepare_prompt(self, user_prompt: str, context: str = None) -> str:
         """Prepare the full prompt with property management context"""
