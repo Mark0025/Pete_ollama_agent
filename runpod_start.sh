@@ -70,7 +70,9 @@ fi
 
 # Ensure no previous instance is running
 echo "🧹 Ensuring no prior PeteOllama server is running..."
+# Kill any python process still running the app
 pkill -f uvicorn 2>/dev/null || true
+pkill -f "src/main.py" 2>/dev/null || true
 
 echo "🏁 Starting your app..."
 python3 src/main.py
