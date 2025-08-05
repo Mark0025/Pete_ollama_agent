@@ -6,13 +6,19 @@ echo "🏠 PeteOllama V1 - AI Property Manager"
 echo "====================================="
 echo ""
 
-# Check if Docker is running
+# Ensure Docker daemon is running (compatible with RunPod)
 if ! docker info > /dev/null 2>&1; then
-    echo "❌ Docker is not running. Please start Docker Desktop."
-    exit 1
+    echo "⚠️  Docker daemon not detected – attempting to start dockerd..."
+    dockerd > /var/log/dockerd.log 2>&1 &
+    sleep 5
+    if ! docker info > /dev/null 2>&1; then
+        echo "❌ Unable to start Docker daemon. Check /var/log/dockerd.log for details."
+        exit 1
+    fi
+    echo "✅ Docker daemon started."
 fi
 
-echo "🐳 Starting all containers..."
+echo "🐳 Starting all containers with docker-compose..."
 docker-compose up -d
 
 echo ""
