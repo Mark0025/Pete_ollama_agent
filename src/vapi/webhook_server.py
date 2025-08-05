@@ -249,6 +249,72 @@ class VAPIWebhookServer:
 </body>
 </html>'''
 
+        # ---------- Admin HTML UI ----------
+        @self.app.get("/admin", response_class=HTMLResponse)
+        async def admin_ui():
+            """Minimal admin dashboard for training and testing"""
+            return '''<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>Admin – JamieAI 1.0</title>
+<style>
+body{font-family:Arial,Helvetica,sans-serif;margin:40px}
+#samples{width:100%;height:250px;border:1px solid #ccc;overflow:auto;white-space:pre;font-size:12px;padding:6px}
+#log{height:120px;border:1px solid #ccc;overflow:auto;white-space:pre;font-size:12px;padding:6px;margin-top:10px}
+button{padding:8px 16px;margin-top:10px}
+</style></head><body>
+<h1>JamieAI 1.0 – Training Dashboard</h1>
+<p>Preview training samples pulled from pete.db</p>
+<button id="refresh">Load Samples</button>
+<button id="train">Train Property-Manager Model</button>
+<div id="samples"></div>
+<h3>Training Log</h3>
+<div id="log"></div>
+<script>
+const samplesDiv=document.getElementById('samples');
+const logDiv=document.getElementById('log');
+function appendLog(txt){logDiv.innerText+=txt+'\n';logDiv.scrollTop=logDiv.scrollHeight;}
+
+document.getElementById('refresh').onclick=async()=>{
+  const res=await fetch('/admin/training-samples?limit=20');
+  const json=await res.json();
+  samplesDiv.innerText=JSON.stringify(json,null,2);
+};
+
+document.getElementById('train').onclick=async()=>{
+  appendLog('Starting training ...');
+  const resp=await fetch('/admin/train-jamie',{method:'POST'});
+  const reader=resp.body.getReader();
+  const dec=new TextDecoder();
+  while(true){const {value,done}=await reader.read();if(done)break;appendLog(dec.decode(value));}
+  appendLog('Training request finished');
+};
+</script></body></html>'''
+
+        # ---------- Admin API endpoints ----------
+        @self.app.get("/admin/training-samples")
+        async def training_samples(limit: int = 20):
+            from database.pete_db_manager import PeteDBManager
+            db = PeteDBManager()
+            samples = db.get_training_examples()[:limit]
+            return samples
+
+        @self.app.post("/admin/train-jamie", response_class=StreamingResponse)
+        async def admin_train_jamie():
+            """Run extractor then train model, stream log lines."""
+            def iter_logs():
+                yield "Extracting data...\n"
+                try:
+                    from virtual_jamie_extractor import VirtualJamieDataExtractor
+                    extractor = VirtualJamieDataExtractor()
+                    ok = extractor.run_full_extraction()
+                    yield ("Extraction success\n" if ok else "Extraction failed\n")
+                except Exception as e:
+                    yield f"Extraction error: {e}\n"
+                    return
+                yield "Training model...\n"
+                ok = self.model_manager.train_property_manager()
+                yield ("Training started\n" if ok else "Training failed\n")
+            return StreamingResponse(iter_logs(), media_type='text/plain')
+
     
     async def handle_function_call(self, body: Dict[str, Any]) -> Dict[str, Any]:
         """Handle VAPI function call"""
