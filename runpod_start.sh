@@ -14,10 +14,23 @@ if ! grep -qE "^export PATH=\"/.ollama/bin:\$PATH\"" ~/.bashrc 2>/dev/null; then
   echo 'export PATH="/.ollama/bin:$PATH"' >> ~/.bashrc
 fi
 
-echo "💡 Checking for uv..."
+echo "# ---------------------------
+# Ensure curl exists
+# ---------------------------
+if ! command -v curl >/dev/null 2>&1; then
+  echo "📦 curl not found. Installing curl..."
+  if [ "$(id -u)" = "0" ]; then
+    apt-get update -y && apt-get install -y curl
+  else
+    echo "❌ curl missing and not root – please install curl first." >&2
+    exit 1
+  fi
+fi
+
+💡 Checking for uv..."
 if ! command -v uv &> /dev/null; then
     echo "📦 uv not found. Installing uv into /.ollama/bin..."
-    curl -Ls https://astral.sh/uv/install.sh | sh -s -- --bin-dir /.ollama/bin
+    curl -Ls https://astral.sh/uv/install.sh | sh -s -- --bin-dir /.ollama/bin || pip install --break-system-packages -U uv
 else
     echo "✅ uv is already installed."
 fi
