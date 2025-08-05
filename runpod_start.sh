@@ -27,6 +27,15 @@ echo "🚀 Switching to app directory..."
 REPO_DIR="$(cd "$(dirname "$0")" && pwd)"
 cd "$REPO_DIR"
 
+# ------------------------------------------------------------------
+#  Create / activate project virtual-env using uv
+# ------------------------------------------------------------------
+if [ ! -d .venv ]; then
+  echo "📦 Creating project virtual-env with uv..."
+  uv venv .venv
+fi
+source .venv/bin/activate
+
 echo "📦 Installing dependencies with uv..."
 if [ -f requirements.txt ]; then
   uv pip install -r requirements.txt
