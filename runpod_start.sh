@@ -52,6 +52,21 @@ REPO_DIR="$(cd "$(dirname "$0")" && pwd)"
 cd "$REPO_DIR"
 
 # ------------------------------------------------------------------
+#  Write .env file for extractor (if DB vars are present)
+# ------------------------------------------------------------------
+if [ -n "${PROD_DB_USERNAME:-}" ] && [ -n "${PROD_DB_PASSWORD:-}" ] && [ -n "${PROD_DB_HOST:-}" ] && [ -n "${PROD_DB_DATABASE:-}" ]; then
+  ENV_FILE="$REPO_DIR/src/.env"
+  cat > "$ENV_FILE" <<EOF
+PROD_DB_USERNAME=${PROD_DB_USERNAME}
+PROD_DB_PASSWORD=${PROD_DB_PASSWORD}
+PROD_DB_HOST=${PROD_DB_HOST}
+PROD_DB_DATABASE=${PROD_DB_DATABASE}
+PROD_DB_DRIVER=${PROD_DB_DRIVER:-ODBC Driver 18 for SQL Server}
+EOF
+  echo "✅ Wrote DB credentials to src/.env for extractor"
+fi
+
+# ------------------------------------------------------------------
 #  Create / activate project virtual-env using uv
 # ------------------------------------------------------------------
 if [ ! -d .venv ]; then
