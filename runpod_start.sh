@@ -29,8 +29,8 @@ echo "📦 Installing dependencies with uv..."
 if [ -f requirements.txt ]; then
   uv pip install -r requirements.txt
 else
-  echo "⚠️  requirements.txt not found – falling back to pyproject.toml"
-  uv pip install --all-extras .
+  echo "⚠️  requirements.txt not found – installing project itself"
+  uv pip install .
 fi
 
 echo "🏁 Starting your app..."
