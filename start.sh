@@ -9,7 +9,7 @@ echo ""
 # Ensure Docker daemon is running (compatible with RunPod)
 if ! docker info > /dev/null 2>&1; then
     echo "⚠️  Docker daemon not detected – attempting to start dockerd..."
-    dockerd > /var/log/dockerd.log 2>&1 &
+    dockerd --data-root /workspace/docker-data > /var/log/dockerd.log 2>&1 &
     sleep 5
     if ! docker info > /dev/null 2>&1; then
         echo "❌ Unable to start Docker daemon. Check /var/log/dockerd.log for details."
