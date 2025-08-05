@@ -152,7 +152,7 @@ class VAPIWebhookServer:
     <meta charset="utf-8">
     <title>PeteOllama Chat</title>
     <style>
-        body { font-family: Arial, sans-serif; margin: 40px; }
+        body { font-family: Arial, sans-serif; margin: 40px; text-align:center; }
         #log { width: 100%; height: 400px; border: 1px solid #ccc; padding: 10px; overflow-y: auto; }
         #msg { width: 80%; padding: 10px; }
         #send { padding: 10px; }
@@ -160,7 +160,6 @@ class VAPIWebhookServer:
 </head>
 <body>
     <img src="/public/pete.png" alt="PeteOllama Logo" style="height:80px;"/>
-    <h1>PeteOllama Chat</h1>
     <h1>PeteOllama Chat</h1>
     <div id="log"></div><br/>
     <label>Model:
