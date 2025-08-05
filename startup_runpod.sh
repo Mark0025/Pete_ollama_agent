@@ -29,11 +29,14 @@ echo "✅ Docker daemon ready"
 
 # Clone or update repo
 cd /workspace
-if [ ! -d Pete_ollama_agent ]; then
+if [ -d Pete_ollama_agent/.git ]; then
+  echo "🔄 Repo exists – pulling latest..."
+  git -C Pete_ollama_agent pull --ff-only
+else
+  echo "📥 Cloning repository..."
   git clone https://github.com/Mark0025/Pete_ollama_agent.git
 fi
 cd Pete_ollama_agent
-git pull --ff-only
 
 # Ensure execution bit and launch
 chmod +x start.sh
