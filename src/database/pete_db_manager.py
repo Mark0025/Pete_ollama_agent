@@ -16,8 +16,13 @@ class PeteDBManager:
     def __init__(self, db_path: str = None):
         """Initialize database manager"""
         if db_path is None:
-            # Default to pete.db in app root
-            self.db_path = Path("/app/pete.db")
+            # Allow PETE_DB_PATH env override for flexible deployments
+            env_path = os.getenv("PETE_DB_PATH")
+            if env_path:
+                self.db_path = Path(env_path)
+            else:
+                # Default to pete.db in app root (RunPod volume mount)
+                self.db_path = Path("/app/pete.db")
         else:
             self.db_path = Path(db_path)
         
