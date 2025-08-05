@@ -71,6 +71,27 @@ class VAPIWebhookServer:
             """Return list of models available in Ollama."""
             models = self.model_manager.list_models()
             return [m.get("name") for m in models]
+
+        # ---- Persona list endpoint ----
+        @self.app.get("/personas")
+        async def personas():
+            """Return list of personas (model + icon)."""
+            models = self.model_manager.list_models()
+            persona_list = []
+            for m in models:
+                name = m.get("name")
+                if name == self.model_manager.custom_model_name:
+                    icon = "/public/pm.png"
+                else:
+                    icon = "/public/pete.png"
+                persona_list.append({"name": name, "icon": icon})
+            return persona_list
+
+        # ---- Train property-manager model ----
+        @self.app.post("/train/pm")
+        async def train_pm():
+            ok = self.model_manager.train_property_manager()
+            return {"status": "started" if ok else "failed"}
         
         @self.app.post("/vapi/webhook")
         async def vapi_webhook(request: Request):
@@ -153,12 +174,16 @@ class VAPIWebhookServer:
     <title>PeteOllama Chat</title>
     <style>
         body { font-family: Arial, sans-serif; margin: 40px; text-align:center; }
+        #personas { position: fixed; left: 10px; top: 120px; display: flex; flex-direction: column; gap: 10px; }
+        .persona-icon { width: 48px; height: 48px; border: 2px solid transparent; border-radius: 6px; cursor: pointer; }
+        .persona-icon.active { border-color: #007bff; }
         #log { width: 100%; height: 400px; border: 1px solid #ccc; padding: 10px; overflow-y: auto; }
         #msg { width: 80%; padding: 10px; }
         #send { padding: 10px; }
     </style>
 </head>
 <body>
+    <div id="personas"></div>
     <img src="/public/pete.png" alt="PeteOllama Logo" style="height:80px;"/>
     <h1>PeteOllama Chat</h1>
     <div id="log"></div><br/>
@@ -178,6 +203,23 @@ class VAPIWebhookServer:
             opt.value = name;
             opt.textContent = name;
             modelSelect.appendChild(opt);
+        });
+    });
+
+    // Populate persona icons
+    fetch('/personas').then(r=>r.json()).then(list=>{
+        const bar=document.getElementById('personas');
+        list.forEach(p=>{
+            const img=document.createElement('img');
+            img.src=p.icon; img.title=p.name; img.className='persona-icon';
+            img.onclick=()=>{
+                Array.from(document.getElementsByClassName('persona-icon')).forEach(el=>el.classList.remove('active'));
+                img.classList.add('active');
+                modelSelect.value=p.name;
+            };
+            bar.appendChild(img);
+            // set first as active default
+            if(p.name===modelSelect.value||!modelSelect.value){img.classList.add('active');}
         });
     });
 

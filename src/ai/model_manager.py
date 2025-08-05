@@ -49,6 +49,20 @@ class ModelManager:
         except Exception as e:
             print(f"Error listing models: {e}")
             return []
+
+    def train_property_manager(self) -> bool:
+        """Train or update the custom property-manager model using conversations in pete.db."""
+        try:
+            from database.pete_db_manager import PeteDBManager
+            db = PeteDBManager()
+            examples = db.get_training_examples()
+            if not examples:
+                print("No training examples found in DB")
+                return False
+            return self.create_custom_model(examples)
+        except Exception as e:
+            print(f"Error training property manager model: {e}")
+            return False
     
     def is_model_available(self, model_name: str = None) -> bool:
         """Check if specific model is available"""
