@@ -8,6 +8,7 @@ Receives voice calls and responds using the trained AI model.
 
 from fastapi import FastAPI, Request, HTTPException
 from fastapi.responses import JSONResponse, HTMLResponse, StreamingResponse
+from fastapi.staticfiles import StaticFiles
 import uvicorn
 import os
 import json
@@ -37,6 +38,10 @@ class VAPIWebhookServer:
         self.model_manager = ModelManager()
         self.db_manager = PeteDBManager()
         
+        # Serve static assets from /public for logos etc.
+        public_dir = Path(__file__).parent.parent / "public"
+        if public_dir.exists():
+            self.app.mount("/public", StaticFiles(directory=str(public_dir)), name="public")
         self.setup_routes()
     
     def setup_routes(self):
@@ -154,6 +159,8 @@ class VAPIWebhookServer:
     </style>
 </head>
 <body>
+    <img src="/public/pete.png" alt="PeteOllama Logo" style="height:80px;"/>
+    <h1>PeteOllama Chat</h1>
     <h1>PeteOllama Chat</h1>
     <div id="log"></div><br/>
     <label>Model:
