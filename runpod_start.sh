@@ -15,14 +15,25 @@ if ! grep -qE "^export PATH=\"/.ollama/bin:\$PATH\"" ~/.bashrc 2>/dev/null; then
 fi
 
 echo "# ---------------------------
-# Ensure curl exists
+# Ensure core build tools (curl, git, pip) exist on minimal images
 # ---------------------------
+missing_pkgs=""
 if ! command -v curl >/dev/null 2>&1; then
-  echo "📦 curl not found. Installing curl..."
+  missing_pkgs="$missing_pkgs curl"
+fi
+if ! command -v git >/dev/null 2>&1; then
+  missing_pkgs="$missing_pkgs git"
+fi
+# system pip is required only for the uv fallback
+if ! command -v pip >/dev/null 2>&1 && ! command -v pip3 >/dev/null 2>&1; then
+  missing_pkgs="$missing_pkgs python3-pip"
+fi
+if [ -n "$missing_pkgs" ]; then
   if [ "$(id -u)" = "0" ]; then
-    apt-get update -y && apt-get install -y curl
+    echo "📦 Installing missing packages:$missing_pkgs"
+    apt-get update -y && apt-get install -y $missing_pkgs
   else
-    echo "❌ curl missing and not root – please install curl first." >&2
+    echo "❌ Missing required tools ($missing_pkgs) and not running as root." >&2
     exit 1
   fi
 fi
