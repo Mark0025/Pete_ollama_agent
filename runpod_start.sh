@@ -14,9 +14,9 @@ if ! grep -qE "^export PATH=\"/.ollama/bin:\$PATH\"" ~/.bashrc 2>/dev/null; then
   echo 'export PATH="/.ollama/bin:$PATH"' >> ~/.bashrc
 fi
 
-echo "# ---------------------------
-# Ensure core build tools (curl, git, pip) exist on minimal images
-# ---------------------------
+echo "---------------------------"
+echo "Ensure core build tools (curl, git, pip) exist on minimal images"
+echo "---------------------------"
 missing_pkgs=""
 if ! command -v curl >/dev/null 2>&1; then
   missing_pkgs="$missing_pkgs curl"
@@ -38,7 +38,7 @@ if [ -n "$missing_pkgs" ]; then
   fi
 fi
 
-💡 Checking for uv..."
+echo "💡 Checking for uv..."
 if ! command -v uv &> /dev/null; then
     echo "📦 uv not found. Installing uv into /.ollama/bin..."
     curl -Ls https://astral.sh/uv/install.sh | sh -s -- --bin-dir /.ollama/bin || pip install --break-system-packages -U uv
