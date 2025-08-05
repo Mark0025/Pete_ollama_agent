@@ -1,0 +1,54 @@
+# ---- Python ----
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.egg-info/
+.eggs/
+
+# Virtual environments
+venv/
+.env/
+.env.*
+.venv/
+
+# ---- Jupyter / Colab ----
+.ipynb_checkpoints/
+*.ipynb
+
+# ---- Poetry / Hatch / UV ----
+*.lock
+
+# ---- Logs & Local data ----
+logs/
+*.log
+*.sqlite3
+*.db
+/data/
+/models/
+
+# ---- OS files ----
+.DS_Store
+Thumbs.db
+
+# ---- Editor folders ----
+.idea/
+.vscode/
+
+# ---- Docker ----
+# Ignore bind-mount volumes and build cache
+ollama_data/
+postgres_data/
+
+# ---- Node / front-end ----
+node_modules/
+
+# ---- Build / Dist ----
+build/
+dist/
+*.wheel
+
+# ---- Misc ----
+*.bak
+*.tmp
