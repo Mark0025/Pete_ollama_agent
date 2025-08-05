@@ -11,7 +11,7 @@ services:
       - ./src:/app/src
       - ./data:/app/data
       - ./logs:/app/logs
-      - pete_db_volume:/app/pete.db
+      - /workspace/pete.db:/app/pete.db
     ports:
       - '8000:8000' # FastAPI/webhook endpoint
       - '8080:8080' # PyQt5 GUI (if web-based)
@@ -37,7 +37,7 @@ services:
     container_name: peteollama_ollama
     pull_policy: always
     volumes:
-      - ollama_data:/root/.ollama
+      - /workspace/ollama_data:/root/.ollama
     ports:
       - '11435:11434' # External access to Ollama
     environment:
@@ -64,7 +64,7 @@ services:
     container_name: peteollama_postgres
     pull_policy: always
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - /workspace/postgres_data:/var/lib/postgresql/data
     ports:
       - '5432:5432' # External access to database
     environment:
@@ -92,8 +92,9 @@ volumes:
     name: peteollama_ollama_data
   postgres_data:
     name: peteollama_postgres_data
+  # host path for sqlite db if needed
   pete_db_volume:
-    name: peteollama_pete_db
+    driver: local
 
 networks:
   peteollama_network:
