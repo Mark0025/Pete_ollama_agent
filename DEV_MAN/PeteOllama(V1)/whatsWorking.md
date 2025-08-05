@@ -12,6 +12,7 @@ _Last updated: **$(date +%Y-%m-%d)**_
 | Auto-pull on pod boot                      | ✅ `startup_runpod.sh` performs `git pull`                 |
 | `start.sh`                                 | ✅ Executes; auto-starts `dockerd` if missing              |
 | Project files mounted under `/workspace`   | ✅ Persists between pod restarts                           |
+| Auto-clone on first boot                   | ✅ Container command clones repo if missing                |
 
 ---
 
