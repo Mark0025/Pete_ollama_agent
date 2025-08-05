@@ -23,7 +23,9 @@ else
 fi
 
 echo "🚀 Switching to app directory..."
-cd /workspace || cd "$(dirname "$0")"
+# Change to repo directory (assumes this script is at repo root)
+REPO_DIR="$(cd "$(dirname "$0")" && pwd)"
+cd "$REPO_DIR"
 
 echo "📦 Installing dependencies with uv..."
 if [ -f requirements.txt ]; then
