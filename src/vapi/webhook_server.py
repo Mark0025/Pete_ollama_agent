@@ -60,6 +60,12 @@ class VAPIWebhookServer:
                 "model_available": self.model_manager.is_available(),
                 "database_connected": self.db_manager.is_connected()
             }
+
+        @self.app.get("/models")
+        async def list_models():
+            """Return list of models available in Ollama."""
+            models = self.model_manager.list_models()
+            return [m.get("name") for m in models]
         
         @self.app.post("/vapi/webhook")
         async def vapi_webhook(request: Request):
@@ -94,17 +100,18 @@ class VAPIWebhookServer:
             try:
                 body = await request.json()
                 message = body.get('message', '')
+                model_name = body.get('model')  # optional specific model
                 
                 if not message:
                     raise HTTPException(status_code=400, detail="Message required")
                 
-                # Generate AI response
-                response = self.model_manager.generate_response(message)
+                # Generate AI response (model_name can be None)
+                response = self.model_manager.generate_response(message, model_name=model_name)
                 
                 return {
                     "user_message": message,
                     "ai_response": response,
-                    "model_used": self.model_manager.custom_model_name if self.model_manager.is_model_available(self.model_manager.custom_model_name) else self.model_manager.model_name
+                    "model_used": model_name or (self.model_manager.custom_model_name if self.model_manager.is_model_available(self.model_manager.custom_model_name) else self.model_manager.model_name)
                 }
             
             except Exception as e:
@@ -130,21 +137,36 @@ class VAPIWebhookServer:
 <body>
     <h1>PeteOllama Chat</h1>
     <div id="log"></div><br/>
+    <label>Model:
+        <select id="model"></select>
+    </label><br/><br/>
     <input id="msg" placeholder="Type a message"/>
     <button id="send">Send</button>
     <script>
     const log = document.getElementById('log');
+    const modelSelect = document.getElementById('model');
+
+    // Populate model list
+    fetch('/models').then(r => r.json()).then(list => {
+        list.forEach(name => {
+            const opt = document.createElement('option');
+            opt.value = name;
+            opt.textContent = name;
+            modelSelect.appendChild(opt);
+        });
+    });
+
     document.getElementById('send').onclick = async () => {
         const text = document.getElementById('msg').value;
         if (!text) return;
-        log.innerHTML += '<div><b>You:</b> ' + text + '</div>';
+        log.innerHTML += `<div><b>You:</b> ${text}</div>`;
         const resp = await fetch('/test/message', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({message: text})
+            body: JSON.stringify({message: text, model: modelSelect.value})
         });
         const data = await resp.json();
-        log.innerHTML += '<div><b>AI:</b> ' + (data.ai_response || 'Error') + '</div>';
+        log.innerHTML += `<div><b>AI (${data.model_used}):</b> ${data.ai_response || 'Error'}</div>`;
         document.getElementById('msg').value = '';
         log.scrollTop = log.scrollHeight;
     };

@@ -86,14 +86,17 @@ class ModelManager:
             print(f"Error pulling model {model_name}: {e}")
             return False
     
-    def generate_response(self, prompt: str, context: str = None) -> str:
+    def generate_response(self, prompt: str, context: str = None, model_name: str | None = None) -> str:
         """Generate AI response to a prompt"""
         try:
             # Prepare the full prompt with context
             full_prompt = self._prepare_prompt(prompt, context)
             
-            # Use custom model if available, otherwise base model
-            model_to_use = self.custom_model_name if self.is_model_available(self.custom_model_name) else self.model_name
+            # Determine which model to use
+            if model_name:
+                model_to_use = model_name
+            else:
+                model_to_use = self.custom_model_name if self.is_model_available(self.custom_model_name) else self.model_name
             
             if not self.is_model_available(model_to_use):
                 return "❌ AI model not available. Please download the model first."
