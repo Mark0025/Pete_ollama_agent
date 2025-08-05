@@ -7,7 +7,7 @@ Receives voice calls and responds using the trained AI model.
 """
 
 from fastapi import FastAPI, Request, HTTPException
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, HTMLResponse
 import uvicorn
 import os
 import json
@@ -110,6 +110,48 @@ class VAPIWebhookServer:
             except Exception as e:
                 logger.error(f"Test message error: {str(e)}")
                 raise HTTPException(status_code=500, detail=str(e))
+
+        # ---------- Simple HTML UI ----------
+        @self.app.get("/ui", response_class=HTMLResponse)
+        async def user_interface():
+            """Basic browser UI for manual testing"""
+            return '''<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>PeteOllama Chat</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; }
+        #log { width: 100%; height: 400px; border: 1px solid #ccc; padding: 10px; overflow-y: auto; }
+        #msg { width: 80%; padding: 10px; }
+        #send { padding: 10px; }
+    </style>
+</head>
+<body>
+    <h1>PeteOllama Chat</h1>
+    <div id="log"></div><br/>
+    <input id="msg" placeholder="Type a message"/>
+    <button id="send">Send</button>
+    <script>
+    const log = document.getElementById('log');
+    document.getElementById('send').onclick = async () => {
+        const text = document.getElementById('msg').value;
+        if (!text) return;
+        log.innerHTML += '<div><b>You:</b> ' + text + '</div>';
+        const resp = await fetch('/test/message', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({message: text})
+        });
+        const data = await resp.json();
+        log.innerHTML += '<div><b>AI:</b> ' + (data.ai_response || 'Error') + '</div>';
+        document.getElementById('msg').value = '';
+        log.scrollTop = log.scrollHeight;
+    };
+    </script>
+</body>
+</html>'''
+
     
     async def handle_function_call(self, body: Dict[str, Any]) -> Dict[str, Any]:
         """Handle VAPI function call"""
