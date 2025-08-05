@@ -16,10 +16,15 @@ class ModelManager:
     
     def __init__(self):
         """Initialize model manager"""
+        # Ollama server configuration
         self.ollama_host = os.getenv('OLLAMA_HOST', 'localhost:11434')
         self.base_url = f"http://{self.ollama_host}"
-        self.model_name = "qwen2.5:7b"
-        self.custom_model_name = "peteollama:property-manager"
+
+        # Base and fine-tuned model names can be overridden via env vars so they can be
+        # changed at deploy time without rebuilding the image.
+        # Fall back to a small quantised model that is quick to pull/start.
+        self.model_name = os.getenv('OLLAMA_BASE_MODEL', 'mistral:7b-instruct-q4_K_M')
+        self.custom_model_name = os.getenv('OLLAMA_CUSTOM_MODEL', 'peteollama:property-manager')
         
         # Model configuration
         self.temperature = 0.7
