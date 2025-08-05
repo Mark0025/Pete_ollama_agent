@@ -68,6 +68,18 @@ else
   uv pip install .
 fi
 
+echo "📦 Ensuring Ollama model qwen3:30b is present..."
+if command -v ollama >/dev/null 2>&1; then
+  if ! ollama list 2>/dev/null | grep -q "qwen3:30b"; then
+    echo "⬇️  Pulling qwen3:30b model..."
+    ollama pull qwen3:30b || echo "⚠️  Unable to pull model; Ollama service may not be running yet."
+  else
+    echo "✅ qwen3:30b already downloaded."
+  fi
+else
+  echo "⚠️  ollama CLI not found – skipping model download."
+fi
+
 # Ensure no previous instance is running
 echo "🧹 Ensuring no prior PeteOllama server is running..."
 # Kill any python process still running the app
