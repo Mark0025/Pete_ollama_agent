@@ -67,6 +67,16 @@ EOF
 fi
 
 # ------------------------------------------------------------------
+#  Load variables from .env back into the environment (for scripts)
+# ------------------------------------------------------------------
+if [ -f "$REPO_DIR/src/.env" ]; then
+  set -a  # export all sourced vars
+  source "$REPO_DIR/src/.env"
+  set +a
+  echo "✅ Loaded variables from src/.env"
+fi
+
+# ------------------------------------------------------------------
 #  Create / activate project virtual-env using uv
 # ------------------------------------------------------------------
 if [ ! -d .venv ]; then
