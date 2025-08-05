@@ -7,7 +7,7 @@ Receives voice calls and responds using the trained AI model.
 """
 
 from fastapi import FastAPI, Request, HTTPException
-from fastapi.responses import JSONResponse, HTMLResponse
+from fastapi.responses import JSONResponse, HTMLResponse, StreamingResponse
 import uvicorn
 import os
 import json
@@ -118,6 +118,25 @@ class VAPIWebhookServer:
                 logger.error(f"Test message error: {str(e)}")
                 raise HTTPException(status_code=500, detail=str(e))
 
+        # --- Streaming endpoint ---
+        @self.app.post("/test/stream")
+        async def test_stream(request: Request):
+            """Stream AI response token-by-token (chunked plain text)."""
+            try:
+                body = await request.json()
+                message = body.get('message', '')
+                model_name = body.get('model')
+                if not message:
+                    raise HTTPException(status_code=400, detail="Message required")
+
+                def token_iter():
+                    for token in self.model_manager.generate_stream(message, model_name=model_name):
+                        yield token
+                return StreamingResponse(token_iter(), media_type='text/plain')
+            except Exception as e:
+                logger.error(f"Stream message error: {str(e)}")
+                raise HTTPException(status_code=500, detail=str(e))
+
         # ---------- Simple HTML UI ----------
         @self.app.get("/ui", response_class=HTMLResponse)
         async def user_interface():
@@ -160,15 +179,23 @@ class VAPIWebhookServer:
         const text = document.getElementById('msg').value;
         if (!text) return;
         log.innerHTML += `<div><b>You:</b> ${text}</div>`;
-        const resp = await fetch('/test/message', {
+        const resp = await fetch('/test/stream', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({message: text, model: modelSelect.value})
         });
-        const data = await resp.json();
-        log.innerHTML += `<div><b>AI (${data.model_used}):</b> ${data.ai_response || 'Error'}</div>`;
+        const reader = resp.body.getReader();
+        const decoder = new TextDecoder();
+        let aiBlock = document.createElement('div');
+        aiBlock.innerHTML = `<b>AI (${modelSelect.value}):</b> `;
+        log.appendChild(aiBlock);
+        while (true) {
+            const {value, done} = await reader.read();
+            if (done) break;
+            aiBlock.innerHTML += decoder.decode(value, {stream: true});
+            log.scrollTop = log.scrollHeight;
+        }
         document.getElementById('msg').value = '';
-        log.scrollTop = log.scrollHeight;
     };
     </script>
 </body>
