@@ -161,16 +161,34 @@ else
   echo "⚠️  ollama CLI not found – skipping Ollama setup."
 fi
 
+# Create /app directory if it doesn't exist
+if [ ! -d "/app" ]; then
+  echo "📁 Creating /app directory..."
+  mkdir -p /app
+fi
+
 # Copy extracted DB to /app if present and not already there
-if [ -f "$REPO_DIR/src/pete.db" ] && [ ! -f /app/pete.db ]; then
+if [ -f "$REPO_DIR/pete.db" ] && [ ! -f /app/pete.db ]; then
   echo "📁 Copying pete.db to /app for ModelManager..."
+  cp "$REPO_DIR/pete.db" /app/pete.db || true
+elif [ -f "$REPO_DIR/src/pete.db" ] && [ ! -f /app/pete.db ]; then
+  echo "📁 Copying src/pete.db to /app for ModelManager..."
   cp "$REPO_DIR/src/pete.db" /app/pete.db || true
 fi
 
-# Generate conversation index if missing
-if [ ! -f "$REPO_DIR/langchain_indexed_conversations.json" ]; then
+# If no pete.db exists, extract data from production DB (if credentials available)
+if [ ! -f /app/pete.db ] && [ -n "${PROD_DB_USERNAME:-}" ]; then
+  echo "🔄 No pete.db found, extracting from production database..."
+  python src/virtual_jamie_extractor.py || echo "⚠️  Could not extract from production DB"
+fi
+
+# Generate conversation index if missing (only if we have a database)
+if [ ! -f "$REPO_DIR/langchain_indexed_conversations.json" ] && [ -f /app/pete.db ]; then
   echo "📊 Generating conversation index for similarity analysis..."
   python src/langchain/conversation_indexer.py || echo "⚠️  Could not generate conversation index"
+elif [ ! -f /app/pete.db ]; then
+  echo "⚠️  No pete.db found - skipping conversation index generation"
+  echo "💡 To enable full similarity analysis, provide PROD_DB_* environment variables"
 fi
 
 # Ensure no previous instance is running
