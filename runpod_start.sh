@@ -191,6 +191,109 @@ elif [ ! -f /app/pete.db ]; then
   echo "💡 To enable full similarity analysis, provide PROD_DB_* environment variables"
 fi
 
+# ------------------------------------------------------------------
+#  Auto-create Jamie models if they don't exist
+# ------------------------------------------------------------------
+echo "🤖 Checking for Jamie AI models..."
+
+# List of Jamie models that should exist
+JAMIE_MODELS=(
+  "peteollama:jamie-fixed"
+  "peteollama:jamie-voice-complete"
+  "peteollama:jamie-simple"
+)
+
+MODELS_TO_CREATE=()
+
+# Check which models are missing
+for model in "${JAMIE_MODELS[@]}"; do
+  if ! ollama list 2>/dev/null | grep -q "$model"; then
+    echo "❌ Model $model not found"
+    MODELS_TO_CREATE+=("$model")
+  else
+    echo "✅ Model $model already exists"
+  fi
+done
+
+# Create missing models if any
+if [ ${#MODELS_TO_CREATE[@]} -gt 0 ]; then
+  echo "🔧 Creating ${#MODELS_TO_CREATE[@]} missing Jamie models..."
+  
+  # Ensure we have the base model
+  if ! ollama list 2>/dev/null | grep -q "llama3:latest"; then
+    echo "📥 Pulling base model llama3:latest..."
+    ollama pull llama3:latest
+  fi
+  
+  # Create models using the enhanced trainer
+  if [ -f /app/pete.db ] && [ -f "$REPO_DIR/langchain_indexed_conversations.json" ]; then
+    echo "🎯 Using enhanced trainer with full conversation data..."
+    python enhanced_model_trainer.py --auto-create-missing || echo "⚠️  Enhanced trainer failed, using fallback method"
+  else
+    echo "🔄 Using basic model creation (no full training data)..."
+    
+    # Create basic Jamie models with simple Modelfiles
+    for model in "${MODELS_TO_CREATE[@]}"; do
+      echo "🏗️  Creating $model..."
+      
+      # Determine model type and create appropriate Modelfile
+      case "$model" in
+        "*jamie-fixed")
+          MODEL_TYPE="comprehensive"
+          MODEL_DESC="Complete Jamie model with full conversation training"
+          ;;
+        "*jamie-voice-complete")
+          MODEL_TYPE="voice"
+          MODEL_DESC="Jamie model optimized for voice interactions"
+          ;;
+        "*jamie-simple")
+          MODEL_TYPE="basic"
+          MODEL_DESC="Simple Jamie model for basic interactions"
+          ;;
+        *)
+          MODEL_TYPE="basic"
+          MODEL_DESC="Jamie property manager model"
+          ;;
+      esac
+      
+      # Create temporary Modelfile
+      cat > "/tmp/${model//[:\/]/_}_modelfile" << EOF
+FROM llama3:latest
+
+PARAMETER temperature 0.7
+PARAMETER top_p 0.9
+PARAMETER repeat_penalty 1.1
+
+SYSTEM You are Jamie, a professional property manager at Nolen Properties. You help tenants with maintenance requests, payment issues, and general inquiries. Always:
+- Acknowledge the tenant's concern with empathy
+- Provide clear, specific next steps
+- Include realistic timeline expectations
+- Maintain a professional but friendly tone
+- Offer your contact information when appropriate
+
+Examples of your responses:
+- For maintenance: "I understand this is urgent. I'm calling our contractor right now to get someone out there today. They should contact you within the next hour."
+- For payments: "I can help you with that. Let me check your account and get this resolved. I'll call you back within 30 minutes."
+- For emergencies: "This sounds like an emergency. I'm dispatching someone immediately and they'll call you within 15 minutes."
+
+TEMPLATE """{{ if .System }}{{ .System }}
+
+{{ end }}{{ if .Prompt }}{{ .Prompt }}{{ end }}"""
+EOF
+      
+      # Create the model
+      ollama create "$model" -f "/tmp/${model//[:\/]/_}_modelfile" && echo "✅ Created $model" || echo "❌ Failed to create $model"
+      
+      # Clean up temporary file
+      rm -f "/tmp/${model//[:\/]/_}_modelfile"
+    done
+  fi
+  
+  echo "🎉 Model creation complete!"
+else
+  echo "✅ All Jamie models already exist"
+fi
+
 # Ensure no previous instance is running
 echo "🧹 Ensuring no prior PeteOllama server is running..."
 # Kill any python process still running the app
