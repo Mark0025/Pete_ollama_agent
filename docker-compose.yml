@@ -1,0 +1,102 @@
+version: '3.9'
+
+services:
+  # Python Application Container (Your Source Code)
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: peteollama_app
+    volumes:
+      - ./src:/app/src
+      - ./data:/app/data
+      - ./logs:/app/logs
+      - /workspace/pete.db:/app/pete.db
+    ports:
+      - '8000:8000' # FastAPI/webhook endpoint
+      - '8080:8080' # PyQt5 GUI (if web-based)
+    environment:
+      - OLLAMA_HOST=ollama:11434
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_USER=${DB_USER:-pete}
+      - DB_PASSWORD=${DB_PASSWORD:-jonihbuyers}
+      - DB_NAME=${DB_NAME:-peteollama}
+    depends_on:
+      ollama:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - peteollama_network
+
+  # Ollama AI Model Container
+  ollama:
+    image: ollama/ollama:latest
+    container_name: peteollama_ollama
+    pull_policy: always
+    volumes:
+      - /workspace/ollama_data:/root/.ollama
+    ports:
+      - '11435:11434' # External access to Ollama
+    environment:
+      - OLLAMA_HOST=0.0.0.0
+    healthcheck:
+      test: ['CMD-SHELL', 'ollama list || exit 1']
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 10G
+        reservations:
+          memory: 6G
+    networks:
+      - peteollama_network
+
+  # PostgreSQL Database Container
+  postgres:
+    image: postgres:17
+    container_name: peteollama_postgres
+    pull_policy: always
+    volumes:
+      - /workspace/postgres_data:/var/lib/postgresql/data
+    ports:
+      - '5432:5432' # External access to database
+    environment:
+      - POSTGRES_USER=${DB_USER:-pete}
+      - POSTGRES_PASSWORD=${DB_PASSWORD:-jonihbuyers}
+      - POSTGRES_DB=${DB_NAME:-peteollama}
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ${DB_USER:-pete}']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+        reservations:
+          memory: 1G
+    networks:
+      - peteollama_network
+
+volumes:
+  ollama_data:
+    name: peteollama_ollama_data
+  postgres_data:
+    name: peteollama_postgres_data
+  # host path for sqlite db if needed
+  pete_db_volume:
+    driver: local
+
+networks:
+  peteollama_network:
+    name: peteollama_network
+    driver: bridge
