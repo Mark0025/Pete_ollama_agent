@@ -129,6 +129,9 @@ else
   uv pip install .
 fi
 
+echo "📦 Installing LangChain dependencies for full similarity analysis..."
+uv pip install langchain langchain-community sentence-transformers faiss-cpu
+
 echo "📦 Ensuring Ollama model qwen3:30b is present..."
 if command -v ollama >/dev/null 2>&1; then
   if ! ollama list 2>/dev/null | grep -q "qwen3:30b"; then
@@ -145,6 +148,12 @@ fi
 if [ -f "$REPO_DIR/src/pete.db" ] && [ ! -f /app/pete.db ]; then
   echo "📁 Copying pete.db to /app for ModelManager..."
   cp "$REPO_DIR/src/pete.db" /app/pete.db || true
+fi
+
+# Generate conversation index if missing
+if [ ! -f "$REPO_DIR/langchain_indexed_conversations.json" ]; then
+  echo "📊 Generating conversation index for similarity analysis..."
+  python src/langchain/conversation_indexer.py || echo "⚠️  Could not generate conversation index"
 fi
 
 # Ensure no previous instance is running
