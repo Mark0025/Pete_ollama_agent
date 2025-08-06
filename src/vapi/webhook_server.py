@@ -306,6 +306,17 @@ document.getElementById('train').onclick=async()=>{
                     from virtual_jamie_extractor import VirtualJamieDataExtractor
                     extractor = VirtualJamieDataExtractor()
                     ok = extractor.run_full_extraction()
+                    if ok:
+                        # move DB to /app so ModelManager can load it
+                        import shutil, os, pathlib
+                        src_db = pathlib.Path(extractor.target_db_path)
+                        dst_db = pathlib.Path("/app/pete.db")
+                        try:
+                            shutil.copy2(src_db, dst_db)
+                            yield "Copied pete.db to /app\n"
+                            os.environ["PETE_DB_PATH"] = str(dst_db)
+                        except Exception as e:
+                            yield f"Copy error: {e}\n"
                     yield ("Extraction success\n" if ok else "Extraction failed\n")
                 except Exception as e:
                     yield f"Extraction error: {e}\n"
