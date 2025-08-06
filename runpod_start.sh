@@ -65,6 +65,29 @@ REPO_DIR="$(cd "$(dirname "$0")" && pwd)"
 cd "$REPO_DIR"
 
 # ------------------------------------------------------------------
+#  Auto-update repo from GitHub (git pull)
+# ------------------------------------------------------------------
+echo "🔄 Checking for latest code updates..."
+if [ -d ".git" ]; then
+  echo "📡 Pulling latest changes from GitHub..."
+  git fetch origin main
+  
+  # Check if we're behind
+  LOCAL=$(git rev-parse HEAD)
+  REMOTE=$(git rev-parse origin/main)
+  
+  if [ "$LOCAL" != "$REMOTE" ]; then
+    echo "🆙 New changes detected, pulling updates..."
+    git reset --hard origin/main
+    echo "✅ Updated to latest version: $(git log -1 --oneline)"
+  else
+    echo "✅ Already up to date with latest version"
+  fi
+else
+  echo "⚠️  Not a git repository - skipping auto-update"
+fi
+
+# ------------------------------------------------------------------
 #  Write .env file for extractor (if DB vars are present)
 # ------------------------------------------------------------------
 if [ -n "${PROD_DB_USERNAME:-}" ] && [ -n "${PROD_DB_PASSWORD:-}" ] && [ -n "${PROD_DB_HOST:-}" ] && [ -n "${PROD_DB_DATABASE:-}" ]; then
