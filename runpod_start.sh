@@ -132,8 +132,25 @@ fi
 echo "📦 Installing LangChain dependencies for full similarity analysis..."
 uv pip install langchain langchain-community sentence-transformers faiss-cpu
 
-echo "📦 Ensuring Ollama model qwen3:30b is present..."
+echo "🚀 Starting Ollama service..."
 if command -v ollama >/dev/null 2>&1; then
+  # Check if Ollama is already running
+  if ! curl -s http://localhost:11434/api/version >/dev/null 2>&1; then
+    echo "📡 Starting Ollama service in background..."
+    ollama serve &
+    sleep 10  # Give Ollama time to start
+    
+    # Verify it started
+    if curl -s http://localhost:11434/api/version >/dev/null 2>&1; then
+      echo "✅ Ollama service started successfully"
+    else
+      echo "⚠️  Ollama service may not have started properly"
+    fi
+  else
+    echo "✅ Ollama service already running"
+  fi
+  
+  echo "📦 Ensuring Ollama model qwen3:30b is present..."
   if ! ollama list 2>/dev/null | grep -q "qwen3:30b"; then
     echo "⬇️  Pulling qwen3:30b model..."
     ollama pull qwen3:30b || echo "⚠️  Unable to pull model; Ollama service may not be running yet."
@@ -141,7 +158,7 @@ if command -v ollama >/dev/null 2>&1; then
     echo "✅ qwen3:30b already downloaded."
   fi
 else
-  echo "⚠️  ollama CLI not found – skipping model download."
+  echo "⚠️  ollama CLI not found – skipping Ollama setup."
 fi
 
 # Copy extracted DB to /app if present and not already there
