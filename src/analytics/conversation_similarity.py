@@ -18,8 +18,10 @@ try:
     from langchain.text_splitter import RecursiveCharacterTextSplitter
     from langchain.schema import Document
     LANGCHAIN_AVAILABLE = True
-except ImportError:
-    logger.warning("LangChain not available, using fallback similarity methods")
+    logger.info("✅ LangChain components loaded successfully")
+except ImportError as e:
+    logger.warning(f"LangChain not available: {e}")
+    logger.warning("Using fallback similarity methods")
     LANGCHAIN_AVAILABLE = False
 
 @dataclass
