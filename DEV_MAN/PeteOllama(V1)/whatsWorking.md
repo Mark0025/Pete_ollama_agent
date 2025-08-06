@@ -97,6 +97,40 @@ except ValidationError as e:
 | jamie-voice-complete | llama3 | 3.1s | 94.8% | 81.0% | ⚠️ Good |
 | jamie-simple | llama3 | 1.2s | 95.5% | 72.0% | ⚠️ Limited |
 | llama3:latest | llama3 | 19.7s | 100% | 22.0% | ❌ Base only |
+| qwen3:30b | qwen3 | 2.1s | 100% | 15.0% | 🔄 Comparison |
+
+### RunPod Deployment Automation
+
+**2025-08-06 Update: Complete automation with dual model support**
+
+**What's Fixed:**
+- ✅ **Git Merge Conflicts**: Force reset prevents "local changes would be overwritten" errors
+- ✅ **Dual Model Support**: Both `llama3:latest` and `qwen3:30b` available for testing
+- ✅ **Auto-Model Creation**: Jamie models created automatically if missing
+- ✅ **LangChain Dependencies**: Full installation with torch, transformers, sentence-transformers
+- ✅ **File Path Fixes**: Correct paths for pete.db and conversation index
+- ✅ **Debug Logging**: Step-by-step execution tracking
+
+**One Command Deployment:**
+```bash
+cd /root/.ollama/app/Pete_ollama_agent && ./runpod_start.sh
+```
+
+**What the script now does automatically:**
+1. 🔄 Git pull with force reset (no merge conflicts)
+2. 📦 Install all dependencies including LangChain
+3. 🚀 Start Ollama service
+4. 📥 Download both llama3:latest and qwen3:30b
+5. 📁 Copy pete.db and conversation index to /app
+6. 📊 Generate conversation index if missing
+7. 🤖 Create Jamie models if missing (peteollama:jamie-*)
+8. 🏁 Start API server with full functionality
+
+**Model Compatibility:**
+- **Jamie Models**: Use `llama3:latest` base (compatible Modelfiles)
+- **Qwen3:30b**: Available for comparison/testing (different base model)
+- **UI Access**: Both models visible in admin interface
+- **Auto-Preloading**: Smart memory management per model settings
 
 ### How it all fits together
 

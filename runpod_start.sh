@@ -78,7 +78,10 @@ if [ -d ".git" ]; then
   
   if [ "$LOCAL" != "$REMOTE" ]; then
     echo "🆙 New changes detected, pulling updates..."
-    git reset --hard origin/main
+    # Force reset to avoid merge conflicts
+    git fetch origin main
+    git reset --hard origin/main --quiet
+    git clean -fd --quiet
     echo "✅ Updated to latest version: $(git log -1 --oneline)"
   else
     echo "✅ Already up to date with latest version"
