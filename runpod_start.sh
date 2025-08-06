@@ -176,6 +176,12 @@ elif [ -f "$REPO_DIR/src/pete.db" ] && [ ! -f /app/pete.db ]; then
   cp "$REPO_DIR/src/pete.db" /app/pete.db || true
 fi
 
+# Also copy the conversation index if it exists
+if [ -f "$REPO_DIR/langchain_indexed_conversations.json" ] && [ ! -f /app/langchain_indexed_conversations.json ]; then
+  echo "📁 Copying langchain_indexed_conversations.json to /app..."
+  cp "$REPO_DIR/langchain_indexed_conversations.json" /app/langchain_indexed_conversations.json || true
+fi
+
 # If no pete.db exists, extract data from production DB (if credentials available)
 if [ ! -f /app/pete.db ] && [ -n "${PROD_DB_USERNAME:-}" ]; then
   echo "🔄 No pete.db found, extracting from production database..."
@@ -183,18 +189,21 @@ if [ ! -f /app/pete.db ] && [ -n "${PROD_DB_USERNAME:-}" ]; then
 fi
 
 # Generate conversation index if missing (only if we have a database)
-if [ ! -f "$REPO_DIR/langchain_indexed_conversations.json" ] && [ -f /app/pete.db ]; then
+if [ ! -f /app/langchain_indexed_conversations.json ] && [ -f /app/pete.db ]; then
   echo "📊 Generating conversation index for similarity analysis..."
-  python src/langchain/conversation_indexer.py || echo "⚠️  Could not generate conversation index"
+  cd "$REPO_DIR" && python src/langchain/conversation_indexer.py || echo "⚠️  Could not generate conversation index"
 elif [ ! -f /app/pete.db ]; then
   echo "⚠️  No pete.db found - skipping conversation index generation"
   echo "💡 To enable full similarity analysis, provide PROD_DB_* environment variables"
 fi
 
+echo "🔍 DEBUG: Conversation index section completed, moving to model creation..."
+
 # ------------------------------------------------------------------
 #  Auto-create Jamie models if they don't exist
 # ------------------------------------------------------------------
-echo "🤖 Checking for Jamie AI models..."
+echo "🤖 STEP 1: Checking for Jamie AI models..."
+echo "🔍 DEBUG: Starting model creation section..."
 
 # List of Jamie models that should exist
 JAMIE_MODELS=(
@@ -203,10 +212,14 @@ JAMIE_MODELS=(
   "peteollama:jamie-simple"
 )
 
+echo "📋 DEBUG: Checking ${#JAMIE_MODELS[@]} models: ${JAMIE_MODELS[*]}"
+
 MODELS_TO_CREATE=()
 
 # Check which models are missing
+echo "🔍 DEBUG: Checking existing models..."
 for model in "${JAMIE_MODELS[@]}"; do
+  echo "🔍 DEBUG: Checking model: $model"
   if ! ollama list 2>/dev/null | grep -q "$model"; then
     echo "❌ Model $model not found"
     MODELS_TO_CREATE+=("$model")
@@ -215,26 +228,41 @@ for model in "${JAMIE_MODELS[@]}"; do
   fi
 done
 
+echo "📊 DEBUG: Found ${#MODELS_TO_CREATE[@]} models to create: ${MODELS_TO_CREATE[*]}"
+
 # Create missing models if any
 if [ ${#MODELS_TO_CREATE[@]} -gt 0 ]; then
-  echo "🔧 Creating ${#MODELS_TO_CREATE[@]} missing Jamie models..."
+  echo "🔧 STEP 2: Creating ${#MODELS_TO_CREATE[@]} missing Jamie models..."
+  echo "🔍 DEBUG: Models to create: ${MODELS_TO_CREATE[*]}"
   
   # Ensure we have the base model
+  echo "🔍 DEBUG: Checking for base model llama3:latest..."
   if ! ollama list 2>/dev/null | grep -q "llama3:latest"; then
     echo "📥 Pulling base model llama3:latest..."
-    ollama pull llama3:latest
+    ollama pull llama3:latest || echo "❌ ERROR: Failed to pull llama3:latest"
+  else
+    echo "✅ Base model llama3:latest already exists"
   fi
   
   # Create models using the enhanced trainer
-  if [ -f /app/pete.db ] && [ -f "$REPO_DIR/langchain_indexed_conversations.json" ]; then
-    echo "🎯 Using enhanced trainer with full conversation data..."
-    python enhanced_model_trainer.py --auto-create-missing || echo "⚠️  Enhanced trainer failed, using fallback method"
+  echo "🔍 DEBUG: Checking for training data files..."
+  echo "🔍 DEBUG: /app/pete.db exists: $([ -f /app/pete.db ] && echo "YES" || echo "NO")"
+  echo "🔍 DEBUG: /app/langchain_indexed_conversations.json exists: $([ -f /app/langchain_indexed_conversations.json ] && echo "YES" || echo "NO")"
+  echo "🔍 DEBUG: $REPO_DIR/enhanced_model_trainer.py exists: $([ -f "$REPO_DIR/enhanced_model_trainer.py" ] && echo "YES" || echo "NO")"
+  
+  if [ -f /app/pete.db ] && [ -f /app/langchain_indexed_conversations.json ] && [ -f "$REPO_DIR/enhanced_model_trainer.py" ]; then
+    echo "🎯 STEP 3A: Using enhanced trainer with full conversation data..."
+    echo "🔍 DEBUG: Running enhanced_model_trainer.py --auto-create-missing"
+    cd "$REPO_DIR" && python enhanced_model_trainer.py --auto-create-missing || echo "⚠️  Enhanced trainer failed, using fallback method"
   else
-    echo "🔄 Using basic model creation (no full training data)..."
+    echo "🔄 STEP 3B: Using basic model creation (no full training data)..."
+    echo "🔍 DEBUG: Will create basic models with Modelfiles"
     
     # Create basic Jamie models with simple Modelfiles
+    echo "🔍 DEBUG: Starting basic model creation loop..."
     for model in "${MODELS_TO_CREATE[@]}"; do
-      echo "🏗️  Creating $model..."
+      echo "🏗️  STEP 4: Creating $model..."
+      echo "🔍 DEBUG: Processing model: $model"
       
       # Determine model type and create appropriate Modelfile
       case "$model" in
@@ -282,16 +310,22 @@ TEMPLATE """{{ if .System }}{{ .System }}
 EOF
       
       # Create the model
+      echo "🔍 DEBUG: Creating model with Modelfile: /tmp/${model//[:\/]/_}_modelfile"
       ollama create "$model" -f "/tmp/${model//[:\/]/_}_modelfile" && echo "✅ Created $model" || echo "❌ Failed to create $model"
       
       # Clean up temporary file
+      echo "🔍 DEBUG: Cleaning up temporary Modelfile"
       rm -f "/tmp/${model//[:\/]/_}_modelfile"
     done
   fi
   
-  echo "🎉 Model creation complete!"
+  echo "🎉 STEP 5: Model creation complete!"
+  echo "🔍 DEBUG: Final model list:"
+  ollama list 2>/dev/null | grep -E "(peteollama|llama3)" || echo "❌ No models found"
 else
-  echo "✅ All Jamie models already exist"
+  echo "✅ STEP 5: All Jamie models already exist"
+  echo "🔍 DEBUG: Current model list:"
+  ollama list 2>/dev/null | grep -E "(peteollama|llama3)" || echo "❌ No models found"
 fi
 
 # Ensure no previous instance is running
