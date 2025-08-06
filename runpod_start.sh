@@ -17,7 +17,7 @@ fi
 echo "---------------------------"
 echo "Ensure core build tools (curl, git, pip) exist on minimal images"
 echo "---------------------------"
-missing_pkgs="libodbc2 unixodbc unixodbc-dev"
+missing_pkgs="msodbcsql18 libodbc2 unixodbc unixodbc-dev"
 if ! command -v curl >/dev/null 2>&1; then
   missing_pkgs="$missing_pkgs curl"
 fi
@@ -31,6 +31,11 @@ fi
 if [ -n "$missing_pkgs" ]; then
   if [ "$(id -u)" = "0" ]; then
     echo "📦 Installing missing packages:$missing_pkgs"
+    # Add Microsoft repository for ODBC driver
+    echo "🔑 Adding Microsoft APT repo for msodbcsql18..."
+    curl -sSL https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor -o /usr/share/keyrings/microsoft.gpg
+    echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/microsoft.gpg] https://packages.microsoft.com/ubuntu/24.04/prod noble main" > /etc/apt/sources.list.d/mssql-release.list
+
     DEBIAN_FRONTEND=noninteractive apt-get update -y && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends $missing_pkgs
   else
     echo "❌ Missing required tools ($missing_pkgs) and not running as root." >&2
