@@ -17,7 +17,7 @@ fi
 echo "---------------------------"
 echo "Ensure core build tools (curl, git, pip) exist on minimal images"
 echo "---------------------------"
-missing_pkgs=""
+missing_pkgs="libodbc1 unixodbc-dev"
 if ! command -v curl >/dev/null 2>&1; then
   missing_pkgs="$missing_pkgs curl"
 fi
@@ -31,7 +31,7 @@ fi
 if [ -n "$missing_pkgs" ]; then
   if [ "$(id -u)" = "0" ]; then
     echo "📦 Installing missing packages:$missing_pkgs"
-    apt-get update -y && apt-get install -y $missing_pkgs
+    apt-get update -y && ACCEPT_EULA=Y apt-get install -y $missing_pkgs
   else
     echo "❌ Missing required tools ($missing_pkgs) and not running as root." >&2
     exit 1
