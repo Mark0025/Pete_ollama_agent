@@ -15,8 +15,16 @@ if ! grep -qE "^export PATH=\"/.ollama/bin:\$PATH\"" ~/.bashrc 2>/dev/null; then
 fi
 
 echo "---------------------------"
-echo "Ensure core build tools (curl, git, pip) exist on minimal images"
+echo "Ensure core build tools (curl, git, gpg, pip) exist on minimal images"
 echo "---------------------------"
+# Install curl git gpg python3-pip early because we need them for repo setup
+for basepkg in curl git gpg python3-pip; do
+  if ! command -v "$basepkg" >/dev/null 2>&1; then
+    echo "📦 Installing $basepkg ...";
+    DEBIAN_FRONTEND=noninteractive apt-get update -y && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends "$basepkg"
+  fi
+done
 missing_pkgs="msodbcsql18 libodbc2 unixodbc unixodbc-dev"
 if ! command -v curl >/dev/null 2>&1; then
   missing_pkgs="$missing_pkgs curl"
@@ -108,6 +116,12 @@ if command -v ollama >/dev/null 2>&1; then
   fi
 else
   echo "⚠️  ollama CLI not found – skipping model download."
+fi
+
+# Copy extracted DB to /app if present and not already there
+if [ -f "$REPO_DIR/src/pete.db" ] && [ ! -f /app/pete.db ]; then
+  echo "📁 Copying pete.db to /app for ModelManager..."
+  cp "$REPO_DIR/src/pete.db" /app/pete.db || true
 fi
 
 # Ensure no previous instance is running
