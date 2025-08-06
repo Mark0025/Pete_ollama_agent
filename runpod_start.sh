@@ -130,7 +130,7 @@ else
 fi
 
 echo "📦 Installing LangChain dependencies for full similarity analysis..."
-uv pip install langchain langchain-community sentence-transformers faiss-cpu
+uv pip install langchain langchain-community sentence-transformers faiss-cpu torch transformers
 
 echo "🚀 Starting Ollama service..."
 if command -v ollama >/dev/null 2>&1; then
@@ -150,10 +150,20 @@ if command -v ollama >/dev/null 2>&1; then
     echo "✅ Ollama service already running"
   fi
   
-  echo "📦 Ensuring Ollama model qwen3:30b is present..."
+  echo "📦 Ensuring base models are present..."
+  
+  # Ensure llama3:latest is available (for Jamie models)
+  if ! ollama list 2>/dev/null | grep -q "llama3:latest"; then
+    echo "⬇️  Pulling llama3:latest model..."
+    ollama pull llama3:latest || echo "⚠️  Unable to pull llama3:latest"
+  else
+    echo "✅ llama3:latest already downloaded."
+  fi
+  
+  # Ensure qwen3:30b is available (for comparison/testing)
   if ! ollama list 2>/dev/null | grep -q "qwen3:30b"; then
     echo "⬇️  Pulling qwen3:30b model..."
-    ollama pull qwen3:30b || echo "⚠️  Unable to pull model; Ollama service may not be running yet."
+    ollama pull qwen3:30b || echo "⚠️  Unable to pull qwen3:30b"
   else
     echo "✅ qwen3:30b already downloaded."
   fi
