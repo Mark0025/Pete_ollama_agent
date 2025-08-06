@@ -13,16 +13,27 @@ import re
 
 # Try to import LangChain components (graceful fallback if not available)
 try:
-    from langchain.embeddings import HuggingFaceEmbeddings
-    from langchain.vectorstores import FAISS
+    # Try the new LangChain structure first
+    from langchain_community.embeddings import HuggingFaceEmbeddings
+    from langchain_community.vectorstores import FAISS
     from langchain.text_splitter import RecursiveCharacterTextSplitter
     from langchain.schema import Document
     LANGCHAIN_AVAILABLE = True
-    logger.info("✅ LangChain components loaded successfully")
-except ImportError as e:
-    logger.warning(f"LangChain not available: {e}")
-    logger.warning("Using fallback similarity methods")
-    LANGCHAIN_AVAILABLE = False
+    logger.info("✅ LangChain components loaded successfully (new structure)")
+except ImportError as e1:
+    try:
+        # Fallback to old structure
+        from langchain.embeddings import HuggingFaceEmbeddings
+        from langchain.vectorstores import FAISS
+        from langchain.text_splitter import RecursiveCharacterTextSplitter
+        from langchain.schema import Document
+        LANGCHAIN_AVAILABLE = True
+        logger.info("✅ LangChain components loaded successfully (legacy structure)")
+    except ImportError as e2:
+        logger.warning(f"LangChain not available: {e1}")
+        logger.warning(f"Legacy import also failed: {e2}")
+        logger.warning("Using fallback similarity methods")
+        LANGCHAIN_AVAILABLE = False
 
 @dataclass
 class ConversationSample:
