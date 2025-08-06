@@ -54,6 +54,17 @@
       "base_model": "llama3:latest",
       "created_at": "2025-08-06T15:43:41.809581",
       "last_updated": "2025-08-06T15:44:50.704830"
+    },
+    "qwen3:30b": {
+      "name": "qwen3:30b",
+      "display_name": "Qwen 3 (30B)",
+      "description": "Qwen 3 30B model for comparison and testing",
+      "show_in_ui": true,
+      "auto_preload": false,
+      "is_jamie_model": false,
+      "base_model": "qwen3",
+      "created_at": "2025-08-06T18:30:00.000000",
+      "last_updated": "2025-08-06T18:30:00.000000"
     }
   },
   "last_updated": "2025-08-06T15:44:50.705032"
