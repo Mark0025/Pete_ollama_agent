@@ -42,7 +42,7 @@ class SimilarityResult:
 class ConversationSimilarityAnalyzer:
     """Analyzes conversation similarity using embeddings and semantic search."""
     
-    def __init__(self, indexed_conversations_path: str = "/Users/markcarpenter/Desktop/pete/ollama_agent/langchain_indexed_conversations.json"):
+    def __init__(self, indexed_conversations_path: str = "/app/langchain_indexed_conversations.json"):
         self.indexed_conversations_path = indexed_conversations_path
         self.conversation_samples: List[ConversationSample] = []
         self.embeddings = None
