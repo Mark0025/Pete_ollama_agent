@@ -36,7 +36,7 @@ if [ -n "$missing_pkgs" ]; then
     curl -sSL https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor -o /usr/share/keyrings/microsoft.gpg
     echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/microsoft.gpg] https://packages.microsoft.com/ubuntu/24.04/prod noble main" > /etc/apt/sources.list.d/mssql-release.list
 
-    DEBIAN_FRONTEND=noninteractive apt-get update -y && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends $missing_pkgs
+    DEBIAN_FRONTEND=noninteractive apt-get update -y && ACCEPT_EULA=Y DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends $missing_pkgs
   else
     echo "❌ Missing required tools ($missing_pkgs) and not running as root." >&2
     exit 1
