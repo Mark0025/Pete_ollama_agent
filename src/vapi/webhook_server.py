@@ -1890,6 +1890,25 @@ input[type="number"], input[type="text"], select{padding:8px;margin:5px;border:1
 </div>
 
 <div class="section">
+<h3>🗑️ Model Management</h3>
+<p>View and delete models from the system</p>
+<button onclick="loadAllModels()">🔄 Load All Models</button>
+<div id="allModelsTable" style="display:none;margin-top:15px;">
+<table style="width:100%;border-collapse:collapse;">
+<thead>
+<tr style="background:#f0f0f0;">
+<th style="padding:8px;border:1px solid #ddd;text-align:left;">Model Name</th>
+<th style="padding:8px;border:1px solid #ddd;text-align:center;">Size</th>
+<th style="padding:8px;border:1px solid #ddd;text-align:center;">Type</th>
+<th style="padding:8px;border:1px solid #ddd;text-align:center;">Actions</th>
+</tr>
+</thead>
+<tbody id="allModelsRows"></tbody>
+</table>
+</div>
+</div>
+
+<div class="section">
 <h3>📋 Current Modelfile</h3>
 <p>View the active Jamie modelfile in markdown format</p>
 <label>Select Model:
@@ -2049,6 +2068,9 @@ function buildModelTable() {
                 </button><br>
                 <button onclick="togglePreload('${model.name}')" style="font-size:12px;margin:2px;">
                     ${model.auto_preload ? 'Disable Preload' : 'Enable Preload'}
+                </button><br>
+                <button onclick="deleteModel('${model.name}')" style="font-size:12px;margin:2px;background:#dc3545;color:white;">
+                    🗑️ Delete Model
                 </button>
             </td>
         `;
@@ -2104,6 +2126,75 @@ async function togglePreload(modelName) {
             alert(result.message);
         } else {
             alert('Error: ' + result.error);
+        }
+    } catch (e) {
+        alert('Network error: ' + e.message);
+    }
+}
+
+async function loadAllModels() {
+    try {
+        const response = await fetch('/admin/api/models');
+        const result = await response.json();
+        
+        if (result.models) {
+            const tbody = document.getElementById('allModelsRows');
+            tbody.innerHTML = '';
+            
+            result.models.forEach(model => {
+                const row = document.createElement('tr');
+                const modelType = model.is_jamie_model ? '🤖 Jamie' : '🔧 Base';
+                
+                row.innerHTML = `
+                    <td style="padding:8px;border:1px solid #ddd;">
+                        <strong>${model.name}</strong>
+                    </td>
+                    <td style="padding:8px;border:1px solid #ddd;text-align:center;">
+                        ${model.size}
+                    </td>
+                    <td style="padding:8px;border:1px solid #ddd;text-align:center;">
+                        ${modelType}
+                    </td>
+                    <td style="padding:8px;border:1px solid #ddd;text-align:center;">
+                        <button onclick="deleteModel('${model.name}')" style="font-size:12px;background:#dc3545;color:white;">
+                            🗑️ Delete
+                        </button>
+                    </td>
+                `;
+                
+                tbody.appendChild(row);
+            });
+            
+            document.getElementById('allModelsTable').style.display = 'block';
+        } else {
+            alert('Error loading models: ' + result.error);
+        }
+    } catch (e) {
+        alert('Network error: ' + e.message);
+    }
+}
+
+async function deleteModel(modelName) {
+    if (!confirm(`Are you sure you want to delete the model "${modelName}"? This action cannot be undone and will free up storage space.`)) {
+        return;
+    }
+    
+    try {
+        const response = await fetch(`/admin/api/models/${encodeURIComponent(modelName)}`, {
+            method: 'DELETE',
+            headers: {'Content-Type': 'application/json'}
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            alert(`✅ Model "${modelName}" deleted successfully!`);
+            // Reload model settings to reflect changes
+            document.getElementById('loadModelSettings').click();
+            // Reload all models table
+            loadAllModels();
+        } else {
+            alert('❌ Error deleting model: ' + result.error);
         }
     } catch (e) {
         alert('Network error: ' + e.message);
@@ -2668,6 +2759,100 @@ function loadHistoricalData() {
                         "models_tested": []
                     }
                 }
+
+        @self.app.get("/admin/api/models")
+        async def api_models():
+            """API endpoint for model management"""
+            try:
+                # Get available models from Ollama
+                models = []
+                try:
+                    result = subprocess.run(['ollama', 'list'], capture_output=True, text=True)
+                    if result.returncode == 0:
+                        lines = result.stdout.strip().split('\n')[1:]  # Skip header
+                        for line in lines:
+                            if line.strip():
+                                parts = line.split()
+                                if len(parts) >= 2:
+                                    model_name = parts[0]
+                                    size = parts[1] if len(parts) > 1 else "Unknown"
+                                    models.append({
+                                        "name": model_name,
+                                        "size": size,
+                                        "is_jamie_model": "jamie" in model_name.lower() or "peteollama" in model_name.lower()
+                                    })
+                except Exception as e:
+                    logger.error(f"Error getting models: {e}")
+                
+                # Get model settings
+                model_settings = ModelSettings()
+                all_models = model_settings.get_all_models()
+                
+                return {
+                    "models": models,
+                    "settings": all_models,
+                    "current_model": self.model_manager.model_name
+                }
+            except Exception as e:
+                logger.error(f"Error in models API: {e}")
+                return {"error": str(e)}
+        
+        @self.app.delete("/admin/api/models/{model_name}")
+        async def delete_model(model_name: str):
+            """API endpoint to delete a model"""
+            try:
+                # URL decode the model name
+                import urllib.parse
+                decoded_model_name = urllib.parse.unquote(model_name)
+                
+                logger.info(f"Attempting to delete model: {decoded_model_name}")
+                
+                # Check if model exists
+                result = subprocess.run(['ollama', 'list'], capture_output=True, text=True)
+                if result.returncode == 0:
+                    models = result.stdout.strip().split('\n')[1:]  # Skip header
+                    model_names = [line.split()[0] for line in models if line.strip()]
+                    
+                    if decoded_model_name not in model_names:
+                        return {"error": f"Model '{decoded_model_name}' not found"}
+                
+                # Delete the model
+                delete_result = subprocess.run(['ollama', 'rm', decoded_model_name], capture_output=True, text=True)
+                
+                if delete_result.returncode == 0:
+                    logger.info(f"Successfully deleted model: {decoded_model_name}")
+                    
+                    # If this was the current model, switch to a fallback
+                    if decoded_model_name == self.model_manager.model_name:
+                        # Find another available model
+                        available_models = []
+                        for line in models:
+                            if line.strip():
+                                available_model = line.split()[0]
+                                if available_model != decoded_model_name:
+                                    available_models.append(available_model)
+                        
+                        if available_models:
+                            # Switch to the first available model
+                            fallback_model = available_models[0]
+                            self.model_manager.switch_model(fallback_model)
+                            logger.info(f"Switched to fallback model: {fallback_model}")
+                        else:
+                            logger.warning("No fallback models available")
+                    
+                    return {
+                        "success": True,
+                        "message": f"Model '{decoded_model_name}' deleted successfully",
+                        "deleted_model": decoded_model_name
+                    }
+                else:
+                    error_msg = delete_result.stderr.strip() if delete_result.stderr else "Unknown error"
+                    logger.error(f"Failed to delete model {decoded_model_name}: {error_msg}")
+                    return {"error": f"Failed to delete model: {error_msg}"}
+                    
+            except Exception as e:
+                logger.error(f"Error deleting model {model_name}: {e}")
+                return {"error": str(e)}
 
         @self.app.get("/admin/stats", response_class=HTMLResponse)
         async def admin_stats():
