@@ -2422,7 +2422,8 @@ function loadHistoricalData() {
                 from analytics.benchmark_analyzer import BenchmarkAnalyzer
                 
                 analyzer = BenchmarkAnalyzer()
-                df = analyzer.load_benchmark_data()
+                # Load all available benchmark data instead of just today's
+                df = analyzer.load_all_benchmark_data()
                 
                 if df.empty:
                     return {

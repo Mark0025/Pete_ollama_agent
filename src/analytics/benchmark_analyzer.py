@@ -39,7 +39,15 @@ class BenchmarkAnalyzer:
         logger.info("Loading benchmark data for analysis")
         
         if date is None:
-            date = pendulum.now().format("YYYY-MM-DD")
+            # Try to find the most recent benchmark file
+            benchmark_files = list(self.logs_dir.glob("benchmark_*.jsonl"))
+            if benchmark_files:
+                # Sort by modification time and get the most recent
+                most_recent = max(benchmark_files, key=lambda x: x.stat().st_mtime)
+                date = most_recent.stem.replace("benchmark_", "")
+                logger.info(f"Loading most recent benchmark data from {date}")
+            else:
+                date = pendulum.now().format("YYYY-MM-DD")
         
         log_file = self.logs_dir / f"benchmark_{date}.jsonl"
         
@@ -72,6 +80,48 @@ class BenchmarkAnalyzer:
         df = self._flatten_dataframe(df)
         
         logger.info(f"Loaded {len(df)} benchmark records for {date}")
+        return df
+    
+    def load_all_benchmark_data(self) -> pd.DataFrame:
+        """Load all available benchmark data from all files"""
+        logger.info("Loading all benchmark data for analysis")
+        
+        all_records = []
+        benchmark_files = list(self.logs_dir.glob("benchmark_*.jsonl"))
+        
+        if not benchmark_files:
+            logger.warning("No benchmark files found")
+            return pd.DataFrame()
+        
+        for log_file in sorted(benchmark_files):
+            try:
+                with open(log_file, 'r', encoding='utf-8') as f:
+                    for line_num, line in enumerate(f, 1):
+                        try:
+                            data = json.loads(line.strip())
+                            # Validate with Pydantic
+                            record = BenchmarkRecord(**data)
+                            all_records.append(record.dict())
+                        except Exception as e:
+                            logger.warning(f"Skipping invalid record in {log_file.name} line {line_num}: {e}")
+                            continue
+            except Exception as e:
+                logger.error(f"Error reading {log_file.name}: {e}")
+                continue
+        
+        if not all_records:
+            logger.warning("No valid benchmark records found in any files")
+            return pd.DataFrame()
+        
+        df = pd.DataFrame(all_records)
+        
+        # Convert timestamp to proper datetime
+        df['timestamp'] = pd.to_datetime(df['timestamp'])
+        
+        # Flatten nested structures for easier analysis
+        df = self._flatten_dataframe(df)
+        
+        logger.info(f"Loaded {len(df)} total benchmark records from {len(benchmark_files)} files")
         return df
     
     def _flatten_dataframe(self, df: pd.DataFrame) -> pd.DataFrame:
