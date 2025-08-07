@@ -1,11 +1,23 @@
 {
+  "default_model": "peteollama:property-manager-enhanced-20250807_133817",
   "models": {
-    "peteollama:property-manager-enhanced-20250807_133318": {
-      "name": "peteollama:property-manager-enhanced-20250807_133318",
+    "peteollama:property-manager-enhanced-20250807_133817": {
+      "name": "peteollama:property-manager-enhanced-20250807_133817",
       "display_name": "Jamie Enhanced (Latest)",
       "description": "Latest enhanced property management model trained on real conversations",
       "show_in_ui": true,
       "auto_preload": true,
+      "is_jamie_model": true,
+      "base_model": "llama3:latest",
+      "created_at": "2025-08-07T13:38:17.000000",
+      "last_updated": "2025-08-07T13:38:17.000000"
+    },
+    "peteollama:property-manager-enhanced-20250807_133318": {
+      "name": "peteollama:property-manager-enhanced-20250807_133318",
+      "display_name": "Jamie Enhanced (v2)",
+      "description": "Enhanced property management model with conversation training",
+      "show_in_ui": true,
+      "auto_preload": false,
       "is_jamie_model": true,
       "base_model": "llama3:latest",
       "created_at": "2025-08-07T13:33:18.000000",
@@ -13,7 +25,7 @@
     },
     "peteollama:property-manager-enhanced-20250807_002249": {
       "name": "peteollama:property-manager-enhanced-20250807_002249",
-      "display_name": "Jamie Enhanced (v2)",
+      "display_name": "Jamie Enhanced (v3)",
       "description": "Enhanced property management model with conversation training",
       "show_in_ui": true,
       "auto_preload": false,
@@ -21,17 +33,6 @@
       "base_model": "llama3:latest",
       "created_at": "2025-08-07T00:22:49.000000",
       "last_updated": "2025-08-07T00:22:49.000000"
-    },
-    "peteollama:property-manager-enhanced-20250807_002148": {
-      "name": "peteollama:property-manager-enhanced-20250807_002148",
-      "display_name": "Jamie Enhanced (v3)",
-      "description": "Enhanced property management model with conversation training",
-      "show_in_ui": true,
-      "auto_preload": false,
-      "is_jamie_model": true,
-      "base_model": "llama3:latest",
-      "created_at": "2025-08-07T00:21:48.000000",
-      "last_updated": "2025-08-07T00:21:48.000000"
     },
     "peteollama:jamie-fixed": {
       "name": "peteollama:jamie-fixed",
@@ -100,5 +101,5 @@
       "last_updated": "2025-08-07T00:10:00.000000"
     }
   },
-  "last_updated": "2025-08-07T13:33:18.000000"
+  "last_updated": "2025-08-07T13:38:17.000000"
 }

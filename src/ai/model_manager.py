@@ -20,16 +20,31 @@ class ModelManager:
         self.ollama_host = os.getenv('OLLAMA_HOST', 'localhost:11434')
         self.base_url = f"http://{self.ollama_host}"
 
+        # Load model settings
+        self.settings_file = Path("config/model_settings.json")
+        self.default_model = self._load_default_model()
+        
         # Base and fine-tuned model names can be overridden via env vars so they can be
         # changed at deploy time without rebuilding the image.
         # Fall back to a small quantised model that is quick to pull/start.
         self.model_name = os.getenv('OLLAMA_BASE_MODEL', 'mistral:7b-instruct-q4_K_M')
-        self.custom_model_name = os.getenv('OLLAMA_CUSTOM_MODEL', 'peteollama:property-manager')
+        self.custom_model_name = os.getenv('OLLAMA_CUSTOM_MODEL', self.default_model or 'peteollama:property-manager')
         
         # Model configuration
         self.temperature = 0.7
         self.max_tokens = 2048
         self.context_window = 128000
+    
+    def _load_default_model(self) -> Optional[str]:
+        """Load the default model from settings file"""
+        try:
+            if self.settings_file.exists():
+                with open(self.settings_file, 'r') as f:
+                    data = json.load(f)
+                    return data.get('default_model')
+        except Exception as e:
+            print(f"Error loading default model from settings: {e}")
+        return None
     
     def is_available(self) -> bool:
         """Check if Ollama service is available"""
@@ -70,7 +85,7 @@ class ModelManager:
     def is_model_available(self, model_name: str = None) -> bool:
         """Check if specific model is available"""
         if model_name is None:
-            model_name = self.model_name
+            model_name = self.custom_model_name
         
         models = self.list_models()
         model_names = [model['name'] for model in models]
@@ -79,7 +94,7 @@ class ModelManager:
     def pull_model(self, model_name: str = None) -> bool:
         """Download/pull a model"""
         if model_name is None:
-            model_name = self.model_name
+            model_name = self.custom_model_name
         
         try:
             response = requests.post(
