@@ -124,6 +124,55 @@ class BenchmarkAnalyzer:
         logger.info(f"Loaded {len(df)} total benchmark records from {len(benchmark_files)} files")
         return df
     
+    def load_benchmark_data_for_range(self, days: int = 7) -> pd.DataFrame:
+        """Load benchmark data for the last N days"""
+        logger.info(f"Loading benchmark data for last {days} days")
+        
+        all_records = []
+        end_date = pendulum.now()
+        start_date = end_date.subtract(days=days)
+        
+        # Generate list of dates to check
+        current_date = start_date
+        while current_date <= end_date:
+            date_str = current_date.format("YYYY-MM-DD")
+            log_file = self.logs_dir / f"benchmark_{date_str}.jsonl"
+            
+            if log_file.exists():
+                try:
+                    with open(log_file, 'r', encoding='utf-8') as f:
+                        for line_num, line in enumerate(f, 1):
+                            try:
+                                data = json.loads(line.strip())
+                                # Validate with Pydantic
+                                record = BenchmarkRecord(**data)
+                                all_records.append(record.dict())
+                            except Exception as e:
+                                logger.warning(f"Skipping invalid record in {log_file.name} line {line_num}: {e}")
+                                continue
+                except Exception as e:
+                    logger.error(f"Error reading {log_file.name}: {e}")
+            
+            current_date = current_date.add(days=1)
+        
+        if not all_records:
+            logger.warning(f"No valid benchmark records found for last {days} days")
+            return pd.DataFrame()
+        
+        df = pd.DataFrame(all_records)
+        
+        # Convert timestamp to proper datetime
+        df['timestamp'] = pd.to_datetime(df['timestamp'])
+        
+        # Filter by date range
+        df = df[(df['timestamp'] >= start_date) & (df['timestamp'] <= end_date)]
+        
+        # Flatten nested structures for easier analysis
+        df = self._flatten_dataframe(df)
+        
+        logger.info(f"Loaded {len(df)} benchmark records for last {days} days")
+        return df
+    
     def _flatten_dataframe(self, df: pd.DataFrame) -> pd.DataFrame:
         """Flatten nested performance and quality metrics"""
         if df.empty:
