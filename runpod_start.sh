@@ -222,89 +222,59 @@ fi
 echo "🔍 DEBUG: Conversation index section completed, moving to model creation..."
 
 # ------------------------------------------------------------------
-#  Auto-create Jamie models if they don't exist
+#  Smart Model Versioning - Only create new models when needed
 # ------------------------------------------------------------------
-echo "🤖 STEP 1: Checking for Jamie AI models..."
-echo "🔍 DEBUG: Starting model creation section..."
+echo "🎯 STEP 1: Smart Model Versioning System"
+echo "🔍 Checking if new model version is needed..."
 
-# List of Jamie models that should exist
-JAMIE_MODELS=(
-  "peteollama:jamie-fixed"
-  "peteollama:jamie-voice-complete"
-  "peteollama:jamie-simple"
-)
+# Ensure we have the base model
+echo "🔍 Checking for base model llama3:latest..."
+if ! ollama list 2>/dev/null | grep -q "llama3:latest"; then
+  echo "📥 Pulling base model llama3:latest..."
+  ollama pull llama3:latest || echo "❌ ERROR: Failed to pull llama3:latest"
+else
+  echo "✅ Base model llama3:latest already exists"
+fi
 
-echo "📋 DEBUG: Checking ${#JAMIE_MODELS[@]} models: ${JAMIE_MODELS[*]}"
-
-MODELS_TO_CREATE=()
-
-# Check which models are missing
-echo "🔍 DEBUG: Checking existing models..."
-for model in "${JAMIE_MODELS[@]}"; do
-  echo "🔍 DEBUG: Checking model: $model"
-  if ! ollama list 2>/dev/null | grep -q "$model"; then
-    echo "❌ Model $model not found"
-    MODELS_TO_CREATE+=("$model")
-  else
-    echo "✅ Model $model already exists"
-  fi
-done
-
-echo "📊 DEBUG: Found ${#MODELS_TO_CREATE[@]} models to create: ${MODELS_TO_CREATE[*]}"
-
-# Create missing models if any
-if [ ${#MODELS_TO_CREATE[@]} -gt 0 ]; then
-  echo "🔧 STEP 2: Creating ${#MODELS_TO_CREATE[@]} missing Jamie models..."
-  echo "🔍 DEBUG: Models to create: ${MODELS_TO_CREATE[*]}"
+# Check if we have training data and smart versioner
+if [ -f /app/pete.db ] && [ -f "$REPO_DIR/smart_model_versioner.py" ]; then
+  echo "🎯 STEP 2: Using Smart Model Versioner..."
+  echo "🔍 Checking for improvements and versioning..."
   
-  # Ensure we have the base model
-  echo "🔍 DEBUG: Checking for base model llama3:latest..."
-  if ! ollama list 2>/dev/null | grep -q "llama3:latest"; then
-    echo "📥 Pulling base model llama3:latest..."
-    ollama pull llama3:latest || echo "❌ ERROR: Failed to pull llama3:latest"
-  else
-    echo "✅ Base model llama3:latest already exists"
+  cd "$REPO_DIR" && python smart_model_versioner.py || echo "⚠️  Smart versioner failed, using fallback"
+  
+  # Check if any property manager models exist
+  if ! ollama list 2>/dev/null | grep -q "peteollama:property-manager"; then
+    echo "🔄 STEP 3: No property manager models found, creating initial version..."
+    cd "$REPO_DIR" && python smart_model_versioner.py || echo "⚠️  Initial model creation failed"
   fi
   
-  # Create models using the enhanced trainer
-  echo "🔍 DEBUG: Checking for training data files..."
-  echo "🔍 DEBUG: /app/pete.db exists: $([ -f /app/pete.db ] && echo "YES" || echo "NO")"
-  echo "🔍 DEBUG: /app/langchain_indexed_conversations.json exists: $([ -f /app/langchain_indexed_conversations.json ] && echo "YES" || echo "NO")"
-  echo "🔍 DEBUG: $REPO_DIR/enhanced_model_trainer.py exists: $([ -f "$REPO_DIR/enhanced_model_trainer.py" ] && echo "YES" || echo "NO")"
+else
+  echo "🔄 STEP 2B: Using basic model creation (no smart versioning)..."
+  echo "🔍 Creating basic Jamie models with Modelfiles"
   
-  if [ -f /app/pete.db ] && [ -f /app/langchain_indexed_conversations.json ] && [ -f "$REPO_DIR/enhanced_model_trainer.py" ]; then
-    echo "🎯 STEP 3A: Using enhanced trainer with full conversation data..."
-    echo "🔍 DEBUG: Running enhanced_model_trainer.py --auto-create-missing"
-    cd "$REPO_DIR" && python enhanced_model_trainer.py --auto-create-missing || echo "⚠️  Enhanced trainer failed, using fallback method"
-  else
-    echo "🔄 STEP 3B: Using basic model creation (no full training data)..."
-    echo "🔍 DEBUG: Will create basic models with Modelfiles"
+  # List of basic Jamie models that should exist
+  JAMIE_MODELS=(
+    "peteollama:jamie-fixed"
+    "peteollama:jamie-voice-complete"
+    "peteollama:jamie-simple"
+  )
+  
+  MODELS_TO_CREATE=()
+  
+  # Check which models are missing
+  for model in "${JAMIE_MODELS[@]}"; do
+    if ! ollama list 2>/dev/null | grep -q "$model"; then
+      MODELS_TO_CREATE+=("$model")
+    fi
+  done
+  
+  # Create missing models if any
+  if [ ${#MODELS_TO_CREATE[@]} -gt 0 ]; then
+    echo "🔧 Creating ${#MODELS_TO_CREATE[@]} missing Jamie models..."
     
-    # Create basic Jamie models with simple Modelfiles
-    echo "🔍 DEBUG: Starting basic model creation loop..."
     for model in "${MODELS_TO_CREATE[@]}"; do
-      echo "🏗️  STEP 4: Creating $model..."
-      echo "🔍 DEBUG: Processing model: $model"
-      
-      # Determine model type and create appropriate Modelfile
-      case "$model" in
-        "*jamie-fixed")
-          MODEL_TYPE="comprehensive"
-          MODEL_DESC="Complete Jamie model with full conversation training"
-          ;;
-        "*jamie-voice-complete")
-          MODEL_TYPE="voice"
-          MODEL_DESC="Jamie model optimized for voice interactions"
-          ;;
-        "*jamie-simple")
-          MODEL_TYPE="basic"
-          MODEL_DESC="Simple Jamie model for basic interactions"
-          ;;
-        *)
-          MODEL_TYPE="basic"
-          MODEL_DESC="Jamie property manager model"
-          ;;
-      esac
+      echo "🏗️  Creating $model..."
       
       # Create temporary Modelfile
       cat > "/tmp/${model//[:\/]/_}_modelfile" << EOF
@@ -332,23 +302,17 @@ TEMPLATE """{{ if .System }}{{ .System }}
 EOF
       
       # Create the model
-      echo "🔍 DEBUG: Creating model with Modelfile: /tmp/${model//[:\/]/_}_modelfile"
       ollama create "$model" -f "/tmp/${model//[:\/]/_}_modelfile" && echo "✅ Created $model" || echo "❌ Failed to create $model"
       
       # Clean up temporary file
-      echo "🔍 DEBUG: Cleaning up temporary Modelfile"
       rm -f "/tmp/${model//[:\/]/_}_modelfile"
     done
   fi
-  
-  echo "🎉 STEP 5: Model creation complete!"
-  echo "🔍 DEBUG: Final model list:"
-  ollama list 2>/dev/null | grep -E "(peteollama|llama3)" || echo "❌ No models found"
-else
-  echo "✅ STEP 5: All Jamie models already exist"
-  echo "🔍 DEBUG: Current model list:"
-  ollama list 2>/dev/null | grep -E "(peteollama|llama3)" || echo "❌ No models found"
 fi
+
+echo "🎉 STEP 3: Model versioning complete!"
+echo "🔍 Current model list:"
+ollama list 2>/dev/null | grep -E "(peteollama|llama3)" || echo "❌ No models found"
 
 # Ensure no previous instance is running
 echo "🧹 Ensuring no prior PeteOllama server is running..."
