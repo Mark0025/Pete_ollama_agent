@@ -12,6 +12,8 @@ from fastapi.staticfiles import StaticFiles
 import uvicorn
 import os
 import json
+import sqlite3
+from datetime import datetime
 from typing import Dict, Any
 from pathlib import Path
 import sys
@@ -172,11 +174,35 @@ class VAPIWebhookServer:
                 
                 # Generate AI response (model_name can be None)
                 response = self.model_manager.generate_response(message, model_name=model_name)
+                model_used = model_name or (self.model_manager.custom_model_name if self.model_manager.is_model_available(self.model_manager.custom_model_name) else self.model_manager.model_name)
+                
+                # Capture training data from this interaction
+                training_data = {
+                    'conversation_id': f"test_{datetime.now().isoformat()}",
+                    'message_index': 0,
+                    'role': 'user',
+                    'content': message,
+                    'timestamp': datetime.now().isoformat(),
+                    'model_used': model_used,
+                    'validation_passed': True,  # Will be validated by response_validator
+                    'similarity_score': 0.0  # Will be calculated by similarity analyzer
+                }
+                
+                # Store user message
+                self._store_training_data(training_data)
+                
+                # Store AI response
+                training_data.update({
+                    'role': 'assistant',
+                    'content': response,
+                    'message_index': 1
+                })
+                self._store_training_data(training_data)
                 
                 return {
                     "user_message": message,
                     "ai_response": response,
-                    "model_used": model_name or (self.model_manager.custom_model_name if self.model_manager.is_model_available(self.model_manager.custom_model_name) else self.model_manager.model_name)
+                    "model_used": model_used
                 }
             
             except Exception as e:
@@ -2847,24 +2873,115 @@ loadBenchmarkData();
             return ""
     
     def store_conversation_update(self, conversation: Dict[str, Any]):
-        """Store conversation update in database"""
+        """Store conversation update in database for training data capture"""
         try:
-            # TODO: Implement conversation storage
-            # This would store the conversation in PostgreSQL for learning
-            logger.info("Conversation update stored")
+            # Extract conversation data
+            messages = conversation.get('messages', [])
+            conversation_id = conversation.get('id', 'unknown')
+            timestamp = conversation.get('timestamp', datetime.now().isoformat())
+            
+            # Store each message for training analysis
+            for i, message in enumerate(messages):
+                role = message.get('role', 'unknown')
+                content = message.get('content', '')
+                
+                # Log conversation data for training
+                training_data = {
+                    'conversation_id': conversation_id,
+                    'message_index': i,
+                    'role': role,
+                    'content': content,
+                    'timestamp': timestamp,
+                    'model_used': conversation.get('model', 'unknown'),
+                    'validation_passed': conversation.get('validation_passed', False),
+                    'similarity_score': conversation.get('similarity_score', 0.0)
+                }
+                
+                # Store in training database
+                self._store_training_data(training_data)
+            
+            logger.info(f"💾 Stored {len(messages)} messages from conversation {conversation_id}")
         
         except Exception as e:
             logger.error(f"Error storing conversation: {str(e)}")
     
     def store_call_data(self, call_data: Dict[str, Any]):
-        """Store complete call data"""
+        """Store complete call data for analysis"""
         try:
-            # TODO: Implement call data storage
-            # This would store complete call transcripts and metadata
-            logger.info("Call data stored")
+            call_id = call_data.get('id', 'unknown')
+            duration = call_data.get('duration', 0)
+            transcript = call_data.get('transcript', '')
+            
+            # Store call metadata
+            call_metadata = {
+                'call_id': call_id,
+                'duration': duration,
+                'transcript': transcript,
+                'timestamp': datetime.now().isoformat(),
+                'model_used': call_data.get('model', 'unknown'),
+                'validation_passed': call_data.get('validation_passed', False),
+                'similarity_score': call_data.get('similarity_score', 0.0)
+            }
+            
+            # Store in training database
+            self._store_training_data(call_metadata)
+            
+            logger.info(f"💾 Stored call data: {call_id} ({duration}s)")
         
         except Exception as e:
             logger.error(f"Error storing call data: {str(e)}")
+    
+    def _store_training_data(self, data: Dict[str, Any]):
+        """Store training data in database for model improvement"""
+        try:
+            # Create training data table if it doesn't exist
+            conn = sqlite3.connect('training_data.db')
+            cursor = conn.cursor()
+            
+            cursor.execute("""
+                CREATE TABLE IF NOT EXISTS training_interactions (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    conversation_id TEXT,
+                    message_index INTEGER,
+                    role TEXT,
+                    content TEXT,
+                    timestamp TEXT,
+                    model_used TEXT,
+                    validation_passed BOOLEAN,
+                    similarity_score REAL,
+                    call_id TEXT,
+                    duration INTEGER,
+                    transcript TEXT,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                )
+            """)
+            
+            # Insert training data
+            cursor.execute("""
+                INSERT INTO training_interactions (
+                    conversation_id, message_index, role, content, timestamp,
+                    model_used, validation_passed, similarity_score,
+                    call_id, duration, transcript
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """, (
+                data.get('conversation_id'),
+                data.get('message_index'),
+                data.get('role'),
+                data.get('content'),
+                data.get('timestamp'),
+                data.get('model_used'),
+                data.get('validation_passed'),
+                data.get('similarity_score'),
+                data.get('call_id'),
+                data.get('duration'),
+                data.get('transcript')
+            ))
+            
+            conn.commit()
+            conn.close()
+            
+        except Exception as e:
+            logger.error(f"Error storing training data: {str(e)}")
     
     async def start(self):
         """Start the webhook server"""
