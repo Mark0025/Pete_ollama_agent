@@ -101,36 +101,100 @@ except ValidationError as e:
 
 ### RunPod Deployment Automation
 
-**2025-08-06 Update: Complete automation with dual model support**
+**2025-08-07 Update: LangChain v0.3 Integration Complete**
 
-**What's Fixed:**
-- ✅ **Git Merge Conflicts**: Force reset prevents "local changes would be overwritten" errors
-- ✅ **Dual Model Support**: Both `llama3:latest` and `qwen3:30b` available for testing
-- ✅ **Auto-Model Creation**: Jamie models created automatically if missing
-- ✅ **LangChain Dependencies**: Full installation with torch, transformers, sentence-transformers
-- ✅ **File Path Fixes**: Correct paths for pete.db and conversation index
-- ✅ **Debug Logging**: Step-by-step execution tracking
+**What's Working:**
+- ✅ **LangChain v0.3 Structure**: Proper imports from langchain_community, langchain_text_splitters, langchain_core
+- ✅ **Vector Store**: Successfully created with 3555 conversation documents
+- ✅ **Embeddings**: HuggingFaceEmbeddings loaded and functional
+- ✅ **Model Creation**: 6 Jamie models created automatically
+- ✅ **Conversation Data**: 913 conversations across 151 threads loaded
+- ✅ **API Server**: Running on port 8000 with full functionality
+- ✅ **Git Automation**: Force reset prevents merge conflicts
+- ✅ **Dual Model Support**: Both llama3:latest and qwen3:30b available
+
+**What Needs Fixing:**
+- ⚠️ **Deprecation Warning**: HuggingFaceEmbeddings deprecated, should use langchain-huggingface
+- ⚠️ **Model Naming**: Models created with timestamps instead of intended names
+- ⚠️ **Package Update**: Need to install langchain-huggingface for latest embeddings
+
+**Current System Architecture:**
+
+```mermaid
+graph TD
+    A[RunPod Environment] --> B[Git Auto-Update]
+    B --> C[LangChain v0.3 Installation]
+    C --> D[Model Download]
+    D --> E[llama3:latest]
+    D --> F[qwen3:30b]
+    
+    G[Database & Index] --> H[pete.db]
+    G --> I[langchain_indexed_conversations.json]
+    H --> J[3555 Conversation Samples]
+    I --> J
+    
+    J --> K[Vector Store Creation]
+    K --> L[HuggingFaceEmbeddings]
+    L --> M[FAISS Vector Store]
+    
+    N[Model Creation] --> O[Enhanced Trainer]
+    O --> P[6 Jamie Models Created]
+    P --> Q[peteollama:property-manager-enhanced-*]
+    
+    R[API Server] --> S[FastAPI on Port 8000]
+    S --> T[/ui Interface]
+    S --> U[/admin Dashboard]
+    S --> V[Response Validation]
+    
+    subgraph "Working Components ✅"
+        B
+        C
+        D
+        E
+        F
+        H
+        I
+        J
+        K
+        L
+        M
+        N
+        O
+        P
+        Q
+        R
+        S
+        T
+        U
+        V
+    end
+    
+    subgraph "Needs Fixing ⚠️"
+        W[langchain-huggingface package]
+        X[Model naming convention]
+        Y[Deprecation warnings]
+    end
+```
 
 **One Command Deployment:**
 ```bash
 cd /root/.ollama/app/Pete_ollama_agent && ./runpod_start.sh
 ```
 
-**What the script now does automatically:**
-1. 🔄 Git pull with force reset (no merge conflicts)
-2. 📦 Install all dependencies including LangChain
-3. 🚀 Start Ollama service
-4. 📥 Download both llama3:latest and qwen3:30b
-5. 📁 Copy pete.db and conversation index to /app
-6. 📊 Generate conversation index if missing
-7. 🤖 Create Jamie models if missing (peteollama:jamie-*)
-8. 🏁 Start API server with full functionality
+**Current Model Inventory:**
+- `peteollama:property-manager-enhanced-20250807_000842` (Latest)
+- `peteollama:property-manager-enhanced-20250806_235809`
+- `peteollama:property-manager-enhanced-20250806_235259`
+- `peteollama:property-manager-enhanced-20250806_235047`
+- `peteollama:property-manager-enhanced-20250806_234859`
+- `peteollama:property-manager-enhanced-20250806_233449`
+- `llama3:latest` (Base model)
 
-**Model Compatibility:**
-- **Jamie Models**: Use `llama3:latest` base (compatible Modelfiles)
-- **Qwen3:30b**: Available for comparison/testing (different base model)
-- **UI Access**: Both models visible in admin interface
-- **Auto-Preloading**: Smart memory management per model settings
+**Next Steps:**
+1. Install `langchain-huggingface` to fix deprecation warning
+2. Fix model naming to use intended names (jamie-fixed, jamie-voice-complete, etc.)
+3. Update model settings to include the new models
+4. Test similarity analysis with full LangChain functionality
 
 ### How it all fits together
 

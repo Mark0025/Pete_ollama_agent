@@ -13,8 +13,8 @@ import re
 
 # Try to import LangChain components (graceful fallback if not available)
 try:
-    # LangChain v0.3 structure (2025) - using current packages
-    from langchain_community.embeddings import HuggingFaceEmbeddings
+    # LangChain v0.3 structure (2025) - using new huggingface package
+    from langchain_huggingface import HuggingFaceEmbeddings
     from langchain_community.vectorstores import FAISS
     from langchain_text_splitters import RecursiveCharacterTextSplitter
     from langchain_core.documents import Document
