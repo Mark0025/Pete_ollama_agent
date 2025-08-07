@@ -2163,7 +2163,46 @@ button:hover{background:#0056b3}
 <h1>📊 Advanced Benchmark Analytics</h1>
 
 <div class="section">
-<h3>📈 Today's Performance Summary</h3>
+<h3>🔍 Filter Controls</h3>
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:15px;margin:15px 0;">
+    <div>
+        <label style="display:block;margin-bottom:5px;font-weight:bold;">Date Range:</label>
+        <select id="dateRange" onchange="loadBenchmarkData()" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:4px;">
+            <option value="today">Today</option>
+            <option value="yesterday">Yesterday</option>
+            <option value="last7days">Last 7 Days</option>
+            <option value="last30days">Last 30 Days</option>
+            <option value="all" selected>All Available Data</option>
+        </select>
+    </div>
+    <div>
+        <label style="display:block;margin-bottom:5px;font-weight:bold;">Model Filter:</label>
+        <select id="modelFilter" onchange="loadBenchmarkData()" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:4px;">
+            <option value="all" selected>All Models</option>
+            <option value="jamie">Jamie Models Only</option>
+            <option value="base">Base Models Only</option>
+        </select>
+    </div>
+    <div>
+        <label style="display:block;margin-bottom:5px;font-weight:bold;">Specific Model:</label>
+        <select id="specificModel" onchange="loadBenchmarkData()" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:4px;">
+            <option value="all" selected>All Models</option>
+        </select>
+    </div>
+    <div>
+        <label style="display:block;margin-bottom:5px;font-weight:bold;">Quality Threshold:</label>
+        <select id="qualityThreshold" onchange="loadBenchmarkData()" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:4px;">
+            <option value="0" selected>All Responses</option>
+            <option value="5">Quality Score ≥ 5</option>
+            <option value="7">Quality Score ≥ 7</option>
+            <option value="8">Quality Score ≥ 8</option>
+        </select>
+    </div>
+</div>
+</div>
+
+<div class="section">
+<h3>📈 Performance Summary</h3>
 <div id="summaryMetrics" class="metrics-grid">
     <div class="loading">Loading performance metrics...</div>
 </div>
@@ -2201,7 +2240,21 @@ document.addEventListener('DOMContentLoaded', function() {
 
 async function loadBenchmarkData() {
     try {
-        const response = await fetch('/admin/api/benchmarks');
+        // Get filter values
+        const dateRange = document.getElementById('dateRange').value;
+        const modelFilter = document.getElementById('modelFilter').value;
+        const specificModel = document.getElementById('specificModel').value;
+        const qualityThreshold = document.getElementById('qualityThreshold').value;
+        
+        // Build query parameters
+        const params = new URLSearchParams({
+            date_range: dateRange,
+            model_filter: modelFilter,
+            specific_model: specificModel,
+            quality_threshold: qualityThreshold
+        });
+        
+        const response = await fetch('/admin/api/benchmarks?' + params.toString());
         const data = await response.json();
         currentData = data;
         
@@ -2210,10 +2263,32 @@ async function loadBenchmarkData() {
         updateBenchmarkTable(data.recent_data);
         drawResponseTimeChart(data.recent_data);
         
+        // Update specific model dropdown with available models
+        updateModelDropdown(data.available_models || []);
+        
     } catch (error) {
         console.error('Error loading benchmark data:', error);
         document.getElementById('summaryMetrics').innerHTML = '<div style="color:red;">Error loading data: ' + error.message + '</div>';
     }
+}
+
+function updateModelDropdown(availableModels) {
+    const specificModelSelect = document.getElementById('specificModel');
+    const currentValue = specificModelSelect.value;
+    
+    // Clear existing options except "All Models"
+    specificModelSelect.innerHTML = '<option value="all" selected>All Models</option>';
+    
+    // Add available models
+    availableModels.forEach(model => {
+        const option = document.createElement('option');
+        option.value = model;
+        option.textContent = model;
+        if (model === currentValue) {
+            option.selected = true;
+        }
+        specificModelSelect.appendChild(option);
+    });
 }
 
 function updateSummaryMetrics(summary) {
@@ -2411,8 +2486,13 @@ function loadHistoricalData() {
 </body></html>'''
         
         @self.app.get("/admin/api/benchmarks")
-        async def api_benchmarks():
-            """API endpoint for benchmark analytics data"""
+        async def api_benchmarks(
+            date_range: str = "all",
+            model_filter: str = "all", 
+            specific_model: str = "all",
+            quality_threshold: float = 0.0
+        ):
+            """API endpoint for benchmark analytics data with filtering"""
             import sys
             from pathlib import Path
             
@@ -2422,8 +2502,38 @@ function loadHistoricalData() {
                 from analytics.benchmark_analyzer import BenchmarkAnalyzer
                 
                 analyzer = BenchmarkAnalyzer()
-                # Load all available benchmark data instead of just today's
-                df = analyzer.load_all_benchmark_data()
+                
+                # Load data based on date range
+                if date_range == "today":
+                    df = analyzer.load_benchmark_data()
+                elif date_range == "yesterday":
+                    yesterday = pendulum.now().subtract(days=1).format("YYYY-MM-DD")
+                    df = analyzer.load_benchmark_data(yesterday)
+                elif date_range == "last7days":
+                    df = analyzer.load_benchmark_data_for_range(days=7)
+                elif date_range == "last30days":
+                    df = analyzer.load_benchmark_data_for_range(days=30)
+                else:  # "all"
+                    df = analyzer.load_all_benchmark_data()
+                
+                # Apply filters
+                if not df.empty:
+                    # Model filter
+                    if model_filter == "jamie":
+                        df = df[df['model'].str.contains('jamie', case=False, na=False)]
+                    elif model_filter == "base":
+                        df = df[~df['model'].str.contains('jamie', case=False, na=False)]
+                    
+                    # Specific model filter
+                    if specific_model != "all":
+                        df = df[df['model'] == specific_model]
+                    
+                    # Quality threshold filter
+                    if quality_threshold > 0:
+                        df = df[df['quality_estimated_quality_score'] >= quality_threshold]
+                
+                # Get available models for dropdown
+                available_models = df['model'].unique().tolist() if not df.empty else []
                 
                 if df.empty:
                     return {
@@ -2450,7 +2560,8 @@ function loadHistoricalData() {
                 return {
                     "summary": summary.dict(),
                     "model_comparisons": [comp.dict() for comp in model_comparisons],
-                    "recent_data": recent_data
+                    "recent_data": recent_data,
+                    "available_models": available_models
                 }
                 
             except Exception as e:
@@ -2463,6 +2574,95 @@ function loadHistoricalData() {
                 }
 
         # ---------- Admin Stats Page ----------
+        @self.app.get("/admin/api/stats")
+        async def api_stats(
+            time_period: str = "all",
+            model_type: str = "all",
+            specific_model: str = "all", 
+            performance_filter: str = "all"
+        ):
+            """API endpoint for stats data with filtering"""
+            try:
+                # Get database stats
+                db_manager = PeteDBManager()
+                total_conversations = 0
+                if db_manager.is_connected():
+                    # Get conversation count from pete.db
+                    conn = db_manager.get_connection()
+                    cursor = conn.cursor()
+                    cursor.execute("SELECT COUNT(*) FROM communication_logs")
+                    total_conversations = cursor.fetchone()[0]
+                
+                # Get model stats from settings
+                jamie_models = len([m for m in model_settings.get_all_models().values() if m.is_jamie_model])
+                
+                # Get benchmark stats
+                analyzer = BenchmarkAnalyzer()
+                df = analyzer.load_all_benchmark_data()
+                
+                # Apply filters
+                if not df.empty:
+                    # Time period filter
+                    if time_period == "today":
+                        today = pendulum.now().format("YYYY-MM-DD")
+                        df = df[df['timestamp'].dt.date == pendulum.parse(today).date()]
+                    elif time_period == "yesterday":
+                        yesterday = pendulum.now().subtract(days=1).format("YYYY-MM-DD")
+                        df = df[df['timestamp'].dt.date == pendulum.parse(yesterday).date()]
+                    elif time_period == "last7days":
+                        week_ago = pendulum.now().subtract(days=7)
+                        df = df[df['timestamp'] >= week_ago]
+                    elif time_period == "last30days":
+                        month_ago = pendulum.now().subtract(days=30)
+                        df = df[df['timestamp'] >= month_ago]
+                    
+                    # Model type filter
+                    if model_type == "jamie":
+                        df = df[df['model'].str.contains('jamie', case=False, na=False)]
+                    elif model_type == "base":
+                        df = df[~df['model'].str.contains('jamie', case=False, na=False)]
+                    
+                    # Specific model filter
+                    if specific_model != "all":
+                        df = df[df['model'] == specific_model]
+                    
+                    # Performance filter
+                    if performance_filter == "fast":
+                        df = df[df['perf_total_duration_ms'] < 3000]
+                    elif performance_filter == "slow":
+                        df = df[df['perf_total_duration_ms'] > 10000]
+                    elif performance_filter == "high_quality":
+                        df = df[df['quality_estimated_quality_score'] >= 8]
+                
+                # Calculate metrics
+                avg_response_time = df['perf_total_duration_ms'].mean() / 1000 if not df.empty else 0
+                success_rate = (df['status'] == 'success').mean() * 100 if not df.empty else 0
+                
+                return {
+                    "metrics": {
+                        "total_conversations": total_conversations,
+                        "jamie_models": jamie_models,
+                        "avg_response_time": f"{avg_response_time:.1f}s",
+                        "success_rate": f"{success_rate:.1f}%",
+                        "total_requests": len(df) if not df.empty else 0,
+                        "models_tested": df['model'].unique().tolist() if not df.empty else []
+                    }
+                }
+                
+            except Exception as e:
+                logger.error(f"Error in stats API: {e}")
+                return {
+                    "error": str(e),
+                    "metrics": {
+                        "total_conversations": 0,
+                        "jamie_models": 0,
+                        "avg_response_time": "0s",
+                        "success_rate": "0%",
+                        "total_requests": 0,
+                        "models_tested": []
+                    }
+                }
+
         @self.app.get("/admin/stats", response_class=HTMLResponse)
         async def admin_stats():
             """Admin stats page with model performance analytics"""
@@ -2507,28 +2707,48 @@ button:hover{background:#0056b3}
 <h1>📊 Model Performance Analytics</h1>
 
 <div class="section">
+<h3>🔍 Filter Controls</h3>
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:15px;margin:15px 0;">
+    <div>
+        <label style="display:block;margin-bottom:5px;font-weight:bold;">Time Period:</label>
+        <select id="timePeriod" onchange="loadStatsData()" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:4px;">
+            <option value="all" selected>All Time</option>
+            <option value="today">Today</option>
+            <option value="yesterday">Yesterday</option>
+            <option value="last7days">Last 7 Days</option>
+            <option value="last30days">Last 30 Days</option>
+        </select>
+    </div>
+    <div>
+        <label style="display:block;margin-bottom:5px;font-weight:bold;">Model Type:</label>
+        <select id="modelType" onchange="loadStatsData()" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:4px;">
+            <option value="all" selected>All Models</option>
+            <option value="jamie">Jamie Models Only</option>
+            <option value="base">Base Models Only</option>
+        </select>
+    </div>
+    <div>
+        <label style="display:block;margin-bottom:5px;font-weight:bold;">Specific Model:</label>
+        <select id="specificModelStats" onchange="loadStatsData()" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:4px;">
+            <option value="all" selected>All Models</option>
+        </select>
+    </div>
+    <div>
+        <label style="display:block;margin-bottom:5px;font-weight:bold;">Performance Filter:</label>
+        <select id="performanceFilter" onchange="loadStatsData()" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:4px;">
+            <option value="all" selected>All Performance</option>
+            <option value="fast">Fast Responses (<3s)</option>
+            <option value="slow">Slow Responses (>10s)</option>
+            <option value="high_quality">High Quality (≥8/10)</option>
+        </select>
+    </div>
+</div>
+</div>
+
+<div class="section">
 <h3>📈 Overall Performance Metrics</h3>
-<div class="stats-grid">
-    <div class="stat-card">
-        <div class="stat-value">1,469</div>
-        <div class="stat-label">Training Conversations</div>
-        <div class="stat-sublabel">From pete.db</div>
-    </div>
-    <div class="stat-card">
-        <div class="stat-value">4</div>
-        <div class="stat-label">Jamie Models</div>
-        <div class="stat-sublabel">Active variants</div>
-    </div>
-    <div class="stat-card">
-        <div class="stat-value">2.3s</div>
-        <div class="stat-label">Avg Response Time</div>
-        <div class="stat-sublabel">Last 24 hours</div>
-    </div>
-    <div class="stat-card">
-        <div class="stat-value">94.7%</div>
-        <div class="stat-label">Success Rate</div>
-        <div class="stat-sublabel">Non-timeout responses</div>
-    </div>
+<div id="statsMetrics" class="stats-grid">
+    <div class="loading">Loading performance metrics...</div>
 </div>
 </div>
 
@@ -2591,99 +2811,89 @@ button:hover{background:#0056b3}
 </div>
 
 <script>
-function refreshStats(){
-    document.getElementById('lastUpdate').textContent = new Date().toLocaleString();
-    // In real implementation, this would fetch fresh stats from API
-}
+// Load initial data
+document.addEventListener('DOMContentLoaded', function() {
+    loadStatsData();
+});
 
-// Load real benchmark data
-async function loadBenchmarkData() {
+async function loadStatsData() {
     try {
-        const response = await fetch('/admin/benchmarks');
+        // Get filter values
+        const timePeriod = document.getElementById('timePeriod').value;
+        const modelType = document.getElementById('modelType').value;
+        const specificModel = document.getElementById('specificModelStats').value;
+        const performanceFilter = document.getElementById('performanceFilter').value;
+        
+        // Build query parameters
+        const params = new URLSearchParams({
+            time_period: timePeriod,
+            model_type: modelType,
+            specific_model: specificModel,
+            performance_filter: performanceFilter
+        });
+        
+        const response = await fetch('/admin/api/stats?' + params.toString());
         const data = await response.json();
         
-        if (data.success && data.comparisons) {
-            updateModelTable(data.comparisons);
-            updateOverallStats(data.summary);
-        } else {
-            console.error('Failed to load benchmark data:', data.error);
-        }
+        updateStatsMetrics(data);
+        
     } catch (error) {
-        console.error('Error loading benchmark data:', error);
+        console.error('Error loading stats data:', error);
+        document.getElementById('statsMetrics').innerHTML = '<div style="color:red;">Error loading data: ' + error.message + '</div>';
     }
 }
 
-function updateModelTable(comparisons) {
-    const tbody = document.querySelector('#modelComparison tbody');
-    tbody.innerHTML = '';
+function updateStatsMetrics(data) {
+    const statsContainer = document.getElementById('statsMetrics');
     
-    comparisons.forEach(model => {
-        const row = document.createElement('tr');
-        
-        // Status class based on performance
-        const timeClass = model.avg_response_time_ms < 2000 ? 'good' : 
-                         model.avg_response_time_ms < 3000 ? 'warning' : 'error';
-        const successClass = model.success_rate >= 95 ? 'good' : 
-                             model.success_rate >= 90 ? 'warning' : 'error';
-        const qualityClass = model.avg_quality_score >= 8 ? 'good' : 
-                             model.avg_quality_score >= 7 ? 'warning' : 'error';
-        
-        // Determine training data description
-        let trainingDescription = 'Unknown';
-        if (model.model_name.includes('jamie-fixed')) trainingDescription = 'Full conversations';
-        else if (model.model_name.includes('jamie-voice')) trainingDescription = 'Voice conversations';
-        else if (model.model_name.includes('jamie-simple')) trainingDescription = 'Basic examples';
-        else if (model.model_name.includes('jamie-working')) trainingDescription = 'Legacy training';
-        else if (model.model_name.includes('llama3')) trainingDescription = 'Base model only';
-        
-        // Status icon based on recommendation
-        const statusIcon = model.recommendation.includes('Excellent') ? '✅ Recommended' :
-                          model.recommendation.includes('Good') ? '⚠️ Good' :
-                          model.recommendation.includes('Needs') ? '❌ Deprecated' : 
-                          '⚠️ Limited';
-        
-        const statusClass = statusIcon.includes('✅') ? 'good' :
-                           statusIcon.includes('⚠️') ? 'warning' : 'error';
-        
-        row.innerHTML = `
-            <td><strong>${model.model_name}</strong><br><small>Base: ${model.base_model || 'unknown'}</small></td>
-            <td><span class="${timeClass}">${(model.avg_response_time_ms / 1000).toFixed(1)}s</span></td>
-            <td><span class="${successClass}">${model.success_rate.toFixed(1)}%</span></td>
-            <td><span class="${qualityClass}">${model.avg_quality_score.toFixed(1)}/10</span></td>
-            <td>${trainingDescription}<br><small>Preloaded: ${model.preload_rate.toFixed(0)}%</small></td>
-            <td><span class="${statusClass}">${statusIcon}</span></td>
-        `;
-        
-        tbody.appendChild(row);
-    });
+    if (!data || !data.metrics) {
+        statsContainer.innerHTML = '<div style="color:red;">No data available</div>';
+        return;
+    }
+    
+    const metrics = data.metrics;
+    statsContainer.innerHTML = `
+        <div class="stat-card">
+            <div class="stat-value">${metrics.total_conversations || 0}</div>
+            <div class="stat-label">Training Conversations</div>
+            <div class="stat-sublabel">From pete.db</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">${metrics.jamie_models || 0}</div>
+            <div class="stat-label">Jamie Models</div>
+            <div class="stat-sublabel">Active variants</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">${metrics.avg_response_time || '0s'}</div>
+            <div class="stat-label">Avg Response Time</div>
+            <div class="stat-sublabel">Filtered period</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">${metrics.success_rate || '0%'}</div>
+            <div class="stat-label">Success Rate</div>
+            <div class="stat-sublabel">Non-timeout responses</div>
+        </div>
+    `;
 }
 
-function updateOverallStats(summary) {
-    if (!summary) return;
-    
-    // Update the overview metrics
-    document.querySelector('.metric:nth-child(1) .metric-value').textContent = summary.successful_requests || 0;
-    document.querySelector('.metric:nth-child(2) .metric-value').textContent = summary.models_tested ? summary.models_tested.length : 0;
-    document.querySelector('.metric:nth-child(3) .metric-value').textContent = 
-        summary.avg_response_time_ms ? `${(summary.avg_response_time_ms / 1000).toFixed(1)}s` : '0s';
-    document.querySelector('.metric:nth-child(4) .metric-value').textContent = 
-        summary.success_rate ? `${summary.success_rate.toFixed(1)}%` : '0%';
+function refreshStats(){
+    document.getElementById('lastUpdate').textContent = new Date().toLocaleString();
+    loadStatsData();
 }
 
 function exportStats(){
     // Use real data for export
-    fetch('/admin/benchmarks')
+    fetch('/admin/api/stats')
         .then(response => response.json())
         .then(data => {
             const statsData = {
                 timestamp: new Date().toISOString(),
-                summary: data.summary,
-                models: data.comparisons,
-                trainingData: {
-                    totalConversations: data.summary?.successful_requests || 0,
-                    modelsCount: data.summary?.models_tested?.length || 0,
-                    avgResponseTime: data.summary?.avg_response_time_ms || 0,
-                    successRate: data.summary?.success_rate || 0
+                metrics: data.metrics,
+                filters: {
+                    time_period: document.getElementById('timePeriod').value,
+                    model_type: document.getElementById('modelType').value,
+                    specific_model: document.getElementById('specificModelStats').value,
+                    performance_filter: document.getElementById('performanceFilter').value
                 }
             };
             
@@ -2703,9 +2913,6 @@ function exportStats(){
 
 // Initialize page
 document.getElementById('lastUpdate').textContent = new Date().toLocaleString();
-
-// Load real benchmark data on page load
-loadBenchmarkData();
 </script>
 </body></html>'''
 
