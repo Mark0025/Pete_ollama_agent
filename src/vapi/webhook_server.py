@@ -2583,6 +2583,12 @@ function loadHistoricalData() {
         ):
             """API endpoint for stats data with filtering"""
             try:
+                # Add src to path for imports
+                import sys
+                from pathlib import Path
+                sys.path.insert(0, str(Path(__file__).parent.parent))
+                from analytics.benchmark_analyzer import BenchmarkAnalyzer
+                
                 # Get database stats
                 db_manager = PeteDBManager()
                 total_conversations = 0
