@@ -37,16 +37,23 @@ fi
 
 echo "✅ Docker daemon ready"
 
-# Clone or update repo
-cd /workspace
-if [ -d Pete_ollama_agent/.git ]; then
-  echo "🔄 Repo exists – pulling latest..."
-  git -C Pete_ollama_agent pull --ff-only
+# Clone or update repo - handle both RunPod and local environments
+if [ "$PWD" = "/workspace/Pete_ollama_agent" ] || [ "$PWD" = "/workspace" ]; then
+  # RunPod environment - use /workspace
+  cd /workspace
+  if [ -d Pete_ollama_agent/.git ]; then
+    echo "🔄 Repo exists – pulling latest..."
+    git -C Pete_ollama_agent pull --ff-only
+  else
+    echo "📥 Cloning repository..."
+    git clone https://github.com/Mark0025/Pete_ollama_agent.git
+  fi
+  cd Pete_ollama_agent
 else
-  echo "📥 Cloning repository..."
-  git clone https://github.com/Mark0025/Pete_ollama_agent.git
+  # Local environment - we're already in the repo directory
+  echo "🔄 Local environment detected – pulling latest changes..."
+  git pull --ff-only
 fi
-cd Pete_ollama_agent
 
 # Ensure execution bit and launch
 chmod +x start.sh
