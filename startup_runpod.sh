@@ -8,17 +8,45 @@ set -euo pipefail
 apt-get update
 apt-get install -y git curl docker.io docker-compose
 
-# Install NVIDIA Container Toolkit - use stable repository for Ubuntu 24.04
-echo "🔧 Installing NVIDIA Container Toolkit..."
+# Try to install NVIDIA Container Toolkit (optional - skip if not available)
+echo "🔧 Attempting to install NVIDIA Container Toolkit..."
 curl -fsSL https://nvidia.github.io/libnvidia-container/gpgkey | gpg --dearmor -o /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg
 
-# Use the stable repository since Ubuntu 24.04 is not yet supported
-echo "📦 Using stable NVIDIA repository for Ubuntu 24.04 compatibility..."
-echo "deb [signed-by=/usr/share/keyrings/nvidia-container-toolkit-keyring.gpg] https://nvidia.github.io/libnvidia-container/stable/deb/amd64 /" | \
-  tee /etc/apt/sources.list.d/nvidia-container-toolkit.list
+# Try different repository URLs for Ubuntu 24.04 compatibility
+NVIDIA_REPO_URLS=(
+  "https://nvidia.github.io/libnvidia-container/stable/deb/amd64"
+  "https://nvidia.github.io/libnvidia-container/experimental/deb/amd64"
+  "https://nvidia.github.io/libnvidia-container/stable/ubuntu22.04/amd64"
+)
 
-apt-get update
-apt-get install -y nvidia-container-toolkit
+NVIDIA_INSTALLED=false
+for repo_url in "${NVIDIA_REPO_URLS[@]}"; do
+  echo "📦 Trying NVIDIA repository: $repo_url"
+  
+  # Test if the repository is accessible
+  if curl -s "$repo_url/" | grep -q "Packages\|Release"; then
+    echo "✅ Found working NVIDIA repository: $repo_url"
+    echo "deb [signed-by=/usr/share/keyrings/nvidia-container-toolkit-keyring.gpg] $repo_url /" | \
+      tee /etc/apt/sources.list.d/nvidia-container-toolkit.list
+    
+    apt-get update
+    if apt-get install -y nvidia-container-toolkit; then
+      echo "✅ NVIDIA Container Toolkit installed successfully"
+      NVIDIA_INSTALLED=true
+      break
+    else
+      echo "⚠️  Failed to install from $repo_url, trying next..."
+      rm -f /etc/apt/sources.list.d/nvidia-container-toolkit.list
+    fi
+  else
+    echo "⚠️  Repository not accessible: $repo_url"
+  fi
+done
+
+if [ "$NVIDIA_INSTALLED" = false ]; then
+  echo "⚠️  NVIDIA Container Toolkit installation skipped - not essential for Ollama setup"
+  echo "ℹ️  GPU support will be limited but Ollama will still work"
+fi
 
 # Start Docker daemon with data under /workspace so images & volumes persist
 mkdir -p /workspace/docker-data
