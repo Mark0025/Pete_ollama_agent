@@ -4,23 +4,23 @@
 
 ### What's new
 
-| Area                | Status                                                                                                                       |
-| ------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
-| **GPU Support**     | ✅ RunPod deployment with qwen3:30b preloaded into GPU memory, proper NVIDIA setup.                                        |
-| **Startup Script**  | ✅ `runpod_start.sh` - Comprehensive script that handles GPU setup, model creation, and full system deployment.              |
-| **FastAPI server**  | ✅ Runs head-less (`src/main.py` launches `VAPIWebhookServer`).                                                              |
-| `/ui` playground    | ✅ Jamie persona selector with model versions dropdown, streaming chat, local/cloud indicator.                               |
-| `/admin` dashboard  | ✅ Model testing, conversation streaming, response parsing, similarity analysis.                                             |
-| `/admin/settings`   | ✅ **Dynamic model management** - Real-time model configuration, visibility controls, auto-preloading.                      |
-| `/admin/stats`      | ✅ Real-time performance analytics with actual benchmark data, base model tracking.                                         |
-| `/admin/benchmarks` | ✅ Advanced analytics with Pendulum timing, model comparison, exportable reports.                                           |
-| **Data extraction** | ✅ `src/virtual_jamie_extractor.py` + LangChain indexing → 3,555 conversation samples from Nolen Properties.               |
-| **Fine-tuning**     | ✅ Complete Modelfile generation from real Jamie conversations → `peteollama:jamie-*` models.                               |
-| **Validation**      | ✅ Pydantic self-correcting system validates responses against Jamie's actual patterns.                                     |
-| **Similarity**      | ✅ LangChain embeddings compare AI responses to real Jamie responses for accuracy scoring.                                  |
-| **Model Preloading**| ✅ Smart memory management - only load models when needed, UI visibility controls.                                         |
-| **Accurate Timing** | ✅ Pendulum-based precision timing from user request to final response.                                                     |
-| **Training Capture**| ✅ **All interactions captured** - Every conversation stored for model improvement.                                        |
+| Area | Status |
+|------|--------|
+| **GPU Support** | ✅ RunPod deployment with qwen3:30b preloaded into GPU memory |
+| **Startup Script** | ✅ `runpod_start.sh` - Comprehensive script for full deployment |
+| **FastAPI server** | ✅ Runs head-less (`src/main.py` launches `VAPIWebhookServer`) |
+| `/ui` playground | ✅ Jamie persona selector with model versions dropdown |
+| `/admin` dashboard | ✅ Model testing, conversation streaming, response parsing |
+| `/admin/settings` | ✅ **Dynamic model management** - Real-time configuration |
+| `/admin/stats` | ✅ Real-time performance analytics with benchmark data |
+| `/admin/benchmarks` | ✅ Advanced analytics with Pendulum timing |
+| **Data extraction** | ✅ 3,555 conversation samples from Nolen Properties |
+| **Fine-tuning** | ✅ Complete Modelfile generation from real conversations |
+| **Validation** | ✅ Pydantic self-correcting system validates responses |
+| **Similarity** | ✅ LangChain embeddings compare AI responses to real Jamie |
+| **Model Preloading** | ✅ Smart memory management - UI visibility controls |
+| **Accurate Timing** | ✅ Pendulum-based precision timing |
+| **Training Capture** | ✅ **All interactions captured** - Every conversation stored |
 
 ### Dynamic Settings System - Complete Architecture
 
