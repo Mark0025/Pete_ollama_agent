@@ -60,11 +60,11 @@
       "display_name": "Qwen 3 (30B)",
       "description": "Qwen 3 30B model for comparison and testing",
       "show_in_ui": true,
-      "auto_preload": false,
+      "auto_preload": true,
       "is_jamie_model": false,
       "base_model": "qwen3",
       "created_at": "2025-08-06T18:30:00.000000",
-      "last_updated": "2025-08-06T18:30:00.000000"
+      "last_updated": "2025-08-07T00:10:00.000000"
     }
   },
   "last_updated": "2025-08-06T15:44:50.705032"

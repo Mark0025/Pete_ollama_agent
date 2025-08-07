@@ -174,6 +174,11 @@ if command -v ollama >/dev/null 2>&1; then
   else
     echo "✅ qwen3:30b already downloaded."
   fi
+  
+  # Preload qwen3:30b for immediate use
+  echo "🚀 Preloading qwen3:30b into GPU memory..."
+  ollama run qwen3:30b "Hello" --verbose >/dev/null 2>&1 &
+  echo "✅ qwen3:30b preloading started (will be ready in ~30 seconds)"
 else
   echo "⚠️  ollama CLI not found – skipping Ollama setup."
 fi
