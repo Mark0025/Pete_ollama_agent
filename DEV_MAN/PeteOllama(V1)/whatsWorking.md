@@ -11,7 +11,7 @@
 | **FastAPI server**  | ✅ Runs head-less (`src/main.py` launches `VAPIWebhookServer`).                                                              |
 | `/ui` playground    | ✅ Jamie persona selector with model versions dropdown, streaming chat, local/cloud indicator.                               |
 | `/admin` dashboard  | ✅ Model testing, conversation streaming, response parsing, similarity analysis.                                             |
-| `/admin/settings`   | ✅ Model management, timeout control, model download, visibility flags, auto-preloading.                                    |
+| `/admin/settings`   | ✅ **Dynamic model management** - Real-time model configuration, visibility controls, auto-preloading.                      |
 | `/admin/stats`      | ✅ Real-time performance analytics with actual benchmark data, base model tracking.                                         |
 | `/admin/benchmarks` | ✅ Advanced analytics with Pendulum timing, model comparison, exportable reports.                                           |
 | **Data extraction** | ✅ `src/virtual_jamie_extractor.py` + LangChain indexing → 3,555 conversation samples from Nolen Properties.               |
@@ -20,6 +20,184 @@
 | **Similarity**      | ✅ LangChain embeddings compare AI responses to real Jamie responses for accuracy scoring.                                  |
 | **Model Preloading**| ✅ Smart memory management - only load models when needed, UI visibility controls.                                         |
 | **Accurate Timing** | ✅ Pendulum-based precision timing from user request to final response.                                                     |
+| **Training Capture**| ✅ **All interactions captured** - Every conversation stored for model improvement.                                        |
+
+### Dynamic Settings System - Complete Architecture
+
+**Revolutionary Real-Time Model Management:**
+
+The system now features a completely dynamic settings panel that allows real-time configuration of all AI models without restarting the application.
+
+```mermaid
+graph TD
+    A[User Interface] --> B[Settings Panel]
+    B --> C[Model Configuration]
+    C --> D[config/model_settings.json]
+    D --> E[ModelSettingsManager]
+    E --> F[Real-time Updates]
+    
+    subgraph "Dynamic Model Control"
+        G[UI Visibility Toggle] --> H[show_in_ui: true/false]
+        I[Auto-Preload Toggle] --> J[auto_preload: true/false]
+        K[Display Name Edit] --> L[display_name: "Custom Name"]
+        M[Description Edit] --> N[description: "Model purpose"]
+        O[Default Model Set] --> P[default_model: "selected_model"]
+    end
+    
+    subgraph "Real-Time Effects"
+        Q[/personas API] --> R[Filtered Model List]
+        R --> S[UI Dropdown Population]
+        T[Model Manager] --> U[Auto-Preload Logic]
+        V[Default Model] --> W[Automatic Selection]
+    end
+    
+    subgraph "Training Data Capture"
+        X[User Interaction] --> Y[Conversation Logger]
+        Y --> Z[Database Storage]
+        Z --> AA[Validation Analysis]
+        AA --> BB[Training Data Collection]
+        BB --> CC[Model Improvement]
+    end
+    
+    F --> G
+    F --> I
+    F --> K
+    F --> M
+    F --> O
+    
+    H --> Q
+    J --> T
+    L --> Q
+    N --> Q
+    P --> V
+    
+    X --> Y
+```
+
+### Complete System Architecture
+
+**How the entire PeteOllama system works:**
+
+```mermaid
+graph TD
+    A[User Query] --> B[Model Selection UI]
+    B --> C[Settings-Driven Model List]
+    C --> D[Selected Model]
+    D --> E[Model Manager]
+    E --> F[Ollama API]
+    F --> G[AI Response Generation]
+    
+    subgraph "Settings Management"
+        H[config/model_settings.json] --> I[ModelSettingsManager]
+        I --> J[Real-time Configuration]
+        J --> K[UI Visibility Control]
+        J --> L[Auto-Preload Logic]
+        J --> M[Default Model Selection]
+    end
+    
+    subgraph "Training Data Pipeline"
+        N[User Interaction] --> O[Conversation Logger]
+        O --> P[Database Storage]
+        P --> Q[Validation System]
+        Q --> R[Pydantic Validation]
+        R --> S{Passes Jamie Test?}
+        
+        S -->|Yes| T[✅ Success Logged]
+        S -->|No| U[❌ Correction Generated]
+        
+        U --> V[Real Jamie Response Lookup]
+        V --> W[Training Data Updated]
+        W --> X[Model Improvement Data]
+        
+        T --> Y[Similarity Analysis]
+        U --> Y
+        Y --> Z[LangChain Embeddings]
+        Z --> AA[Jamie Score Calculation]
+        AA --> BB[Benchmark Analytics]
+    end
+    
+    subgraph "Model Management"
+        CC[Admin Settings Panel] --> DD[Model Configuration]
+        DD --> EE[Real-time Updates]
+        EE --> FF[UI Dropdown Refresh]
+        FF --> GG[Model Availability]
+    end
+    
+    G --> N
+    M --> D
+    GG --> E
+    BB --> CC
+```
+
+### Dynamic Settings Panel Features
+
+**Real-Time Model Configuration:**
+
+| Feature | Description | Impact |
+|---------|-------------|---------|
+| **UI Visibility Toggle** | Show/hide models in dropdown without restart | Instant UI updates |
+| **Auto-Preload Control** | Automatically load models into GPU memory | Performance optimization |
+| **Display Name Editing** | Custom names for models in UI | User-friendly interface |
+| **Default Model Setting** | Automatic model selection | Seamless user experience |
+| **Description Management** | Model purpose documentation | Clear model identification |
+| **Real-time Updates** | Changes apply immediately | No application restart needed |
+
+**Settings Panel Access:**
+- **URL**: `http://localhost:8000/admin/settings`
+- **Features**: Model testing, configuration, visibility controls
+- **Real-time**: All changes apply immediately to running system
+
+### Training Data Capture System
+
+**Complete Interaction Tracking:**
+
+Every user interaction is now captured and used for model improvement:
+
+```mermaid
+graph LR
+    A[User Input] --> B[Conversation Logger]
+    B --> C[Database Storage]
+    C --> D[Validation Analysis]
+    D --> E[Training Data Collection]
+    E --> F[Model Improvement]
+    
+    subgraph "Capture Points"
+        G[UI Chat Interface] --> A
+        H[Admin Test Panel] --> A
+        I[API Endpoints] --> A
+        J[VAPI Webhooks] --> A
+    end
+    
+    subgraph "Data Processing"
+        K[Response Quality] --> D
+        L[Similarity Score] --> D
+        M[Validation Errors] --> D
+        N[Performance Metrics] --> D
+    end
+    
+    subgraph "Training Output"
+        O[Conversation Samples] --> F
+        P[Validation Failures] --> F
+        Q[Improvement Suggestions] --> F
+        R[Model Retraining Data] --> F
+    end
+```
+
+**What Gets Captured:**
+- ✅ **User Queries** - All input messages
+- ✅ **AI Responses** - Generated responses with timing
+- ✅ **Validation Results** - Pass/fail with specific error details
+- ✅ **Similarity Scores** - How close to real Jamie responses
+- ✅ **Performance Metrics** - Response time, success rate
+- ✅ **Model Selection** - Which model was used for each interaction
+- ✅ **Correction Data** - When validation fails, the correct response is captured
+
+**Training Data Usage:**
+1. **Model Improvement** - Failed validations become training corrections
+2. **Performance Analytics** - Track model effectiveness over time
+3. **Similarity Analysis** - Compare AI responses to real Jamie patterns
+4. **Benchmark Tracking** - Monitor progress toward Jamie-like responses
+5. **Auto-Retraining** - Use captured data for model refinement
 
 ### RunPod GPU Deployment - FIXED ✅
 
@@ -32,6 +210,8 @@
 - ✅ **Database Connection**: Connected to production data
 - ✅ **Ollama Service**: Running with GPU acceleration
 - ✅ **No Repository Errors**: Doesn't try to install nvidia-container-toolkit from broken repositories
+- ✅ **Dynamic Settings**: Real-time model configuration without restarts
+- ✅ **Training Capture**: All interactions logged for model improvement
 
 **Deployment Command:**
 ```bash
@@ -45,6 +225,8 @@
 - Preloads models into GPU memory
 - Auto-creates Jamie AI models
 - Starts the main application
+- Enables dynamic settings management
+- Activates training data capture
 
 ### Revolutionary Jamie Training System
 
