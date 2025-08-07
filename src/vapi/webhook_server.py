@@ -430,14 +430,15 @@ class VAPIWebhookServer:
             jamieGroup.label = '👩‍💼 Jamie Models';
             jamieModels.forEach(model => {
             const opt = document.createElement('option');
-                opt.value = model;
-                opt.textContent = model.replace('peteollama:jamie-', 'Jamie ').replace('peteollama:', '');
+                opt.value = model.name;
+                // Use display_name if available, otherwise format the model name
+                opt.textContent = model.display_name || model.name.replace('peteollama:', '').replace(/_/g, ' ').replace(/-/g, ' ');
                 jamieGroup.appendChild(opt);
             });
             modelSelect.appendChild(jamieGroup);
             
             // Set first Jamie model as default
-            modelSelect.value = jamieModels[0];
+            modelSelect.value = jamieModels[0].name;
         }
         
         // Add other models if any (as backup)
@@ -446,8 +447,8 @@ class VAPIWebhookServer:
             otherGroup.label = '🤖 Other Models';
             otherModels.forEach(model => {
                 const opt = document.createElement('option');
-                opt.value = model;
-                opt.textContent = model;
+                opt.value = model.name;
+                opt.textContent = model.display_name || model.name;
                 otherGroup.appendChild(opt);
             });
             modelSelect.appendChild(otherGroup);
