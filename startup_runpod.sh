@@ -8,26 +8,14 @@ set -euo pipefail
 apt-get update
 apt-get install -y git curl docker.io docker-compose
 
-# Install NVIDIA Container Toolkit - more robust installation
+# Install NVIDIA Container Toolkit - use stable repository for Ubuntu 24.04
 echo "🔧 Installing NVIDIA Container Toolkit..."
 curl -fsSL https://nvidia.github.io/libnvidia-container/gpgkey | gpg --dearmor -o /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg
 
-# Use a more reliable distribution detection
-DISTRIBUTION=$(. /etc/os-release; echo $ID$VERSION_ID)
-echo "📦 Detected distribution: $DISTRIBUTION"
-
-# Add NVIDIA repository with proper error handling
-curl -s -L https://nvidia.github.io/libnvidia-container/$DISTRIBUTION/libnvidia-container.list | \
-  sed 's#deb https://#deb [signed-by=/usr/share/keyrings/nvidia-container-toolkit-keyring.gpg] https://#g' | \
+# Use the stable repository since Ubuntu 24.04 is not yet supported
+echo "📦 Using stable NVIDIA repository for Ubuntu 24.04 compatibility..."
+echo "deb [signed-by=/usr/share/keyrings/nvidia-container-toolkit-keyring.gpg] https://nvidia.github.io/libnvidia-container/stable/deb/amd64 /" | \
   tee /etc/apt/sources.list.d/nvidia-container-toolkit.list
-
-# Verify the repository file was created correctly
-if [ ! -s /etc/apt/sources.list.d/nvidia-container-toolkit.list ]; then
-  echo "⚠️  Repository file is empty, trying alternative method..."
-  # Fallback: use ubuntu22.04 repository for ubuntu24.04
-  echo "deb [signed-by=/usr/share/keyrings/nvidia-container-toolkit-keyring.gpg] https://nvidia.github.io/libnvidia-container/ubuntu22.04/amd64 /" | \
-    tee /etc/apt/sources.list.d/nvidia-container-toolkit.list
-fi
 
 apt-get update
 apt-get install -y nvidia-container-toolkit
