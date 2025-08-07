@@ -133,7 +133,7 @@ else
 fi
 
 echo "📦 Installing LangChain dependencies for full similarity analysis..."
-uv pip install langchain langchain-community langchain-text-splitters langchain-core sentence-transformers faiss-cpu torch transformers huggingface-hub
+uv pip install langchain langchain-community langchain-text-splitters langchain-core sentence-transformers faiss-cpu torch transformers
 echo "🔍 DEBUG: Verifying LangChain installation..."
 python -c "import langchain; print('✅ LangChain v0.3 installed')" || echo "❌ LangChain import failed"
 python -c "from langchain_community.embeddings import HuggingFaceEmbeddings; print('✅ HuggingFaceEmbeddings available')" || echo "❌ HuggingFaceEmbeddings import failed"
