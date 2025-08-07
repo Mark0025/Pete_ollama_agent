@@ -6,7 +6,17 @@
 set -euo pipefail
 
 apt-get update
-apt-get install -y git curl docker.io docker-compose nvidia-container-toolkit
+apt-get install -y git curl docker.io docker-compose
+
+# Try to install NVIDIA Container Toolkit if available
+if apt-cache search nvidia-container-toolkit | grep -q nvidia-container-toolkit; then
+    echo "🔧 Installing NVIDIA Container Toolkit..."
+    apt-get install -y nvidia-container-toolkit
+    echo "✅ NVIDIA Container Toolkit installed"
+else
+    echo "⚠️  NVIDIA Container Toolkit not available in repositories - skipping"
+    echo "ℹ️  GPU support will be limited but Ollama will still work"
+fi
 
 # Start Docker daemon with data under /workspace so images & volumes persist
 mkdir -p /workspace/docker-data
