@@ -30,11 +30,11 @@
     },
     "qwen3:30b": {
       "name": "qwen3:30b",
-      "display_name": "Qwen 3 (30B)",
-      "description": "Qwen 3 30B model for comparison and testing",
+      "display_name": "Qwen 3 (30B) - Manual Load",
+      "description": "Qwen 3 30B model for comparison and testing (manual load only)",
       "version": "base",
       "base_model": "qwen3",
-      "show_in_ui": true,
+      "show_in_ui": false,
       "auto_preload": false,
       "is_jamie_model": false,
       "created_at": "2025-08-06T18:30:00.000000",
@@ -51,7 +51,7 @@
     },
     "qwen3:30b": {
       "display_name": "Qwen 3 (30B)",
-      "description": "Alibaba's Qwen 3 30B model",
+      "description": "Alibaba's Qwen 3 30B model (manual load only)",
       "size": "18 GB",
       "status": "available"
     }

@@ -83,9 +83,15 @@ if ! ollama list | grep -q "llama3:latest"; then
     ollama pull llama3:latest
 fi
 
-if ! ollama list | grep -q "qwen3:30b"; then
-    echo "📥 Pulling qwen3:30b..."
-    ollama pull qwen3:30b
+# Only pull qwen3:30b if we have enough memory
+MEMORY_AVAILABLE=$(free -g | awk 'NR==2{print $2}')
+if [ "$MEMORY_AVAILABLE" -gt 20 ]; then
+    if ! ollama list | grep -q "qwen3:30b"; then
+        echo "📥 Pulling qwen3:30b (sufficient memory available)..."
+        ollama pull qwen3:30b
+    fi
+else
+    echo "⚠️ Skipping qwen3:30b - insufficient memory (${MEMORY_AVAILABLE}GB available)"
 fi
 
 # Create custom model if not exists
@@ -128,9 +134,28 @@ echo ""
 echo "🔄 Services are running in background..."
 echo "💡 To stop services: pkill -f 'python src/main.py' && pkill ollama"
 
-# Keep the script alive without blocking
-echo "🔄 Keeping startup script alive..."
+# Memory monitoring and management
+echo "🔄 Starting memory monitoring..."
 while true; do
+    # Check memory usage
+    MEMORY_USAGE=$(free -g | awk 'NR==2{printf "%.0f", $3/$2 * 100}')
+    
+    if [ "$MEMORY_USAGE" -gt 85 ]; then
+        echo "⚠️ High memory usage: ${MEMORY_USAGE}% - unloading large models..."
+        
+        # Unload qwen3:30b if it's loaded
+        if ollama list | grep -q "qwen3:30b"; then
+            echo "🗑️ Unloading qwen3:30b to free memory..."
+            ollama rm qwen3:30b 2>/dev/null || true
+        fi
+        
+        # Clear cache
+        rm -rf /tmp/* 2>/dev/null || true
+        rm -rf /root/.cache/uv 2>/dev/null || true
+        
+        echo "✅ Memory freed - continuing..."
+    fi
+    
     # Check if main app is still running
     if ! ps -p $APP_PID > /dev/null 2>&1; then
         echo "⚠️ Main app stopped, restarting..."
