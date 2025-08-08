@@ -1,11 +1,43 @@
 #!/bin/bash
 
 # PeteOllama Agent Startup Script for RunPod
-# Optimized for memory and disk space management
+# Robust version with crash prevention
 
 set -e
 
-echo "🚀 Starting PeteOllama Agent Setup..."
+# Create log file for debugging
+LOG_FILE="/workspace/startup.log"
+exec > >(tee -a "$LOG_FILE") 2>&1
+
+echo "🚀 Starting PeteOllama Agent Setup - $(date)"
+echo "📝 Logging to: $LOG_FILE"
+
+# Function to check if we're in a restart loop
+check_restart_loop() {
+    local restart_count=0
+    if [ -f "/workspace/restart_count" ]; then
+        restart_count=$(cat /workspace/restart_count)
+    fi
+    
+    if [ "$restart_count" -gt 5 ]; then
+        echo "🚨 Too many restarts detected. Starting minimal mode..."
+        echo "0" > /workspace/restart_count
+        return 1
+    fi
+    
+    echo $((restart_count + 1)) > /workspace/restart_count
+    return 0
+}
+
+# Function to cleanup on exit
+cleanup() {
+    echo "🧹 Cleaning up on exit..."
+    pkill ollama 2>/dev/null || true
+    pkill -f uvicorn 2>/dev/null || true
+    pkill -f "src/main.py" 2>/dev/null || true
+}
+
+trap cleanup EXIT
 
 # Memory and disk optimization
 echo "🧹 Clearing cache and optimizing memory..."
@@ -34,88 +66,128 @@ mkdir -p /workspace/cache
 
 # Install system dependencies
 echo "📦 Installing system dependencies..."
-apt-get update -qq
-apt-get install -y tree xsel curl git
+apt-get update -qq || echo "⚠️ apt-get update failed, continuing..."
+apt-get install -y tree xsel curl git || echo "⚠️ Some packages failed to install, continuing..."
 
 # Install uv if not present
 if ! command -v uv &> /dev/null; then
     echo "📦 Installing uv..."
-    curl -Ls https://astral.sh/uv/install.sh | sh
+    curl -Ls https://astral.sh/uv/install.sh | sh || echo "⚠️ uv installation failed, trying pip..."
+    if ! command -v uv &> /dev/null; then
+        pip install uv || echo "⚠️ uv installation completely failed"
+    fi
 fi
 
 # Change to repo directory and pull latest changes
 echo "🔄 Checking for latest code updates..."
-cd /workspace/Pete_ollama_agent
+cd /workspace/Pete_ollama_agent || {
+    echo "❌ Failed to change to repo directory"
+    exit 1
+}
+
 if [ -d ".git" ]; then
     echo "📡 Pulling latest changes from GitHub..."
-    git fetch origin main
-    git reset --hard origin/main --quiet
-    git clean -fd --quiet
+    git fetch origin main || echo "⚠️ git fetch failed"
+    git reset --hard origin/main --quiet || echo "⚠️ git reset failed"
+    git clean -fd --quiet || echo "⚠️ git clean failed"
     echo "✅ Updated to latest version"
 else
     echo "⚠️ Not a git repository - skipping auto-update"
 fi
 
-# Kill any existing Ollama processes
-echo "🔄 Stopping existing Ollama processes..."
+# Kill any existing processes
+echo "🔄 Stopping existing processes..."
 pkill ollama 2>/dev/null || true
 pkill -f uvicorn 2>/dev/null || true
 pkill -f "src/main.py" 2>/dev/null || true
-sleep 2
+sleep 3
 
 # Install Ollama
 echo "🤖 Installing Ollama..."
-curl -fsSL https://ollama.com/install.sh | sh
+if ! command -v ollama &> /dev/null; then
+    curl -fsSL https://ollama.com/install.sh | sh || {
+        echo "❌ Ollama installation failed"
+        exit 1
+    }
+fi
 
-# Start Ollama with optimized settings
+# Start Ollama with error handling
 echo "🚀 Starting Ollama..."
 ollama serve &
 OLLAMA_PID=$!
 
-# Wait for Ollama to start
+# Wait for Ollama to start with timeout
 echo "⏳ Waiting for Ollama to start..."
-sleep 10
+for i in {1..30}; do
+    if curl -s http://localhost:11434/api/version >/dev/null 2>&1; then
+        echo "✅ Ollama started successfully"
+        break
+    fi
+    if [ $i -eq 30 ]; then
+        echo "❌ Ollama failed to start within 30 seconds"
+        exit 1
+    fi
+    sleep 1
+done
 
-# Pull base models (only if not already present)
+# Pull base models with error handling
 echo "📥 Checking for base models..."
 if ! ollama list | grep -q "llama3:latest"; then
     echo "📥 Pulling llama3:latest..."
-    ollama pull llama3:latest
+    ollama pull llama3:latest || echo "⚠️ Failed to pull llama3:latest"
 fi
 
-# Only pull qwen3:30b if we have enough memory
-MEMORY_AVAILABLE=$(free -g | awk 'NR==2{print $2}')
-if [ "$MEMORY_AVAILABLE" -gt 20 ]; then
-    if ! ollama list | grep -q "qwen3:30b"; then
-        echo "📥 Pulling qwen3:30b (sufficient memory available)..."
-        ollama pull qwen3:30b
+# Only pull qwen3:30b if we have enough memory and not in restart loop
+if check_restart_loop; then
+    MEMORY_AVAILABLE=$(free -g | awk 'NR==2{print $2}')
+    if [ "$MEMORY_AVAILABLE" -gt 20 ]; then
+        if ! ollama list | grep -q "qwen3:30b"; then
+            echo "📥 Pulling qwen3:30b (sufficient memory available)..."
+            ollama pull qwen3:30b || echo "⚠️ Failed to pull qwen3:30b"
+        fi
+    else
+        echo "⚠️ Skipping qwen3:30b - insufficient memory (${MEMORY_AVAILABLE}GB available)"
     fi
 else
-    echo "⚠️ Skipping qwen3:30b - insufficient memory (${MEMORY_AVAILABLE}GB available)"
+    echo "⚠️ Skipping qwen3:30b - restart loop detected"
 fi
 
 # Create custom model if not exists
 echo "🔧 Setting up custom model..."
 if ! ollama list | grep -q "peteollama:property-manager-v0.0.1"; then
     echo "📥 Creating peteollama:property-manager-v0.0.1..."
-    ollama create peteollama:property-manager-v0.0.1 -f models/Modelfile.enhanced
+    if [ -f "models/Modelfile.enhanced" ]; then
+        ollama create peteollama:property-manager-v0.0.1 -f models/Modelfile.enhanced || echo "⚠️ Failed to create custom model"
+    else
+        echo "❌ Modelfile.enhanced not found"
+    fi
 fi
 
 # Install Python dependencies
 echo "🐍 Installing Python dependencies..."
-uv sync
+if command -v uv &> /dev/null; then
+    uv sync || echo "⚠️ uv sync failed"
+else
+    pip install -r requirements.txt || echo "⚠️ pip install failed"
+fi
 
 # Create database
 echo "🗄️ Setting up database..."
-python src/virtual_jamie_extractor.py
+python src/virtual_jamie_extractor.py || echo "⚠️ Database setup failed"
 
 # Start the application in background
 echo "🌐 Starting PeteOllama application..."
 uv run python src/main.py &
 APP_PID=$!
 
-# Wait for services to start
+# Wait for app to start
 sleep 5
+
+# Verify app is running
+if ! ps -p $APP_PID > /dev/null 2>&1; then
+    echo "❌ Main app failed to start"
+    exit 1
+fi
 
 # Show status
 echo "📊 System Status:"
@@ -133,6 +205,9 @@ echo "🤖 Ollama: http://localhost:11434"
 echo ""
 echo "🔄 Services are running in background..."
 echo "💡 To stop services: pkill -f 'python src/main.py' && pkill ollama"
+
+# Reset restart count on successful startup
+echo "0" > /workspace/restart_count
 
 # Memory monitoring and management
 echo "🔄 Starting memory monitoring..."
