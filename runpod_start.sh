@@ -169,6 +169,19 @@ if [ -f "$REPO_DIR/src/.env" ]; then
 fi
 
 # ------------------------------------------------------------------
+#  Set up environment variables for Ollama proxy
+# ------------------------------------------------------------------
+echo "🔧 Setting up environment variables for Ollama proxy..."
+export OLLAMA_BASE_URL="http://localhost:11434"
+export DEFAULT_MODEL="peteollama:property-manager-v0.0.1"
+export PROXY_PORT="8001"
+
+echo "✅ Environment variables set:"
+echo "   OLLAMA_BASE_URL=$OLLAMA_BASE_URL"
+echo "   DEFAULT_MODEL=$DEFAULT_MODEL"
+echo "   PROXY_PORT=$PROXY_PORT"
+
+# ------------------------------------------------------------------
 #  Create / activate project virtual-env using uv
 # ------------------------------------------------------------------
 if [ ! -d .venv ]; then
