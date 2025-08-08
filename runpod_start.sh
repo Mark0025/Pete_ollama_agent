@@ -103,9 +103,10 @@ uv sync
 echo "🗄️ Setting up database..."
 python src/virtual_jamie_extractor.py
 
-# Start the application
+# Start the application in background
 echo "🌐 Starting PeteOllama application..."
 uv run python src/main.py &
+APP_PID=$!
 
 # Wait for services to start
 sleep 5
@@ -123,6 +124,26 @@ echo "✅ PeteOllama Agent is ready!"
 echo "🌐 Frontend: http://localhost:8000"
 echo "🔗 Proxy: http://localhost:8001"
 echo "🤖 Ollama: http://localhost:11434"
+echo ""
+echo "🔄 Services are running in background..."
+echo "💡 To stop services: pkill -f 'python src/main.py' && pkill ollama"
 
-# Keep script running
-wait
+# Keep the script alive without blocking
+echo "🔄 Keeping startup script alive..."
+while true; do
+    # Check if main app is still running
+    if ! ps -p $APP_PID > /dev/null 2>&1; then
+        echo "⚠️ Main app stopped, restarting..."
+        uv run python src/main.py &
+        APP_PID=$!
+    fi
+    
+    # Check if Ollama is still running
+    if ! ps -p $OLLAMA_PID > /dev/null 2>&1; then
+        echo "⚠️ Ollama stopped, restarting..."
+        ollama serve &
+        OLLAMA_PID=$!
+    fi
+    
+    sleep 30
+done
