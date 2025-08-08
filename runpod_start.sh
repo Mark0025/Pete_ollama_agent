@@ -7,6 +7,56 @@ set -euo pipefail
 # Add /usr/local/bin to PATH for ollama and other tools at the very beginning
 export PATH="$PATH:/usr/local/bin"
 
+# ------------------------------------------------------------------
+#  DEBUGGING SETUP - Install clipboard tools and tree for debugging
+# ------------------------------------------------------------------
+echo "🔧 Setting up debugging tools (clipboard + tree)..."
+
+# Install tree for project structure visualization
+if ! command -v tree >/dev/null 2>&1; then
+  echo "📦 Installing tree for project structure visualization..."
+  apt-get update -y && apt-get install -y tree
+else
+  echo "✅ tree already installed."
+fi
+
+# Install xsel for clipboard functionality
+if ! command -v xsel >/dev/null 2>&1; then
+  echo "📦 Installing xsel for clipboard functionality..."
+  apt-get update -y && apt-get install -y xsel
+else
+  echo "✅ xsel already installed."
+fi
+
+# Create pbcopy wrapper in /workspace
+echo "📋 Creating pbcopy wrapper..."
+cat << 'EOF' > /workspace/pbcopy
+#!/bin/bash
+xsel --clipboard --input
+EOF
+
+# Create pbpaste wrapper in /workspace
+echo "📋 Creating pbpaste wrapper..."
+cat << 'EOF' > /workspace/pbpaste
+#!/bin/bash
+xsel --clipboard --output
+EOF
+
+# Make them executable
+chmod +x /workspace/pbcopy /workspace/pbpaste
+
+# Add /workspace to PATH for current session
+export PATH="/workspace:$PATH"
+
+# Persist PATH change in .bashrc
+if ! grep -q 'export PATH="/workspace:$PATH"' ~/.bashrc; then
+  echo 'export PATH="/workspace:$PATH"' >> ~/.bashrc
+  echo "✅ Added /workspace to PATH in ~/.bashrc"
+fi
+
+echo "✅ Debugging tools ready: tree, pbcopy, pbpaste"
+echo "💡 Usage: echo 'test' | pbcopy && pbpaste"
+
 echo "📁 Ensuring /.ollama directory exists and is writeable..."
 mkdir -p /.ollama/bin
 chmod -R 755 /.ollama
