@@ -32,15 +32,36 @@ export PROXY_PORT=8001
 mkdir -p /workspace/.ollama/models
 mkdir -p /workspace/cache
 
-# Kill any existing Ollama processes
-echo "🔄 Stopping existing Ollama processes..."
-pkill ollama 2>/dev/null || true
-sleep 2
-
 # Install system dependencies
 echo "📦 Installing system dependencies..."
 apt-get update -qq
-apt-get install -y tree xsel curl
+apt-get install -y tree xsel curl git
+
+# Install uv if not present
+if ! command -v uv &> /dev/null; then
+    echo "📦 Installing uv..."
+    curl -Ls https://astral.sh/uv/install.sh | sh
+fi
+
+# Change to repo directory and pull latest changes
+echo "🔄 Checking for latest code updates..."
+cd /workspace/Pete_ollama_agent
+if [ -d ".git" ]; then
+    echo "📡 Pulling latest changes from GitHub..."
+    git fetch origin main
+    git reset --hard origin/main --quiet
+    git clean -fd --quiet
+    echo "✅ Updated to latest version"
+else
+    echo "⚠️ Not a git repository - skipping auto-update"
+fi
+
+# Kill any existing Ollama processes
+echo "🔄 Stopping existing Ollama processes..."
+pkill ollama 2>/dev/null || true
+pkill -f uvicorn 2>/dev/null || true
+pkill -f "src/main.py" 2>/dev/null || true
+sleep 2
 
 # Install Ollama
 echo "🤖 Installing Ollama..."
