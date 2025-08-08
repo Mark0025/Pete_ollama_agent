@@ -3,103 +3,58 @@
   "models": {
     "peteollama:property-manager-v0.0.1": {
       "name": "peteollama:property-manager-v0.0.1",
-      "display_name": "PeteOllama Property Manager",
-      "description": "Latest property management model trained on real conversations",
+      "display_name": "PeteOllama Property Manager v1",
+      "description": "Property management model v1 trained on llama3",
+      "version": "v1",
+      "base_model": "llama3:latest",
+      "modelfile": "models/Modelfile.enhanced",
       "show_in_ui": true,
       "auto_preload": true,
       "is_jamie_model": true,
-      "base_model": "llama3:latest",
       "created_at": "2025-08-08T20:50:48.000000",
-      "last_updated": "2025-08-08T20:50:48.000000"
-    },
-    "peteollama:property-manager-enhanced-20250807_133318": {
-      "name": "peteollama:property-manager-enhanced-20250807_133318",
-      "display_name": "Jamie Enhanced (v2)",
-      "description": "Enhanced property management model with conversation training",
-      "show_in_ui": true,
-      "auto_preload": false,
-      "is_jamie_model": true,
-      "base_model": "llama3:latest",
-      "created_at": "2025-08-07T13:33:18.000000",
-      "last_updated": "2025-08-07T13:33:18.000000"
-    },
-    "peteollama:property-manager-enhanced-20250807_002249": {
-      "name": "peteollama:property-manager-enhanced-20250807_002249",
-      "display_name": "Jamie Enhanced (v3)",
-      "description": "Enhanced property management model with conversation training",
-      "show_in_ui": true,
-      "auto_preload": false,
-      "is_jamie_model": true,
-      "base_model": "llama3:latest",
-      "created_at": "2025-08-07T00:22:49.000000",
-      "last_updated": "2025-08-07T00:22:49.000000"
-    },
-    "peteollama:jamie-fixed": {
-      "name": "peteollama:jamie-fixed",
-      "display_name": "Jamie Fixed (Legacy)",
-      "description": "Legacy stable Jamie model with bug fixes",
-      "show_in_ui": false,
-      "auto_preload": false,
-      "is_jamie_model": true,
-      "base_model": "llama3:latest",
-      "created_at": "2025-08-06T15:43:41.809499",
-      "last_updated": "2025-08-06T15:43:41.809517"
-    },
-    "peteollama:jamie-voice-complete": {
-      "name": "peteollama:jamie-voice-complete",
-      "display_name": "Jamie Voice Complete (Legacy)",
-      "description": "Legacy Jamie model optimized for voice interactions",
-      "show_in_ui": false,
-      "auto_preload": false,
-      "is_jamie_model": true,
-      "base_model": "llama3:latest",
-      "created_at": "2025-08-06T15:43:41.809536",
-      "last_updated": "2025-08-06T15:43:41.809543"
-    },
-    "peteollama:jamie-simple": {
-      "name": "peteollama:jamie-simple",
-      "display_name": "Jamie Simple (Legacy)",
-      "description": "Legacy lightweight Jamie model for basic tasks",
-      "show_in_ui": false,
-      "auto_preload": false,
-      "is_jamie_model": true,
-      "base_model": "llama3:latest",
-      "created_at": "2025-08-06T15:43:41.809554",
-      "last_updated": "2025-08-06T15:43:41.809560"
-    },
-    "peteollama:jamie-working-working_20250806": {
-      "name": "peteollama:jamie-working-working_20250806",
-      "display_name": "Jamie Working (Legacy)",
-      "description": "Legacy working version of Jamie",
-      "show_in_ui": false,
-      "auto_preload": false,
-      "is_jamie_model": true,
-      "base_model": "llama3:latest",
-      "created_at": "2025-08-06T15:43:41.809568",
-      "last_updated": "2025-08-06T15:43:41.809573"
+      "last_updated": "2025-08-08T20:50:48.000000",
+      "status": "available"
     },
     "llama3:latest": {
       "name": "llama3:latest",
       "display_name": "Base Model (Llama3)",
       "description": "Base Llama3 model for comparison",
+      "version": "base",
+      "base_model": "llama3:latest",
       "show_in_ui": true,
       "auto_preload": true,
       "is_jamie_model": false,
-      "base_model": "llama3:latest",
       "created_at": "2025-08-06T15:43:41.809581",
-      "last_updated": "2025-08-06T15:44:50.704830"
+      "last_updated": "2025-08-08T21:29:13.000000",
+      "status": "available"
     },
     "qwen3:30b": {
       "name": "qwen3:30b",
       "display_name": "Qwen 3 (30B)",
       "description": "Qwen 3 30B model for comparison and testing",
+      "version": "base",
+      "base_model": "qwen3",
       "show_in_ui": true,
       "auto_preload": false,
       "is_jamie_model": false,
-      "base_model": "qwen3",
       "created_at": "2025-08-06T18:30:00.000000",
-      "last_updated": "2025-08-08T20:50:48.000000"
+      "last_updated": "2025-08-08T21:29:13.000000",
+      "status": "available"
     }
   },
-  "last_updated": "2025-08-07T13:38:17.000000"
+  "base_models": {
+    "llama3:latest": {
+      "display_name": "Llama 3 (Latest)",
+      "description": "Meta's Llama 3 base model",
+      "size": "4.7 GB",
+      "status": "available"
+    },
+    "qwen3:30b": {
+      "display_name": "Qwen 3 (30B)",
+      "description": "Alibaba's Qwen 3 30B model",
+      "size": "18 GB",
+      "status": "available"
+    }
+  },
+  "last_updated": "2025-08-08T21:29:13.000000"
 }
