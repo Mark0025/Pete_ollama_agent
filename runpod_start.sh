@@ -216,17 +216,24 @@ echo "🔍 Ollama path: $(which ollama || echo 'Not found')"
 echo "🔍 Current PATH: $PATH"
 
 if command -v ollama >/dev/null 2>&1; then
+  # Kill any existing Ollama processes to avoid conflicts
+  pkill ollama 2>/dev/null || true
+  sleep 2
+  
   # Check if Ollama is already running
   if ! curl -s http://localhost:11434/api/version >/dev/null 2>&1; then
     echo "📡 Starting Ollama service in background..."
+    # Set environment variables for Ollama to bind to all interfaces
+    export OLLAMA_HOST=0.0.0.0
+    export OLLAMA_ORIGINS=*
     ollama serve &
     sleep 10  # Give Ollama time to start
     
-    # Verify it started
-    if curl -s http://localhost:11434/api/version >/dev/null 2>&1; then
-      echo "✅ Ollama service started successfully"
+    # Verify it started and is accessible from all interfaces
+    if curl -s http://localhost:11434/api/version >/dev/null 2>&1 && curl -s http://0.0.0.0:11434/api/version >/dev/null 2>&1; then
+      echo "✅ Ollama service started successfully and accessible from all interfaces"
     else
-      echo "⚠️  Ollama service may not have started properly"
+      echo "⚠️  Ollama service may not have started properly or is not accessible externally"
     fi
   else
     echo "✅ Ollama service already running"
