@@ -4,6 +4,9 @@
 #   /bin/bash /workspace/ollama_agent/runpod_start.sh
 set -euo pipefail
 
+# Add /usr/local/bin to PATH for ollama and other tools at the very beginning
+export PATH="$PATH:/usr/local/bin"
+
 echo "📁 Ensuring /.ollama directory exists and is writeable..."
 mkdir -p /.ollama/bin
 chmod -R 755 /.ollama
@@ -157,6 +160,10 @@ if ! command -v ollama >/dev/null 2>&1; then
     echo 'export PATH="$PATH:/usr/local/bin"' >> ~/.bashrc
   fi
 fi
+
+echo "🔍 DEBUG: Checking ollama installation..."
+echo "🔍 Ollama path: $(which ollama || echo 'Not found')"
+echo "🔍 Current PATH: $PATH"
 
 if command -v ollama >/dev/null 2>&1; then
   # Check if Ollama is already running
