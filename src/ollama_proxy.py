@@ -100,9 +100,22 @@ async def chat_completions(request: ChatCompletionRequest):
             # Convert Ollama response to OpenAI format
             content = ollama_response.get("response", "")
             
+            # Convert ISO timestamp to Unix timestamp
+            import datetime
+            created_at = ollama_response.get("created_at", "")
+            if created_at:
+                try:
+                    # Parse ISO timestamp and convert to Unix timestamp
+                    dt = datetime.datetime.fromisoformat(created_at.replace('Z', '+00:00'))
+                    created_timestamp = int(dt.timestamp())
+                except:
+                    created_timestamp = int(datetime.datetime.now().timestamp())
+            else:
+                created_timestamp = int(datetime.datetime.now().timestamp())
+            
             chat_response = ChatCompletionResponse(
                 id="chatcmpl-" + str(hash(content))[:8],
-                created=int(ollama_response.get("created_at", 0)),
+                created=created_timestamp,
                 model=request.model,
                 choices=[{
                     "index": 0,
