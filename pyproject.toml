@@ -23,6 +23,7 @@ dependencies = [
     # VAPI Integration
     "websockets>=11.0.0",
     "aiohttp>=3.9.0",
+    "httpx>=0.25.0",
     "nodemon>=0.1.1",
     "sqlalchemy>=2.0.42",
     "pandas>=2.3.1",
