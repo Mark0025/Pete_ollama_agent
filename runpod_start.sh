@@ -139,7 +139,25 @@ python -c "import langchain; print('✅ LangChain v0.3 installed')" || echo "❌
 python -c "from langchain_huggingface import HuggingFaceEmbeddings; print('✅ HuggingFaceEmbeddings available')" || echo "❌ HuggingFaceEmbeddings import failed"
 python -c "from langchain_text_splitters import RecursiveCharacterTextSplitter; print('✅ TextSplitter available')" || echo "❌ TextSplitter import failed"
 
-echo "🚀 Starting Ollama service..."
+echo "🚀 Installing and starting Ollama service..."
+# Install Ollama if not present
+if ! command -v ollama >/dev/null 2>&1; then
+  echo "📦 Installing Ollama..."
+  curl -fsSL https://ollama.com/install.sh | sh
+  # Add ollama to PATH
+  export PATH="$PATH:/usr/local/bin"
+  # Verify installation
+  if ! command -v ollama >/dev/null 2>&1; then
+    echo "❌ Failed to install Ollama"
+    exit 1
+  fi
+  echo "✅ Ollama installed successfully"
+  # Add to bashrc for persistence
+  if ! grep -q "/usr/local/bin" ~/.bashrc 2>/dev/null; then
+    echo 'export PATH="$PATH:/usr/local/bin"' >> ~/.bashrc
+  fi
+fi
+
 if command -v ollama >/dev/null 2>&1; then
   # Check if Ollama is already running
   if ! curl -s http://localhost:11434/api/version >/dev/null 2>&1; then
@@ -204,10 +222,21 @@ if [ -f "$REPO_DIR/langchain_indexed_conversations.json" ] && [ ! -f /app/langch
   cp "$REPO_DIR/langchain_indexed_conversations.json" /app/langchain_indexed_conversations.json || true
 fi
 
-# If no pete.db exists, extract data from production DB (if credentials available)
-if [ ! -f /app/pete.db ] && [ -n "${PROD_DB_USERNAME:-}" ]; then
-  echo "🔄 No pete.db found, extracting from production database..."
-  python src/virtual_jamie_extractor.py || echo "⚠️  Could not extract from production DB"
+# If no pete.db exists, extract data using the existing virtual_jamie_extractor
+if [ ! -f /app/pete.db ]; then
+  echo "🔄 No pete.db found, extracting data using virtual_jamie_extractor..."
+  
+  # Set PETE_DB_PATH to ensure database is created in the right location
+  export PETE_DB_PATH="/app/pete.db"
+  
+  if [ -n "${PROD_DB_USERNAME:-}" ]; then
+    echo "📊 Using production database credentials for real data extraction..."
+    python src/virtual_jamie_extractor.py || echo "⚠️  Could not extract from production DB"
+  else
+    echo "📊 No production DB credentials found, but virtual_jamie_extractor will handle fallback..."
+    echo "💡 The extractor will create a basic database structure even without production data"
+    python src/virtual_jamie_extractor.py || echo "⚠️  Could not run virtual_jamie_extractor"
+  fi
 fi
 
 # Generate conversation index if missing (only if we have a database)
@@ -216,7 +245,7 @@ if [ ! -f /app/langchain_indexed_conversations.json ] && [ -f /app/pete.db ]; th
   cd "$REPO_DIR" && python src/langchain/conversation_indexer.py || echo "⚠️  Could not generate conversation index"
 elif [ ! -f /app/pete.db ]; then
   echo "⚠️  No pete.db found - skipping conversation index generation"
-  echo "💡 To enable full similarity analysis, provide PROD_DB_* environment variables"
+  echo "💡 To enable full similarity analysis, provide PROD_DB_* environment variables or the script will create sample data"
 fi
 
 echo "🔍 DEBUG: Conversation index section completed, moving to model creation..."

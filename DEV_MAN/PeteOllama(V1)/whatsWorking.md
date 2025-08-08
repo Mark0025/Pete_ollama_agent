@@ -459,6 +459,7 @@ Then open:
 The system now uses intelligent versioning that only creates new models when there are meaningful improvements:
 
 ### **Versioning Logic:**
+
 - **Semantic Versioning**: `v0.0.1`, `v0.1.0`, `v1.0.0` instead of random timestamps
 - **Smart Detection**: Only creates new models when:
   - Training data has changed (new conversations)
@@ -468,33 +469,37 @@ The system now uses intelligent versioning that only creates new models when the
 - **Cost Optimization**: Prevents wasteful 4.1GB model recreations
 
 ### **Improvement Tracking:**
+
 - **Data Hash Tracking**: Detects when training data changes
 - **Performance Monitoring**: Analyzes benchmark scores
 - **Version History**: Maintains complete model lineage
 - **Rollback Capability**: Can revert to previous versions
 
 ### **Model Creation Triggers:**
+
 1. **New Training Data** → Patch version increment (v0.0.1 → v0.0.2)
 2. **Performance Improvements** → Minor version increment (v0.0.2 → v0.1.0)
 3. **Major Changes** → Major version increment (v0.1.0 → v1.0.0)
 4. **Regular Updates** → Patch version increment (30+ days)
 
 ### **Version History Example:**
+
 ```
 v0.0.1: Initial model (2025-08-07)
   - 150 conversations
   - Basic property management responses
-  
+
 v0.0.2: Training data update (2025-08-10)
   - 175 conversations (+25 new)
   - Improved emergency response handling
-  
+
 v0.1.0: Performance improvements (2025-08-15)
   - Benchmark score: 7.2 → 8.1
   - Enhanced payment processing responses
 ```
 
 ### **Diff Analysis Example:**
+
 ```
 Model Improvement Analysis:
 - Training data hash: a1b2c3d4
@@ -505,6 +510,7 @@ Model Improvement Analysis:
 ```
 
 ### **Smart Versioning Flow:**
+
 ```mermaid
 graph TD
     A[Startup] --> B{Check Training Data}
@@ -525,6 +531,7 @@ graph TD
 ```
 
 ### **Cost Savings:**
+
 - **Before**: 4.1GB model created every startup
 - **After**: Only creates when improvements detected
 - **Savings**: ~90% reduction in model creation costs
