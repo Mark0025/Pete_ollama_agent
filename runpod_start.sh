@@ -236,9 +236,10 @@ if command -v ollama >/dev/null 2>&1; then
   # Check if Ollama is already running
   if ! curl -s http://localhost:11434/api/version >/dev/null 2>&1; then
     echo "📡 Starting Ollama service in background..."
-    # Set environment variables for Ollama to bind to all interfaces
+    # Set environment variables for Ollama to bind to all interfaces and use /workspace for models
     export OLLAMA_HOST=0.0.0.0
     export OLLAMA_ORIGINS=*
+    export OLLAMA_MODELS=/workspace/.ollama/models
     ollama serve &
     sleep 10  # Give Ollama time to start
     
@@ -251,6 +252,9 @@ if command -v ollama >/dev/null 2>&1; then
   else
     echo "✅ Ollama service already running"
   fi
+  
+  # Ensure Ollama models directory exists in /workspace for persistence
+  mkdir -p /workspace/.ollama/models
   
   echo "📦 Ensuring base models are present..."
   
