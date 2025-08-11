@@ -26,6 +26,9 @@ class ModelConfig:
     auto_preload: bool = False
     is_jamie_model: bool = False
     base_model: str = "unknown"
+    type: str = "unknown"
+    size: str = "unknown"
+    status: str = "unknown"
     created_at: str = ""
     last_updated: str = ""
     
@@ -88,7 +91,10 @@ class ModelSettingsManager:
                 "show_in_ui": True,
                 "auto_preload": True,
                 "is_jamie_model": True,
-                "base_model": "llama3:latest"
+                "base_model": "llama3:latest",
+                "type": "jamie",
+                "size": "unknown",
+                "status": "unknown"
             },
             {
                 "name": "peteollama:jamie-voice-complete",
@@ -97,7 +103,10 @@ class ModelSettingsManager:
                 "show_in_ui": True,
                 "auto_preload": False,
                 "is_jamie_model": True,
-                "base_model": "llama3:latest"
+                "base_model": "llama3:latest",
+                "type": "jamie",
+                "size": "unknown",
+                "status": "unknown"
             },
             {
                 "name": "peteollama:jamie-simple",
@@ -106,7 +115,10 @@ class ModelSettingsManager:
                 "show_in_ui": False,
                 "auto_preload": False,
                 "is_jamie_model": True,
-                "base_model": "llama3:latest"
+                "base_model": "llama3:latest",
+                "type": "jamie",
+                "size": "unknown",
+                "status": "unknown"
             },
             {
                 "name": "peteollama:jamie-working-working_20250806",
@@ -115,7 +127,10 @@ class ModelSettingsManager:
                 "show_in_ui": False,
                 "auto_preload": False,
                 "is_jamie_model": True,
-                "base_model": "llama3:latest"
+                "base_model": "llama3:latest",
+                "type": "jamie",
+                "size": "unknown",
+                "status": "unknown"
             },
             {
                 "name": "llama3:latest",
@@ -124,7 +139,10 @@ class ModelSettingsManager:
                 "show_in_ui": False,
                 "auto_preload": False,
                 "is_jamie_model": False,
-                "base_model": "llama3:latest"
+                "base_model": "llama3:latest",
+                "type": "llama3",
+                "size": "unknown",
+                "status": "unknown"
             }
         ]
         
