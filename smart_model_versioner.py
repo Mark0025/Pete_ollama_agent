@@ -238,8 +238,8 @@ Model Improvement Analysis:
             print(f"🎯 Creating new model version {version}")
             print(f"📝 Reason: {reason}")
             
-            # Generate model name
-            model_name = f"peteollama:property-manager-v{version}"
+            # Generate model name - use jamie naming convention to match UI expectations
+            model_name = f"peteollama:jamie-v{version}"
             
             # Create the model using enhanced trainer
             from enhanced_model_trainer import PropertyManagementModelfileGenerator
