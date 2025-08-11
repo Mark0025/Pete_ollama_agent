@@ -81,6 +81,9 @@ class VAPIWebhookServer:
         @self.app.get("/personas")
         async def personas():
             """Return list of personas filtered by model settings."""
+            # Refresh models from ollama list first
+            model_settings.refresh_from_ollama()
+            
             # Get only models that are enabled for UI display
             ui_models = model_settings.get_ui_models()
             
@@ -97,7 +100,9 @@ class VAPIWebhookServer:
                     "name": model_config.name,
                     "display_name": model_config.display_name,
                     "description": model_config.description,
-                    "auto_preload": model_config.auto_preload
+                    "auto_preload": model_config.auto_preload,
+                    "type": getattr(model_config, 'type', 'unknown'),
+                    "base_model": getattr(model_config, 'base_model', 'unknown')
                 }
                 
                 if model_config.is_jamie_model:
@@ -2760,38 +2765,52 @@ function loadHistoricalData() {
                     }
                 }
 
+        @self.app.post("/admin/api/models/refresh")
+        async def refresh_models():
+            """Manually refresh model list from ollama list"""
+            try:
+                success = model_settings.refresh_from_ollama()
+                if success:
+                    return {"status": "success", "message": "Models refreshed successfully"}
+                else:
+                    return {"status": "error", "message": "Failed to refresh models"}
+            except Exception as e:
+                logger.error(f"Error refreshing models: {e}")
+                return {"status": "error", "message": str(e)}
+
         @self.app.get("/admin/api/models")
         async def api_models():
             """API endpoint for model management"""
             try:
-                # Get available models from Ollama
-                models = []
-                try:
-                    result = subprocess.run(['ollama', 'list'], capture_output=True, text=True)
-                    if result.returncode == 0:
-                        lines = result.stdout.strip().split('\n')[1:]  # Skip header
-                        for line in lines:
-                            if line.strip():
-                                parts = line.split()
-                                if len(parts) >= 2:
-                                    model_name = parts[0]
-                                    size = parts[1] if len(parts) > 1 else "Unknown"
-                                    models.append({
-                                        "name": model_name,
-                                        "size": size,
-                                        "is_jamie_model": "jamie" in model_name.lower() or "peteollama" in model_name.lower()
-                                    })
-                except Exception as e:
-                    logger.error(f"Error getting models: {e}")
+                # Refresh model list from ollama list
+                model_settings.refresh_from_ollama()
                 
-                # Get model settings
-                model_settings = ModelSettings()
+                # Get all model configurations
                 all_models = model_settings.get_all_models()
                 
+                # Convert to list format for API response
+                models_list = []
+                for model_name, config in all_models.items():
+                    models_list.append({
+                        "name": model_name,
+                        "size": getattr(config, 'size', 'Unknown'),
+                        "is_jamie_model": getattr(config, 'is_jamie_model', False),
+                        "display_name": getattr(config, 'display_name', model_name),
+                        "description": getattr(config, 'description', ''),
+                        "show_in_ui": getattr(config, 'show_in_ui', False),
+                        "auto_preload": getattr(config, 'auto_preload', False),
+                        "status": getattr(config, 'status', 'unknown'),
+                        "type": getattr(config, 'type', 'unknown'),
+                        "base_model": getattr(config, 'base_model', 'unknown')
+                    })
+                
                 return {
-                    "models": models,
-                    "settings": all_models,
-                    "current_model": self.model_manager.model_name
+                    "models": models_list,
+                    "total_count": len(models_list),
+                    "jamie_models": len([m for m in models_list if m["is_jamie_model"]]),
+                    "base_models": len([m for m in models_list if not m["is_jamie_model"]]),
+                    "current_model": self.model_manager.model_name,
+                    "last_updated": datetime.now().isoformat()
                 }
             except Exception as e:
                 logger.error(f"Error in models API: {e}")

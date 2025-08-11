@@ -8,6 +8,13 @@ from pathlib import Path
 from loguru import logger
 from dataclasses import dataclass, asdict
 from datetime import datetime
+import sys
+from pathlib import Path
+
+# Add src to path for imports
+sys.path.insert(0, str(Path(__file__).parent.parent))
+
+from utils.enhanced_model_discovery import enhanced_discovery
 
 @dataclass
 class ModelConfig:
@@ -203,6 +210,57 @@ class ModelSettingsManager:
             "auto_preload": auto_preload,
             "base_models": total - jamie_models
         }
+    
+    def sync_with_discovered_models(self) -> bool:
+        """Sync configuration with models discovered from ollama list"""
+        try:
+            # Discover available models
+            discovered_models = enhanced_discovery.discover_available_models()
+            
+            if not discovered_models:
+                logger.warning("No models discovered from ollama list")
+                return False
+            
+            # Generate current config dict
+            current_config = {
+                "models": {name: asdict(config) for name, config in self.models.items()},
+                "default_model": getattr(self, 'default_model', None)
+            }
+            
+            # Sync with discovered models
+            synced_config = enhanced_discovery.sync_with_existing_config(
+                current_config, discovered_models
+            )
+            
+            # Update internal models
+            for model_name, config_data in synced_config["models"].items():
+                if model_name not in self.models:
+                    # Create new model config
+                    self.models[model_name] = ModelConfig(**config_data)
+                else:
+                    # Update existing config with new info
+                    existing = self.models[model_name]
+                    for key, value in config_data.items():
+                        if hasattr(existing, key):
+                            setattr(existing, key, value)
+            
+            # Update default model
+            if synced_config.get("default_model"):
+                self.default_model = synced_config["default_model"]
+            
+            # Save updated settings
+            self.save_settings()
+            
+            logger.info(f"Synced {len(discovered_models)} discovered models with configuration")
+            return True
+            
+        except Exception as e:
+            logger.error(f"Error syncing with discovered models: {e}")
+            return False
+    
+    def refresh_from_ollama(self) -> bool:
+        """Refresh model list from ollama list command"""
+        return self.sync_with_discovered_models()
 
 # Global settings manager instance
 model_settings = ModelSettingsManager()

@@ -540,3 +540,650 @@ graph TD
 ---
 
 **Status:** Jamie 1.0 training system is fully operational with real-time validation, self-correction, continuous improvement based on actual Nolen Properties conversation data, and smart model versioning that prevents wasteful recreations.
+
+---
+
+## 🏭 **AGENT FACTORY - Multi-Agent Creation System**
+
+**Date:** August 11, 2025  
+**Status:** 🎯 DESIGN COMPLETE - Ready for Implementation
+
+---
+
+## 🎯 **Agent Factory Overview**
+
+The Agent Factory is a unified system that transforms your existing property manager training pipeline into a **multi-agent creation platform**. Instead of just creating property managers, you can now create:
+
+- **🤖 Python Coding Agents** - Trained on programming conversations
+- **💼 Sales Agents** - Trained on sales calls and negotiations
+- **🏠 Property Managers** - Your existing Jamie system
+- **📚 Customer Support Agents** - Trained on support tickets
+- **🔧 Technical Support Agents** - Trained on technical issues
+- **📊 Data Analysis Agents** - Trained on analytical conversations
+
+### **Key Benefits:**
+
+1. **Reuse Existing Infrastructure** - Leverage your working training pipeline
+2. **Rapid Agent Creation** - Create new agents in minutes, not days
+3. **Bulk Testing** - Test agents on hundreds of questions simultaneously
+4. **Version Control** - Track improvements across all agent types
+5. **Unified Management** - Single admin interface for all agents
+
+---
+
+## 🏗️ **Agent Factory Architecture**
+
+```mermaid
+graph TD
+    A[Agent Factory UI] --> B[Agent Designer]
+    B --> C[Training Data Selector]
+    C --> D[Base Model Chooser]
+    D --> E[Agent Configuration]
+    E --> F[Training Pipeline]
+    F --> G[Model Creation]
+    G --> H[Validation & Testing]
+    H --> I[Agent Deployment]
+
+    subgraph "Agent Designer Interface"
+        J[Agent Type Selection] --> K[Personality Definition]
+        L[Training Data Source] --> M[Data Filtering]
+        N[Base Model Selection] --> O[Model Parameters]
+        P[Validation Rules] --> Q[Quality Thresholds]
+    end
+
+    subgraph "Training Pipeline (Reusing Existing)"
+        R[Conversation Indexer] --> S[Pattern Analysis]
+        S --> T[Training Example Generation]
+        T --> U[Modelfile Creation]
+        U --> V[Ollama Model Training]
+    end
+
+    subgraph "Bulk Testing System"
+        W[Question Database] --> X[Batch Testing Engine]
+        X --> Y[Response Validation]
+        Y --> Z[Performance Analytics]
+        Z --> AA[Improvement Suggestions]
+    end
+
+    subgraph "Agent Management"
+        BB[Agent Registry] --> CC[Version Control]
+        CC --> DD[Performance Tracking]
+        DD --> EE[Auto-Improvement]
+    end
+
+    B --> J
+    B --> L
+    B --> N
+    B --> P
+
+    F --> R
+    H --> W
+    G --> BB
+```
+
+---
+
+## 🔧 **Agent Factory Components**
+
+### **1. Agent Designer Interface**
+
+**Unified Agent Creation Form:**
+
+```typescript
+interface AgentDesign {
+  // Basic Information
+  agent_name: string; // "python-coder-v1", "sales-agent-v2"
+  display_name: string; // "Python Coding Assistant"
+  description: string; // "Expert Python developer for code reviews"
+  agent_type: AgentType; // "coder", "sales", "support", "property"
+
+  // Training Configuration
+  base_model: string; // "llama3:latest", "qwen3:30b", "codellama:7b"
+  training_data_source: string; // "existing_db", "new_extraction", "custom_upload"
+  data_filters: DataFilters; // Category, date range, quality thresholds
+
+  // Personality & Behavior
+  system_prompt: string; // Custom system prompt for this agent
+  response_style: ResponseStyle; // "concise", "detailed", "conversational"
+  expertise_areas: string[]; // ["python", "web development", "data science"]
+
+  // Validation Rules
+  validation_rules: ValidationRule[]; // Pydantic schemas for this agent type
+  quality_thresholds: QualityThresholds; // Minimum scores for deployment
+
+  // Performance Settings
+  temperature: number; // 0.1 - 2.0
+  max_tokens: number; // Response length limits
+  context_window: number; // Memory capacity
+}
+```
+
+### **2. Training Data Selector**
+
+**Intelligent Data Source Management:**
+
+```mermaid
+graph LR
+    A[Training Data Sources] --> B[Existing Database]
+    A --> C[New Extraction]
+    A --> D[Custom Upload]
+
+    B --> E[Filter by Category]
+    B --> F[Filter by Date Range]
+    B --> G[Filter by Quality Score]
+
+    C --> H[Extract from Production DB]
+    C --> I[Extract from New Sources]
+    C --> J[Extract from APIs]
+
+    D --> K[CSV Upload]
+    D --> L[JSON Upload]
+    D --> M[Text File Upload]
+
+    E --> N[Conversation Categorization]
+    F --> O[Temporal Analysis]
+    G --> P[Quality Assessment]
+
+    N --> Q[Training Data Pipeline]
+    O --> Q
+    P --> Q
+```
+
+**Data Source Types:**
+
+1. **Existing Database** - Reuse your current `pete.db` with filtering
+2. **New Extraction** - Extract from different data sources
+3. **Custom Upload** - Upload your own training conversations
+4. **Synthetic Generation** - Generate training data using templates
+
+### **3. Base Model Chooser**
+
+**Intelligent Base Model Selection:**
+
+```typescript
+interface BaseModel {
+  name: string; // "llama3:latest"
+  size: string; // "4.7 GB"
+  context_window: number; // 128000
+  strengths: string[]; // ["coding", "reasoning", "creativity"]
+  weaknesses: string[]; // ["factual accuracy", "recent events"]
+  recommended_for: AgentType[]; // ["coder", "analyst", "general"]
+  performance_metrics: {
+    response_time: number; // Average response time
+    accuracy_score: number; // Validation pass rate
+    similarity_score: number; // How close to human responses
+  };
+}
+```
+
+**Base Model Recommendations:**
+
+- **🤖 Python Coder**: `codellama:7b` or `llama3:latest`
+- **💼 Sales Agent**: `qwen3:30b` or `llama3:latest`
+- **🏠 Property Manager**: `llama3:latest` (your current choice)
+- **📚 Customer Support**: `llama3:latest` or `mistral:7b`
+- **🔧 Technical Support**: `codellama:7b` or `llama3:latest`
+
+### **4. Training Pipeline (Reusing Existing)**
+
+**Leverage Your Working System:**
+
+```mermaid
+graph TD
+    A[Agent Design] --> B[Training Data Selection]
+    B --> C[Conversation Indexer]
+    C --> D[Pattern Analysis]
+    D --> E[Training Example Generation]
+    E --> F[Modelfile Creation]
+    F --> G[Ollama Model Training]
+    G --> H[Agent Validation]
+    H --> I[Agent Deployment]
+
+    subgraph "Reused Components"
+        C --> C1[Your Existing Indexer]
+        D --> D1[Your Existing Analyzer]
+        E --> E1[Your Existing Generator]
+        F --> F1[Your Existing Modelfile Creator]
+    end
+
+    subgraph "New Agent Factory Features"
+        A --> A1[Agent Type Templates]
+        B --> B1[Multi-Source Data Selection]
+        H --> H1[Agent-Specific Validation]
+        I --> I1[Agent Registry Management]
+    end
+```
+
+---
+
+## 🧪 **Bulk Testing System**
+
+### **Mass Question Testing**
+
+**Test Agents on Hundreds of Questions Simultaneously:**
+
+```typescript
+interface BulkTest {
+  agent_name: string; // Which agent to test
+  question_set: string; // "python_questions", "sales_scenarios"
+  test_parameters: {
+    batch_size: number; // Questions per batch
+    parallel_workers: number; // Concurrent testing
+    timeout_per_question: number; // Max time per response
+  };
+
+  validation_rules: ValidationRule[]; // Agent-specific validation
+  performance_metrics: {
+    response_time: boolean; // Track timing
+    validation_pass: boolean; // Track validation success
+    similarity_score: boolean; // Track human-like responses
+    quality_score: boolean; // Track overall quality
+  };
+}
+```
+
+**Question Database Structure:**
+
+```sql
+-- Question categories for different agent types
+CREATE TABLE question_categories (
+    id INTEGER PRIMARY KEY,
+    category_name TEXT,         -- "python_coding", "sales_negotiation"
+    agent_type TEXT,            -- "coder", "sales", "property"
+    description TEXT
+);
+
+-- Questions for testing
+CREATE TABLE test_questions (
+    id INTEGER PRIMARY KEY,
+    category_id INTEGER,
+    question_text TEXT,         -- The actual question
+    expected_response_type TEXT, -- "code_snippet", "explanation", "action_plan"
+    difficulty_level INTEGER,   -- 1-5 scale
+    tags TEXT[]                 -- ["python", "debugging", "best_practices"]
+);
+
+-- Test results
+CREATE TABLE test_results (
+    id INTEGER PRIMARY KEY,
+    agent_name TEXT,            -- Which agent was tested
+    question_id INTEGER,        -- Which question was asked
+    response_text TEXT,         -- Agent's response
+    response_time REAL,         -- Time to respond
+    validation_passed BOOLEAN,  -- Did it pass validation?
+    similarity_score REAL,      -- How close to human response
+    quality_score REAL,         -- Overall quality rating
+    improvement_suggestions TEXT -- What could be better
+);
+```
+
+**Bulk Testing Workflow:**
+
+```mermaid
+graph TD
+    A[Select Agent] --> B[Choose Question Set]
+    B --> C[Configure Test Parameters]
+    C --> D[Start Batch Testing]
+    D --> E[Process Questions in Parallel]
+    E --> F[Generate Responses]
+    F --> G[Validate Responses]
+    G --> H[Calculate Metrics]
+    H --> I[Generate Report]
+    I --> J[Identify Improvements]
+
+    subgraph "Parallel Processing"
+        E --> E1[Worker 1: Questions 1-50]
+        E --> E2[Worker 2: Questions 51-100]
+        E --> E3[Worker 3: Questions 101-150]
+    end
+
+    subgraph "Validation Pipeline"
+        G --> G1[Pydantic Validation]
+        G --> G2[Similarity Analysis]
+        G --> G3[Quality Assessment]
+    end
+
+    subgraph "Reporting"
+        I --> I1[Performance Summary]
+        I --> I2[Failure Analysis]
+        I --> I3[Improvement Suggestions]
+    end
+```
+
+---
+
+## 🎨 **Agent Factory UI Design**
+
+### **Main Agent Factory Dashboard**
+
+**Unified Agent Management Interface:**
+
+```html
+<!-- Agent Factory Dashboard -->
+<div class="agent-factory-dashboard">
+  <!-- Agent Registry -->
+  <div class="agent-registry">
+    <h2>🤖 Agent Registry</h2>
+    <div class="agent-grid">
+      <!-- Python Coder Agent -->
+      <div class="agent-card python-coder">
+        <h3>🐍 Python Coding Assistant</h3>
+        <p>Expert Python developer for code reviews and debugging</p>
+        <div class="agent-stats">
+          <span>Version: v1.2.0</span>
+          <span>Base: codellama:7b</span>
+          <span>Accuracy: 94.2%</span>
+        </div>
+        <div class="agent-actions">
+          <button>🧪 Test</button>
+          <button>📊 Analytics</button>
+          <button>🔄 Retrain</button>
+        </div>
+      </div>
+
+      <!-- Sales Agent -->
+      <div class="agent-card sales-agent">
+        <h3>💼 Sales Negotiation Expert</h3>
+        <p>Professional sales agent for customer interactions</p>
+        <div class="agent-stats">
+          <span>Version: v0.9.1</span>
+          <span>Base: qwen3:30b</span>
+          <span>Accuracy: 87.6%</span>
+        </div>
+        <div class="agent-actions">
+          <button>🧪 Test</button>
+          <button>📊 Analytics</button>
+          <button>🔄 Retrain</button>
+        </div>
+      </div>
+
+      <!-- Property Manager (Your Existing) -->
+      <div class="agent-card property-manager">
+        <h3>🏠 Jamie Property Manager</h3>
+        <p>Expert property management assistant</p>
+        <div class="agent-stats">
+          <span>Version: v0.0.1</span>
+          <span>Base: llama3:latest</span>
+          <span>Accuracy: 89.3%</span>
+        </div>
+        <div class="agent-actions">
+          <button>🧪 Test</button>
+          <button>📊 Analytics</button>
+          <button>🔄 Retrain</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Create New Agent -->
+  <div class="create-agent">
+    <h2>🏭 Create New Agent</h2>
+    <button class="create-btn">➕ New Agent</button>
+  </div>
+</div>
+```
+
+### **Agent Creation Wizard**
+
+**Step-by-Step Agent Design:**
+
+```html
+<!-- Agent Creation Wizard -->
+<div class="agent-wizard">
+  <!-- Step 1: Agent Type -->
+  <div class="wizard-step">
+    <h3>Step 1: Choose Agent Type</h3>
+    <div class="agent-type-grid">
+      <div class="type-option" data-type="coder">
+        <h4>🐍 Python Coder</h4>
+        <p>Code review, debugging, best practices</p>
+      </div>
+      <div class="type-option" data-type="sales">
+        <h4>💼 Sales Agent</h4>
+        <p>Customer interactions, negotiations</p>
+      </div>
+      <div class="type-option" data-type="support">
+        <h4>🔧 Technical Support</h4>
+        <p>Problem solving, troubleshooting</p>
+      </div>
+      <div class="type-option" data-type="custom">
+        <h4>⚙️ Custom Agent</h4>
+        <p>Define your own agent type</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Step 2: Base Model -->
+  <div class="wizard-step">
+    <h3>Step 2: Select Base Model</h3>
+    <div class="base-model-selector">
+      <div class="model-option" data-model="llama3:latest">
+        <h4>🦙 Llama 3 (Latest)</h4>
+        <p>4.7 GB • General purpose • Good balance</p>
+      </div>
+      <div class="model-option" data-model="codellama:7b">
+        <h4>💻 Code Llama 7B</h4>
+        <p>3.8 GB • Code-focused • Excellent for developers</p>
+      </div>
+      <div class="model-option" data-model="qwen3:30b">
+        <h4>🌟 Qwen 3 (30B)</h4>
+        <p>18 GB • High performance • Best for complex tasks</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Step 3: Training Data -->
+  <div class="wizard-step">
+    <h3>Step 3: Select Training Data</h3>
+    <div class="training-data-selector">
+      <div class="data-source">
+        <h4>📊 Existing Database</h4>
+        <p>Use your current pete.db with filtering</p>
+        <div class="data-filters">
+          <label
+            >Category:
+            <select id="categoryFilter">
+              <option>All Categories</option>
+              <option>Property Management</option>
+              <option>Technical Support</option>
+              <option>Sales Calls</option>
+            </select></label
+          >
+          <label
+            >Date Range: <input type="date" id="startDate" /> to
+            <input type="date" id="endDate"
+          /></label>
+          <label
+            >Quality Score:
+            <input
+              type="range"
+              min="0"
+              max="10"
+              value="7"
+              id="qualityThreshold"
+          /></label>
+        </div>
+      </div>
+      <div class="data-source">
+        <h4>🆕 New Extraction</h4>
+        <p>Extract from different data sources</p>
+        <button>Configure Extraction</button>
+      </div>
+      <div class="data-source">
+        <h4>📁 Custom Upload</h4>
+        <p>Upload your own training data</p>
+        <input type="file" accept=".csv,.json,.txt" />
+      </div>
+    </div>
+  </div>
+
+  <!-- Step 4: Agent Configuration -->
+  <div class="wizard-step">
+    <h3>Step 4: Configure Agent</h3>
+    <div class="agent-config">
+      <div class="config-section">
+        <h4>🎭 Personality & Behavior</h4>
+        <label
+          >System Prompt: <textarea id="systemPrompt" rows="4"></textarea>
+        </label>
+        <label
+          >Response Style:
+          <select id="responseStyle">
+            <option value="concise">Concise & Direct</option>
+            <option value="detailed">Detailed & Explanatory</option>
+            <option value="conversational">Conversational & Friendly</option>
+          </select></label
+        >
+      </div>
+      <div class="config-section">
+        <h4>⚙️ Performance Settings</h4>
+        <label
+          >Temperature:
+          <input
+            type="range"
+            min="0"
+            max="2"
+            step="0.1"
+            value="0.7"
+            id="temperature"
+        /></label>
+        <label
+          >Max Tokens:
+          <input type="number" value="2048" min="256" max="8192" id="maxTokens"
+        /></label>
+        <label
+          >Context Window:
+          <input
+            type="number"
+            value="128000"
+            min="4096"
+            max="128000"
+            id="contextWindow"
+        /></label>
+      </div>
+    </div>
+  </div>
+
+  <!-- Step 5: Validation Rules -->
+  <div class="wizard-step">
+    <h3>Step 5: Define Validation Rules</h3>
+    <div class="validation-rules">
+      <div class="rule-template">
+        <h4>📋 Response Structure Validation</h4>
+        <p>Define what a good response looks like for this agent type</p>
+        <button>Use Template</button>
+        <button>Custom Rules</button>
+      </div>
+      <div class="rule-editor">
+        <h4>✏️ Custom Validation Rules</h4>
+        <textarea
+          id="validationRules"
+          rows="6"
+          placeholder="Define your Pydantic validation schema..."
+        ></textarea>
+      </div>
+    </div>
+  </div>
+</div>
+```
+
+---
+
+## 🚀 **Implementation Roadmap**
+
+### **Phase 1: Core Agent Factory (Week 1-2)**
+
+1. **Agent Registry System**
+
+   - Database schema for agent management
+   - Agent metadata storage
+   - Version control system
+
+2. **Agent Creation Wizard**
+
+   - Step-by-step agent design interface
+   - Base model selection
+   - Training data configuration
+
+3. **Training Pipeline Integration**
+   - Reuse existing conversation indexer
+   - Agent-specific training data filtering
+   - Custom Modelfile generation
+
+### **Phase 2: Bulk Testing System (Week 3-4)**
+
+1. **Question Database**
+
+   - Question categorization system
+   - Agent-specific question sets
+   - Quality scoring system
+
+2. **Batch Testing Engine**
+
+   - Parallel question processing
+   - Response validation pipeline
+   - Performance analytics
+
+3. **Testing Dashboard**
+   - Real-time testing progress
+   - Performance metrics display
+   - Improvement suggestions
+
+### **Phase 3: Advanced Features (Week 5-6)**
+
+1. **Agent Performance Tracking**
+
+   - Historical performance data
+   - Improvement trend analysis
+   - Auto-retraining triggers
+
+2. **Multi-Agent Orchestration**
+
+   - Agent collaboration systems
+   - Workflow automation
+   - Agent handoff management
+
+3. **Production Deployment**
+   - Agent deployment pipeline
+   - Monitoring and alerting
+   - Rollback capabilities
+
+---
+
+## 💡 **Key Innovation: Reusing Your Working System**
+
+**The brilliance of this design is that it leverages your existing, proven infrastructure:**
+
+1. **✅ Conversation Indexer** - Already processes real conversations perfectly
+2. **✅ Pattern Analysis** - Already identifies conversation patterns
+3. **✅ Training Example Generation** - Already creates quality training data
+4. **✅ Modelfile Creation** - Already generates working Ollama Modelfiles
+5. **✅ Model Training** - Already creates working models via Ollama
+6. **✅ Validation System** - Already validates responses with Pydantic
+7. **✅ Admin Interface** - Already manages models dynamically
+
+**What's New:**
+
+- **Agent Type Templates** - Pre-configured agent personalities
+- **Multi-Source Data Selection** - Choose from different training data
+- **Bulk Testing System** - Test on hundreds of questions simultaneously
+- **Agent Registry** - Manage multiple agent types in one place
+
+**Result:** You can create a Python coding agent in minutes using the same pipeline that creates your property manager, just with different training data and configuration.
+
+---
+
+## 🎯 **Immediate Next Steps**
+
+1. **Design the Agent Registry Database Schema**
+2. **Create Agent Type Templates** (Python Coder, Sales Agent, etc.)
+3. **Build Agent Creation Wizard UI**
+4. **Integrate with Existing Training Pipeline**
+5. **Implement Bulk Testing System**
+6. **Create Question Database for Different Agent Types**
+
+**The Agent Factory will transform your single-purpose property manager system into a multi-agent creation platform, allowing you to rapidly prototype and deploy AI agents for any business need.**
+
+---
+
+**Status:** 🎯 Agent Factory design complete - Ready for implementation using your existing, proven infrastructure.
