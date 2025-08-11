@@ -6,7 +6,7 @@
 set -e
 
 # Create log file for debugging
-LOG_FILE="/workspace/startup.log"
+LOG_FILE="/root/.ollama/startup.log"
 exec > >(tee -a "$LOG_FILE") 2>&1
 
 echo "🚀 Starting PeteOllama Agent Setup - $(date)"
@@ -15,17 +15,17 @@ echo "📝 Logging to: $LOG_FILE"
 # Function to check if we're in a restart loop
 check_restart_loop() {
     local restart_count=0
-    if [ -f "/workspace/restart_count" ]; then
-        restart_count=$(cat /workspace/restart_count)
+    if [ -f "/root/.ollama/restart_count" ]; then
+        restart_count=$(cat /root/.ollama/restart_count)
     fi
     
     if [ "$restart_count" -gt 5 ]; then
         echo "🚨 Too many restarts detected. Starting minimal mode..."
-        echo "0" > /workspace/restart_count
+        echo "0" > /root/.ollama/restart_count
         return 1
     fi
     
-    echo $((restart_count + 1)) > /workspace/restart_count
+    echo $((restart_count + 1)) > /root/.ollama/restart_count
     return 0
 }
 
@@ -46,23 +46,23 @@ rm -rf /root/.cache/pip 2>/dev/null || true
 rm -rf /tmp/* 2>/dev/null || true
 
 # Move cache to persistent volume
-mkdir -p /workspace/cache
+mkdir -p /root/.ollama/cache
 if [ ! -L /root/.cache ]; then
-    ln -sf /workspace/cache /root/.cache
+    ln -sf /root/.ollama/cache /root/.cache
 fi
 
 # Set environment variables
 export PATH="$PATH:/usr/local/bin"
 export OLLAMA_HOST=0.0.0.0
 export OLLAMA_ORIGINS=*
-export OLLAMA_MODELS=/workspace/.ollama/models
+export OLLAMA_MODELS=/root/.ollama/models
 export OLLAMA_BASE_URL=http://localhost:11434
 export DEFAULT_MODEL=peteollama:property-manager-v0.0.1
 export PROXY_PORT=8001
 
 # Create necessary directories
-mkdir -p /workspace/.ollama/models
-mkdir -p /workspace/cache
+mkdir -p /root/.ollama/models
+mkdir -p /root/.ollama/cache
 
 # Install system dependencies
 echo "📦 Installing system dependencies..."
@@ -80,7 +80,7 @@ fi
 
 # Change to repo directory and pull latest changes
 echo "🔄 Checking for latest code updates..."
-cd /workspace/Pete_ollama_agent || {
+cd /root/.ollama/app/Pete_ollama_agent || {
     echo "❌ Failed to change to repo directory"
     exit 1
 }
@@ -173,6 +173,10 @@ fi
 
 # Create database
 echo "🗄️ Setting up database..."
+# Copy pete.db to current directory if it exists in /app
+if [ -f "/app/pete.db" ]; then
+    cp /app/pete.db . || echo "⚠️ Failed to copy database"
+fi
 python src/virtual_jamie_extractor.py || echo "⚠️ Database setup failed"
 
 # Start the application in background
