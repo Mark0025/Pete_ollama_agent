@@ -6,6 +6,17 @@ echo "🏠 PeteOllama V1 - AI Property Manager"
 echo "====================================="
 echo ""
 
+# Check network connectivity
+echo "🔍 Checking network connectivity..."
+if curl -s --connect-timeout 5 https://httpbin.org/ip >/dev/null 2>&1; then
+    echo "✅ Internet connectivity confirmed"
+else
+    echo "⚠️ Internet connectivity issues detected"
+    echo "💡 Docker containers will still work locally"
+fi
+
+echo ""
+
 # Ensure Docker daemon is running (compatible with RunPod)
 if ! docker info > /dev/null 2>&1; then
     echo "⚠️  Docker daemon not detected – attempting to start dockerd..."

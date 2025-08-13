@@ -1,0 +1,75 @@
+{
+  "models": {
+    "peteollama:jamie-fixed": {
+      "name": "peteollama:jamie-fixed",
+      "display_name": "Jamie Fixed (Latest)",
+      "description": "Latest stable Jamie model with bug fixes",
+      "show_in_ui": true,
+      "auto_preload": true,
+      "is_jamie_model": true,
+      "base_model": "llama3:latest",
+      "type": "jamie",
+      "size": "unknown",
+      "status": "unknown",
+      "created_at": "2025-08-12T18:37:48.980335",
+      "last_updated": "2025-08-12T18:37:48.980345"
+    },
+    "peteollama:jamie-voice-complete": {
+      "name": "peteollama:jamie-voice-complete",
+      "display_name": "Jamie Voice Complete",
+      "description": "Jamie model optimized for voice interactions",
+      "show_in_ui": true,
+      "auto_preload": false,
+      "is_jamie_model": true,
+      "base_model": "llama3:latest",
+      "type": "jamie",
+      "size": "unknown",
+      "status": "unknown",
+      "created_at": "2025-08-12T18:37:48.980353",
+      "last_updated": "2025-08-12T18:37:48.980356"
+    },
+    "peteollama:jamie-simple": {
+      "name": "peteollama:jamie-simple",
+      "display_name": "Jamie Simple",
+      "description": "Lightweight Jamie model for basic tasks",
+      "show_in_ui": false,
+      "auto_preload": false,
+      "is_jamie_model": true,
+      "base_model": "llama3:latest",
+      "type": "jamie",
+      "size": "unknown",
+      "status": "unknown",
+      "created_at": "2025-08-12T18:37:48.980361",
+      "last_updated": "2025-08-12T18:37:48.980364"
+    },
+    "peteollama:jamie-working-working_20250806": {
+      "name": "peteollama:jamie-working-working_20250806",
+      "display_name": "Jamie Working (Legacy)",
+      "description": "Legacy working version of Jamie",
+      "show_in_ui": false,
+      "auto_preload": false,
+      "is_jamie_model": true,
+      "base_model": "llama3:latest",
+      "type": "jamie",
+      "size": "unknown",
+      "status": "unknown",
+      "created_at": "2025-08-12T18:37:48.980367",
+      "last_updated": "2025-08-12T18:37:48.980370"
+    },
+    "llama3:latest": {
+      "name": "llama3:latest",
+      "display_name": "Base Model (Llama3)",
+      "description": "Base Llama3 model for comparison",
+      "show_in_ui": false,
+      "auto_preload": false,
+      "is_jamie_model": false,
+      "base_model": "llama3:latest",
+      "type": "llama3",
+      "size": "unknown",
+      "status": "unknown",
+      "created_at": "2025-08-12T18:37:48.980374",
+      "last_updated": "2025-08-12T18:37:48.980376"
+    }
+  },
+  "last_updated": "2025-08-12T18:37:48.980540"
+}
