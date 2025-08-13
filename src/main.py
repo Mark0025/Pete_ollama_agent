@@ -28,9 +28,9 @@ def main() -> None:
     logger.info(f"🚀 Starting PeteOllama API server on port {port}")
     logger.info(f"🔗 Starting Ollama proxy on port {proxy_port} for VAPI integration")
 
-    # Start the Ollama proxy in the background
+    # Start the Ollama proxy with streaming support in the background
     proxy_process = subprocess.Popen([
-        sys.executable, "src/ollama_proxy.py"
+        sys.executable, "src/ollama_proxy_streaming.py"
     ])
     
     logger.info(f"✅ Ollama proxy started (PID: {proxy_process.pid})")
