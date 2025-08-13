@@ -16,6 +16,7 @@ import json
 import os
 import datetime
 import asyncio
+import uuid
 from loguru import logger
 
 app = FastAPI(title="Ollama OpenAI Proxy with Streaming", version="1.0.0")
@@ -29,6 +30,9 @@ import sys
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent))
 from config.model_settings import ModelSettingsManager, ModelConfig
+
+# Import conversation manager for thread isolation
+from vapi.conversation_manager import conversation_manager, thread_manager, response_cleaner
 
 class ChatMessage(BaseModel):
     role: str
@@ -67,6 +71,16 @@ async def health_check():
 async def chat_completions(request: ChatCompletionRequest):
     """Convert OpenAI chat completion request to Ollama format with streaming support"""
     
+    # Generate or get session ID for conversation isolation
+    session_id = str(uuid.uuid4())
+    
+    # Create isolated conversation session
+    conversation_manager.create_conversation(session_id, request.model)
+    
+    # Add messages to conversation context
+    for message in request.messages:
+        conversation_manager.add_to_context(session_id, message.role, message.content)
+    
     # Convert messages to Ollama prompt format
     prompt = ""
     for message in request.messages:
@@ -92,17 +106,20 @@ async def chat_completions(request: ChatCompletionRequest):
         }
     }
     
-    logger.info(f"Converting request for model: {request.model}, stream: {request.stream}")
+    logger.info(f"Converting request for model: {request.model}, stream: {request.stream}, session: {session_id}")
     logger.debug(f"Prompt: {prompt[:100]}...")
     
     # Handle streaming response
     if request.stream:
-        return await handle_streaming_response(ollama_request, request.model, prompt)
+        return await handle_streaming_response(ollama_request, request.model, prompt, session_id)
     else:
-        return await handle_non_streaming_response(ollama_request, request.model, prompt)
+        return await handle_non_streaming_response(ollama_request, request.model, prompt, session_id)
 
-async def handle_streaming_response(ollama_request: dict, model: str, prompt: str):
+async def handle_streaming_response(ollama_request: dict, model: str, prompt: str, session_id: str):
     """Handle streaming responses for VAPI real-time interactions with admin-controlled settings"""
+    
+    # Start isolated stream for this session
+    thread_manager.start_stream(session_id, model)
     
     # Get admin settings for this model
     settings_manager = ModelSettingsManager()
@@ -133,6 +150,12 @@ async def handle_streaming_response(ollama_request: dict, model: str, prompt: st
                                         full_response, model_config, model
                                     )
                                     
+                                    # Clean the response to remove system prompts and duplicates
+                                    final_cleaned_response = response_cleaner.clean_response(processed_response)
+                                    
+                                    # Add to conversation buffer
+                                    conversation_manager.add_to_buffer(session_id, final_cleaned_response)
+                                    
                                     # Send final message
                                     final_response = {
                                         "id": f"chatcmpl-{hash(str(data)) % 100000000}",
@@ -146,6 +169,9 @@ async def handle_streaming_response(ollama_request: dict, model: str, prompt: st
                                         }]
                                     }
                                     yield f"data: {json.dumps(final_response)}\n\n"
+                                    
+                                    # Stop stream for this session
+                                    thread_manager.stop_stream(session_id)
                                     yield "data: [DONE]\n\n"
                                     break
                                 else:
@@ -173,6 +199,8 @@ async def handle_streaming_response(ollama_request: dict, model: str, prompt: st
                                 
         except Exception as e:
             logger.error(f"Streaming error: {e}")
+            # Stop stream for this session on error
+            thread_manager.stop_stream(session_id)
             error_response = {
                 "error": {
                     "message": f"Streaming failed: {str(e)}",
