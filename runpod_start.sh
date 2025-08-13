@@ -5,6 +5,13 @@
 
 set -e
 
+# Function to handle errors gracefully
+handle_error() {
+    echo "❌ Error occurred on line $1"
+    echo "🔄 Continuing with startup..."
+}
+trap 'handle_error $LINENO' ERR
+
 # Create log file for debugging
 LOG_FILE="/root/.ollama/startup.log"
 exec > >(tee -a "$LOG_FILE") 2>&1
@@ -108,9 +115,10 @@ fi
 
 # Kill any existing processes
 echo "🔄 Stopping existing processes..."
-pkill ollama 2>/dev/null || true
-pkill -f uvicorn 2>/dev/null || true
-pkill -f "src/main.py" 2>/dev/null || true
+pkill ollama 2>/dev/null || echo "⚠️ No ollama processes to stop"
+pkill -f uvicorn 2>/dev/null || echo "⚠️ No uvicorn processes to stop"
+pkill -f "src/main.py" 2>/dev/null || echo "⚠️ No main.py processes to stop"
+echo "✅ Process cleanup completed"
 sleep 3
 
 # Install Ollama
