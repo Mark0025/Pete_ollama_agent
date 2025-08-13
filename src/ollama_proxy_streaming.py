@@ -24,6 +24,12 @@ app = FastAPI(title="Ollama OpenAI Proxy with Streaming", version="1.0.0")
 OLLAMA_BASE_URL = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
 DEFAULT_MODEL = os.getenv("DEFAULT_MODEL", "peteollama:property-manager-v0.0.1")
 
+# Import model settings manager
+import sys
+from pathlib import Path
+sys.path.insert(0, str(Path(__file__).parent))
+from config.model_settings import ModelSettingsManager
+
 class ChatMessage(BaseModel):
     role: str
     content: str
@@ -71,6 +77,8 @@ async def chat_completions(request: ChatCompletionRequest):
         elif message.role == "assistant":
             prompt += f"Assistant: {message.content}\n"
     
+    # Add conversational mode constraint
+    prompt += "System: IMPORTANT - You are in conversational mode. Give ONLY direct, helpful answers. NO internal thinking, NO model configuration details, NO system information. Keep responses concise and focused on the user's question.\n\n"
     prompt += "Assistant: "
     
     # Prepare Ollama request
@@ -94,7 +102,11 @@ async def chat_completions(request: ChatCompletionRequest):
         return await handle_non_streaming_response(ollama_request, request.model, prompt)
 
 async def handle_streaming_response(ollama_request: dict, model: str, prompt: str):
-    """Handle streaming responses for VAPI real-time interactions"""
+    """Handle streaming responses for VAPI real-time interactions with admin-controlled settings"""
+    
+    # Get admin settings for this model
+    settings_manager = ModelSettingsManager()
+    model_config = settings_manager.models.get(model)
     
     async def generate_stream():
         try:
@@ -110,11 +122,17 @@ async def handle_streaming_response(ollama_request: dict, model: str, prompt: st
                         yield f"data: {json.dumps({'error': 'Ollama service error'})}\n\n"
                         return
                     
+                    full_response = ""
                     async for line in response.aiter_lines():
                         if line.strip():
                             try:
                                 data = json.loads(line)
                                 if data.get("done", False):
+                                    # Process full response based on admin settings
+                                    processed_response = process_response_for_vapi(
+                                        full_response, model_config, model
+                                    )
+                                    
                                     # Send final message
                                     final_response = {
                                         "id": f"chatcmpl-{hash(str(data)) % 100000000}",
@@ -131,7 +149,11 @@ async def handle_streaming_response(ollama_request: dict, model: str, prompt: st
                                     yield "data: [DONE]\n\n"
                                     break
                                 else:
-                                    # Send streaming chunk
+                                    # Accumulate response for processing
+                                    chunk_content = data.get("response", "")
+                                    full_response += chunk_content
+                                    
+                                    # Send streaming chunk (raw for now, will be processed at end)
                                     chunk_response = {
                                         "id": f"chatcmpl-{hash(str(data)) % 100000000}",
                                         "object": "chat.completion.chunk",
@@ -140,7 +162,7 @@ async def handle_streaming_response(ollama_request: dict, model: str, prompt: st
                                         "choices": [{
                                             "index": 0,
                                             "delta": {
-                                                "content": data.get("response", "")
+                                                "content": chunk_content
                                             },
                                             "finish_reason": None
                                         }]
@@ -168,6 +190,61 @@ async def handle_streaming_response(ollama_request: dict, model: str, prompt: st
             "Content-Type": "text/event-stream"
         }
     )
+
+def process_response_for_vapi(response: str, model_config: ModelConfig, model_name: str) -> str:
+    """Process response based on admin panel settings"""
+    if not model_config:
+        return response
+    
+    processed = response
+    
+    # 1. Conversational Mode: Remove internal thinking
+    if model_config.conversational_mode:
+        # Remove common thinking patterns
+        thinking_patterns = [
+            "Let me think about this",
+            "I need to consider",
+            "Based on my training",
+            "As an AI model",
+            "My configuration shows",
+            "According to my settings"
+        ]
+        for pattern in thinking_patterns:
+            processed = processed.replace(pattern, "")
+    
+    # 2. Remove Model Info if disabled
+    if not model_config.include_model_info:
+        # Remove model configuration details
+        info_patterns = [
+            "Model: ",
+            "Configuration: ",
+            "Settings: ",
+            "Parameters: "
+        ]
+        for pattern in info_patterns:
+            processed = processed.replace(pattern, "")
+    
+    # 3. Apply Response Style
+    if model_config.response_style == "concise":
+        # Keep only the direct answer
+        lines = processed.split('\n')
+        concise_lines = []
+        for line in lines:
+            if line.strip() and not line.startswith(('Note:', 'Info:', 'Config:')):
+                concise_lines.append(line)
+        processed = '\n'.join(concise_lines)
+    
+    # 4. Limit Response Length
+    if model_config.max_response_length > 0:
+        words = processed.split()
+        if len(words) > model_config.max_response_length:
+            processed = ' '.join(words[:model_config.max_response_length]) + "..."
+    
+    # 5. Clean up extra whitespace
+    processed = ' '.join(processed.split())
+    
+    logger.info(f"Processed response for {model_name}: {len(response)} -> {len(processed)} chars")
+    return processed
 
 async def handle_non_streaming_response(ollama_request: dict, model: str, prompt: str):
     """Handle non-streaming responses (fallback)"""

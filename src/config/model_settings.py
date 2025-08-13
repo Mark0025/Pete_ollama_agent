@@ -29,6 +29,12 @@ class ModelConfig:
     type: str = "unknown"
     size: str = "unknown"
     status: str = "unknown"
+    # Response Control Settings (controlled by admin panel)
+    conversational_mode: bool = True      # Only give clean answers, no internal thinking
+    max_response_length: int = 200       # Limit response length for VAPI
+    include_thinking: bool = False       # Show internal reasoning process
+    include_model_info: bool = False     # Show model configuration details
+    response_style: str = "concise"      # concise, detailed, or verbose
     created_at: str = ""
     last_updated: str = ""
     
@@ -100,7 +106,12 @@ class ModelSettingsManager:
                 "base_model": "llama3:latest",
                 "type": "jamie",
                 "size": "unknown",
-                "status": "unknown"
+                "status": "unknown",
+                "conversational_mode": True,
+                "max_response_length": 200,
+                "include_thinking": False,
+                "include_model_info": False,
+                "response_style": "concise"
             },
             {
                 "name": "peteollama:jamie-voice-complete",
