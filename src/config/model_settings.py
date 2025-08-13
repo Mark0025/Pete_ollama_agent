@@ -53,10 +53,16 @@ class ModelSettingsManager:
             if self.settings_file.exists():
                 with open(self.settings_file, 'r') as f:
                     data = json.load(f)
-                    self.models = {
-                        name: ModelConfig(**config) 
-                        for name, config in data.get('models', {}).items()
-                    }
+                    self.models = {}
+                    for name, config in data.get('models', {}).items():
+                        # Filter out any unexpected fields that aren't in ModelConfig
+                        valid_fields = {k: v for k, v in config.items() 
+                                      if k in ModelConfig.__annotations__}
+                        try:
+                            self.models[name] = ModelConfig(**valid_fields)
+                        except Exception as e:
+                            logger.warning(f"Skipping invalid model config for {name}: {e}")
+                            continue
                 logger.info(f"Loaded settings for {len(self.models)} models")
             else:
                 logger.info("No existing model settings found, will create defaults")
