@@ -46,6 +46,29 @@ cleanup() {
 
 trap cleanup EXIT
 
+# Network connectivity check and fix
+echo "🔍 Checking network connectivity..."
+if ! curl -s --connect-timeout 5 https://httpbin.org/ip >/dev/null 2>&1; then
+    echo "❌ Network connectivity issues detected"
+    echo "🔧 Attempting to fix network..."
+    
+    # Try to fix DNS
+    cp /etc/resolv.conf /etc/resolv.conf.backup 2>/dev/null || true
+    echo "nameserver 8.8.8.8" > /etc/resolv.conf
+    echo "nameserver 8.8.4.4" >> /etc/resolv.conf
+    
+    # Test if it worked
+    if curl -s --connect-timeout 5 https://httpbin.org/ip >/dev/null 2>&1; then
+        echo "✅ Network fixed with Google DNS"
+    else
+        echo "⚠️ Network fix failed, restoring original config"
+        cp /etc/resolv.conf.backup /etc/resolv.conf 2>/dev/null || true
+        echo "💡 Continuing with existing code..."
+    fi
+else
+    echo "✅ Network connectivity confirmed"
+fi
+
 # Memory and disk optimization
 echo "🧹 Clearing cache and optimizing memory..."
 rm -rf /root/.cache/uv 2>/dev/null || true
@@ -104,11 +127,17 @@ cd /root/.ollama/app/Pete_ollama_agent || {
 }
 
 if [ -d ".git" ]; then
-    echo "📡 Pulling latest changes from GitHub..."
+  echo "📡 Pulling latest changes from GitHub..."
+  
+  # Test GitHub access before pulling
+  if curl -s --connect-timeout 10 https://github.com >/dev/null 2>&1; then
     git fetch origin main || echo "⚠️ git fetch failed"
     git reset --hard origin/main --quiet || echo "⚠️ git reset failed"
     git clean -fd --quiet || echo "⚠️ git clean failed"
     echo "✅ Updated to latest version"
+  else
+    echo "⚠️ GitHub access failed, using existing code"
+  fi
 else
     echo "⚠️ Not a git repository - skipping auto-update"
 fi
@@ -132,9 +161,9 @@ fi
 
 # Start Ollama with error handling
 echo "🚀 Starting Ollama..."
-ollama serve &
+    ollama serve &
 OLLAMA_PID=$!
-
+    
 # Wait for Ollama to start with timeout
 echo "⏳ Waiting for Ollama to start..."
 for i in {1..30}; do
