@@ -28,7 +28,7 @@ DEFAULT_MODEL = os.getenv("DEFAULT_MODEL", "peteollama:property-manager-v0.0.1")
 import sys
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent))
-from config.model_settings import ModelSettingsManager
+from config.model_settings import ModelSettingsManager, ModelConfig
 
 class ChatMessage(BaseModel):
     role: str
