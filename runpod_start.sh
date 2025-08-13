@@ -72,11 +72,22 @@ apt-get install -y tree xsel curl git || echo "⚠️ Some packages failed to in
 # Install uv if not present
 if ! command -v uv &> /dev/null; then
     echo "📦 Installing uv..."
-    curl -Ls https://astral.sh/uv/install.sh | sh || echo "⚠️ uv installation failed, trying pip..."
+    curl -Ls https://astral.sh/uv/install.sh | sh
+    
+    # Add uv to PATH
+    export PATH="$HOME/.local/bin:$PATH"
+    
+    # Verify uv installation
     if ! command -v uv &> /dev/null; then
-        pip install uv || echo "⚠️ uv installation completely failed"
+        echo "❌ uv installation failed"
+        exit 1
     fi
+    
+    echo "✅ uv installed successfully"
 fi
+
+# Ensure uv is in PATH
+export PATH="$HOME/.local/bin:$PATH"
 
 # Change to repo directory and pull latest changes
 echo "🔄 Checking for latest code updates..."
@@ -166,9 +177,14 @@ fi
 # Install Python dependencies
 echo "🐍 Installing Python dependencies..."
 if command -v uv &> /dev/null; then
-    uv sync || echo "⚠️ uv sync failed"
+    echo "📦 Using uv to install dependencies..."
+    uv sync || {
+        echo "❌ uv sync failed - this is required for the application to work"
+        exit 1
+    }
 else
-    pip install -r requirements.txt || echo "⚠️ pip install failed"
+    echo "❌ uv not found - this is required for the application to work"
+    exit 1
 fi
 
 # Create database
@@ -177,7 +193,7 @@ echo "🗄️ Setting up database..."
 if [ -f "/app/pete.db" ]; then
     cp /app/pete.db . || echo "⚠️ Failed to copy database"
 fi
-python src/virtual_jamie_extractor.py || echo "⚠️ Database setup failed"
+uv run python src/virtual_jamie_extractor.py || echo "⚠️ Database setup failed"
 
 # Start the application in background
 echo "🌐 Starting PeteOllama application..."
