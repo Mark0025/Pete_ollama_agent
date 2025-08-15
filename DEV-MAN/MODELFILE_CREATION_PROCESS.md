@@ -11,11 +11,13 @@ This document explains how the `Modelfile.enhanced` is created and whether it us
 The `Modelfile.enhanced` is created through a multi-step process:
 
 #### **Step 1: Database Extraction (`virtual_jamie_extractor.py`)**
+
 - **Source**: Production database (prod-db) containing real property management communication logs
 - **Target**: Local SQLite database (`pete.db`) in your project directory
 - **Data**: Phone call transcripts, communication metadata, call duration, etc.
 
 #### **Step 2: Modelfile Generation (`enhanced_model_trainer.py`)**
+
 - **Input**: Local `pete.db` database
 - **Output**: `models/Modelfile.enhanced`
 - **Process**: Extracts conversations, categorizes them, and creates training examples
@@ -29,7 +31,7 @@ FROM llama3:latest
 
 SYSTEM """You are PeteOllama, an expert AI property manager with extensive experience in:
 - Tenant communications and relations
-- Property maintenance coordination  
+- Property maintenance coordination
 - Lease management and renewals
 - Financial calculations and rent collection
 - Real estate market knowledge
@@ -56,6 +58,7 @@ MESSAGE assistant "Um, did you try and call the city at all? I did not"
 ### **What Database is Used:**
 
 1. **Primary Source**: Production database (`prod-db`) containing:
+
    - CompanyId = 1 (your property management company)
    - UserId = 6 (Jamie - the property manager)
    - CommunicationType = 3 (phone calls)

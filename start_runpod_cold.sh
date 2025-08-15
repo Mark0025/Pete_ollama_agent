@@ -202,61 +202,34 @@ fi
 
 # Create custom models if not exists
 echo "🔧 Setting up custom models..."
-if ! ollama list | grep -q "peteollama:property-manager-v0.0.1"; then
-    echo "📥 Creating peteollama:property-manager-v0.0.1..."
-    if [ -f "models/Modelfile.enhanced" ]; then
+if [ -f "models/Modelfile.enhanced" ]; then
+    # Create property-manager model if not exists
+    if ! ollama list | grep -q "peteollama:property-manager-v0.0.1"; then
+        echo "📥 Creating peteollama:property-manager-v0.0.1..."
         ollama create peteollama:property-manager-v0.0.1 -f models/Modelfile.enhanced || echo "⚠️ Failed to create property-manager model"
     else
-        echo "❌ Modelfile.enhanced not found"
+        echo "✅ peteollama:property-manager-v0.0.1 already exists"
     fi
-fi
-
-# Create latest Jamie model if not exists
-if ! ollama list | grep -q "peteollama:jamie-fixed"; then
-    echo "📥 Creating peteollama:jamie-fixed (latest Jamie model)..."
-    if [ -f "models/Modelfile.enhanced" ]; then
-        ollama create peteollama:jamie-fixed -f models/Modelfile.enhanced || echo "⚠️ Failed to create jamie-fixed model"
-    else
-        echo "❌ Modelfile.enhanced not found"
-    fi
-fi
-
-# Create all Jamie models from database
-echo "🔧 Setting up Jamie models..."
-if [ -f "models/Modelfile.enhanced" ]; then
-    # Create jamie-fixed
+    
+    # Create jamie-fixed model if not exists
     if ! ollama list | grep -q "peteollama:jamie-fixed"; then
         echo "📥 Creating peteollama:jamie-fixed..."
-        ollama create peteollama:jamie-fixed -f models/Modelfile.enhanced || echo "⚠️ Failed to create jamie-fixed"
+        ollama create peteollama:jamie-fixed -f models/Modelfile.enhanced || echo "⚠️ Failed to create jamie-fixed model"
+    else
+        echo "✅ peteollama:jamie-fixed already exists"
     fi
     
-    # Create jamie-working-working_20250806
-    if ! ollama list | grep -q "peteollama:jamie-working-working_20250806"; then
-        echo "📥 Creating peteollama:jamie-working-working_20250806..."
-        ollama create peteollama:jamie-working-working_20250806 -f models/Modelfile.enhanced || echo "⚠️ Failed to create jamie-working-working_20250806"
-    fi
-    
-    # Create jamie-voice-complete
+    # Create jamie-voice-complete model if not exists
     if ! ollama list | grep -q "peteollama:jamie-voice-complete"; then
         echo "📥 Creating peteollama:jamie-voice-complete..."
-        ollama create peteollama:jamie-voice-complete -f models/Modelfile.enhanced || echo "⚠️ Failed to create jamie-voice-complete"
+        ollama create peteollama:jamie-voice-complete -f models/Modelfile.enhanced || echo "⚠️ Failed to create jamie-voice-complete model"
+    else
+        echo "✅ peteollama:jamie-voice-complete already exists"
     fi
     
-    # Create jamie-simple
-    if ! ollama list | grep -q "peteollama:jamie-simple"; then
-        echo "📥 Creating peteollama:jamie-simple..."
-        ollama create peteollama:jamie-simple -f models/Modelfile.enhanced || echo "⚠️ Failed to create jamie-simple"
-    fi
-    
-    # Create property-manager-enhanced-20250806_102528
-    if ! ollama list | grep -q "peteollama:property-manager-enhanced-20250806_102528"; then
-        echo "📥 Creating peteollama:property-manager-enhanced-20250806_102528..."
-        ollama create peteollama:property-manager-enhanced-20250806_102528 -f models/Modelfile.enhanced || echo "⚠️ Failed to create property-manager-enhanced-20250806_102528"
-    fi
-    
-    echo "✅ All Jamie models created successfully"
+    echo "✅ All required models created successfully"
 else
-    echo "❌ Modelfile.enhanced not found - cannot create Jamie models"
+    echo "❌ Modelfile.enhanced not found - cannot create custom models"
 fi
 
 # Install Python dependencies
@@ -280,8 +253,8 @@ if [ -f "/app/pete.db" ]; then
 fi
 uv run python src/virtual_jamie_extractor.py || echo "⚠️ Database setup failed"
 
-# Start the application in background
-echo "🌐 Starting PeteOllama application..."
+# Start the app
+echo "🌐 Starting PeteOllama..."
 uv run python src/main.py &
 APP_PID=$!
 

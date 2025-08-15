@@ -125,7 +125,33 @@ if check_network; then
         if command -v ollama &> /dev/null; then
             echo "🔧 Creating latest Jamie model..."
             if [ -f "models/Modelfile.enhanced" ]; then
-                ollama create peteollama:jamie-fixed -f models/Modelfile.enhanced 2>/dev/null || echo "⚠️ Failed to create Jamie model"
+                # Create property-manager model if not exists
+                if ! ollama list | grep -q "peteollama:property-manager-v0.0.1"; then
+                    echo "📥 Creating peteollama:property-manager-v0.0.1..."
+                    ollama create peteollama:property-manager-v0.0.1 -f models/Modelfile.enhanced 2>/dev/null || echo "⚠️ Failed to create property-manager model"
+                else
+                    echo "✅ peteollama:property-manager-v0.0.1 already exists"
+                fi
+                
+                # Create jamie-fixed model if not exists
+                if ! ollama list | grep -q "peteollama:jamie-fixed"; then
+                    echo "📥 Creating peteollama:jamie-fixed..."
+                    ollama create peteollama:jamie-fixed -f models/Modelfile.enhanced 2>/dev/null || echo "⚠️ Failed to create jamie-fixed model"
+                else
+                    echo "✅ peteollama:jamie-fixed already exists"
+                fi
+                
+                # Create jamie-voice-complete model if not exists
+                if ! ollama list | grep -q "peteollama:jamie-voice-complete"; then
+                    echo "📥 Creating peteollama:jamie-voice-complete..."
+                    ollama create peteollama:jamie-voice-complete -f models/Modelfile.enhanced 2>/dev/null || echo "⚠️ Failed to create jamie-voice-complete model"
+                else
+                    echo "✅ peteollama:jamie-voice-complete already exists"
+                fi
+                
+                echo "✅ All required models created successfully"
+            else
+                echo "❌ Modelfile.enhanced not found - cannot create models"
             fi
         fi
         
@@ -161,7 +187,33 @@ else
             if command -v ollama &> /dev/null; then
                 echo "🔧 Creating latest Jamie model..."
                 if [ -f "models/Modelfile.enhanced" ]; then
-                    ollama create peteollama:jamie-fixed -f models/Modelfile.enhanced 2>/dev/null || echo "⚠️ Failed to create Jamie model"
+                    # Create property-manager model if not exists
+                    if ! ollama list | grep -q "peteollama:property-manager-v0.0.1"; then
+                        echo "📥 Creating peteollama:property-manager-v0.0.1..."
+                        ollama create peteollama:property-manager-v0.0.1 -f models/Modelfile.enhanced 2>/dev/null || echo "⚠️ Failed to create property-manager model"
+                    else
+                        echo "✅ peteollama:property-manager-v0.0.1 already exists"
+                    fi
+                    
+                    # Create jamie-fixed model if not exists
+                    if ! ollama list | grep -q "peteollama:jamie-fixed"; then
+                        echo "📥 Creating peteollama:jamie-fixed..."
+                        ollama create peteollama:jamie-fixed -f models/Modelfile.enhanced 2>/dev/null || echo "⚠️ Failed to create jamie-fixed model"
+                    else
+                        echo "✅ peteollama:jamie-fixed already exists"
+                    fi
+                    
+                    # Create jamie-voice-complete model if not exists
+                    if ! ollama list | grep -q "peteollama:jamie-voice-complete"; then
+                        echo "📥 Creating peteollama:jamie-voice-complete..."
+                        ollama create peteollama:jamie-voice-complete -f models/Modelfile.enhanced 2>/dev/null || echo "⚠️ Failed to create jamie-voice-complete model"
+                    else
+                        echo "✅ peteollama:jamie-voice-complete already exists"
+                    fi
+                    
+                    echo "✅ All required models created successfully"
+                else
+                    echo "❌ Modelfile.enhanced not found - cannot create models"
                 fi
             fi
             

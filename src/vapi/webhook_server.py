@@ -77,6 +77,172 @@ class VAPIWebhookServer:
             models = self.model_manager.list_models()
             return [m.get("name") for m in models]
 
+        @self.app.get("/modelfile/{model_name}")
+        async def get_modelfile(model_name: str):
+            """Get the modelfile content for a specific model."""
+            try:
+                import subprocess
+                result = subprocess.run(
+                    ["ollama", "show", model_name, "--modelfile"],
+                    capture_output=True,
+                    text=True,
+                    timeout=30
+                )
+                if result.returncode == 0:
+                    return {"modelfile": result.stdout.strip()}
+                else:
+                    return {"error": f"Failed to get modelfile: {result.stderr}"}
+            except Exception as e:
+                logger.error(f"Error getting modelfile for {model_name}: {e}")
+                return {"error": str(e)}
+
+        @self.app.get("/modelfile/{model_name}/analysis")
+        async def analyze_modelfile(model_name: str):
+            """Analyze a modelfile and return structured information."""
+            try:
+                import subprocess
+                import re
+                
+                # Get modelfile content
+                result = subprocess.run(
+                    ["ollama", "show", model_name, "--modelfile"],
+                    capture_output=True,
+                    text=True,
+                    timeout=30
+                )
+                
+                if result.returncode != 0:
+                    return {"error": f"Failed to get modelfile: {result.stderr}"}
+                
+                modelfile_content = result.stdout.strip()
+                
+                # Parse modelfile content
+                analysis = {
+                    "model_name": model_name,
+                    "base_model": None,
+                    "system_prompt": None,
+                    "parameters": {},
+                    "template": None,
+                    "examples": [],
+                    "features": [],
+                    "estimated_tokens": 0
+                }
+                
+                lines = modelfile_content.split('\n')
+                current_section = None
+                
+                for line in lines:
+                    line = line.strip()
+                    if not line or line.startswith('#'):
+                        continue
+                    
+                    if line.startswith('FROM '):
+                        analysis["base_model"] = line.replace('FROM ', '').strip()
+                    elif line.startswith('SYSTEM '):
+                        current_section = "system"
+                        analysis["system_prompt"] = line.replace('SYSTEM ', '').strip('"')
+                    elif line.startswith('PARAMETER '):
+                        parts = line.replace('PARAMETER ', '').split(' ', 1)
+                        if len(parts) == 2:
+                            param_name, param_value = parts
+                            try:
+                                # Try to parse as number, fallback to string
+                                if '.' in param_value:
+                                    analysis["parameters"][param_name] = float(param_value)
+                                else:
+                                    analysis["parameters"][param_name] = int(param_value)
+                            except ValueError:
+                                analysis["parameters"][param_name] = param_value
+                    elif line.startswith('TEMPLATE '):
+                        current_section = "template"
+                        analysis["template"] = line.replace('TEMPLATE ', '').strip('"')
+                    elif line.startswith('MESSAGE '):
+                        parts = line.split(' ', 2)
+                        if len(parts) >= 3:
+                            role = parts[1]
+                            content = parts[2].strip('"')
+                            analysis["examples"].append({"role": role, "content": content})
+                
+                # Analyze features based on content
+                if analysis["system_prompt"]:
+                    system_lower = analysis["system_prompt"].lower()
+                    if "property" in system_lower or "tenant" in system_lower:
+                        analysis["features"].append("Property Management")
+                    if "professional" in system_lower:
+                        analysis["features"].append("Professional Communication")
+                    if "emergency" in system_lower:
+                        analysis["features"].append("Emergency Handling")
+                    if "maintenance" in system_lower:
+                        analysis["features"].append("Maintenance Coordination")
+                
+                # Estimate token count
+                analysis["estimated_tokens"] = len(modelfile_content.split()) * 1.3  # Rough estimate
+                
+                return analysis
+                
+            except Exception as e:
+                logger.error(f"Error analyzing modelfile for {model_name}: {e}")
+                return {"error": str(e)}
+
+        @self.app.get("/modelfile/compare/{model1}/{model2}")
+        async def compare_modelfiles(model1: str, model2: str):
+            """Compare two modelfiles and highlight differences."""
+            try:
+                # Get both modelfiles
+                result1 = subprocess.run(
+                    ["ollama", "show", model1, "--modelfile"],
+                    capture_output=True,
+                    text=True,
+                    timeout=30
+                )
+                result2 = subprocess.run(
+                    ["ollama", "show", model2, "--modelfile"],
+                    capture_output=True,
+                    text=True,
+                    timeout=30
+                )
+                
+                if result1.returncode != 0 or result2.returncode != 0:
+                    return {"error": "Failed to get one or both modelfiles"}
+                
+                modelfile1 = result1.stdout.strip()
+                modelfile2 = result2.stdout.strip()
+                
+                # Simple line-by-line comparison
+                lines1 = modelfile1.split('\n')
+                lines2 = modelfile2.split('\n')
+                
+                comparison = {
+                    "model1": model1,
+                    "model2": model2,
+                    "differences": [],
+                    "similarities": [],
+                    "model1_only": [],
+                    "model2_only": []
+                }
+                
+                # Find differences
+                for i, (line1, line2) in enumerate(zip(lines1, lines2)):
+                    if line1 != line2:
+                        comparison["differences"].append({
+                            "line": i + 1,
+                            "model1": line1,
+                            "model2": line2
+                        })
+                
+                # Find lines unique to each model
+                set1 = set(lines1)
+                set2 = set(lines2)
+                comparison["model1_only"] = list(set1 - set2)
+                comparison["model2_only"] = list(set2 - set1)
+                comparison["similarities"] = list(set1 & set2)
+                
+                return comparison
+                
+            except Exception as e:
+                logger.error(f"Error comparing modelfiles: {e}")
+                return {"error": str(e)}
+
         # ---- Persona list endpoint ----
         @self.app.get("/personas")
         async def personas():
@@ -1805,6 +1971,7 @@ conversationMessage.addEventListener('keypress', (e) => {
             return '''<!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Settings – JamieAI 1.0</title>
 <link rel="icon" type="image/png" href="/favicon.ico">
+<script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
 <style>
 body{font-family:Arial,Helvetica,sans-serif;margin:20px;background:#f5f5f5}
 .container{max-width:1200px;margin:0 auto;background:white;padding:20px;border-radius:8px;box-shadow:0 2px 10px rgba(0,0,0,0.1)}
@@ -1914,15 +2081,96 @@ input[type="number"], input[type="text"], select{padding:8px;margin:5px;border:1
 </div>
 
 <div class="section">
-<h3>📋 Current Modelfile</h3>
-<p>View the active Jamie modelfile in markdown format</p>
-<label>Select Model:
-    <select id="modelfileSelect">
-        <option value="">Loading models...</option>
+<h3>📋 Modelfile Management & Analysis</h3>
+<p>View, compare, and analyze your model files with best practices and visual representations</p>
+
+<!-- Model Selection -->
+<div style="margin-bottom: 20px;">
+    <label><strong>Select Model:</strong>
+        <select id="modelfileSelect">
+            <option value="">Loading models...</option>
+        </select>
+        <button onclick="loadModelfile()">📖 Load Modelfile</button>
+        <button onclick="analyzeModelfile()">🔍 Analyze</button>
     </select>
-    <button onclick="loadModelfile()">Load Modelfile</button>
-</label>
+</div>
+
+<!-- Model Comparison -->
+<div style="margin-bottom: 20px;">
+    <h4>🔄 Compare Models</h4>
+    <label>Model 1: <select id="compareModel1"><option value="">Select first model...</option></select></label>
+    <label>Model 2: <select id="compareModel2"><option value="">Select second model...</option></select></label>
+    <button onclick="compareModelfiles()">⚖️ Compare</button>
+</div>
+
+<!-- Modelfile Viewer -->
 <div id="modelfileViewer" class="modelfile-viewer">Select a model to view its Modelfile...</div>
+
+<!-- Analysis Results -->
+<div id="analysisResults" style="display:none; margin-top: 20px;">
+    <h4>🔍 Modelfile Analysis</h4>
+    <div id="analysisContent"></div>
+</div>
+
+<!-- Comparison Results -->
+<div id="comparisonResults" style="display:none; margin-top: 20px;">
+    <h4>⚖️ Model Comparison</h4>
+    <div id="comparisonContent"></div>
+</div>
+
+<!-- Best Practices -->
+<div style="margin-top: 30px; padding: 20px; background: #f8f9fa; border-radius: 8px;">
+    <h4>📚 Modelfile Best Practices</h4>
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+        <div>
+            <h5>🎯 System Prompts</h5>
+            <ul>
+                <li><strong>Clear Role Definition:</strong> Define the AI's persona and expertise</li>
+                <li><strong>Behavioral Guidelines:</strong> Specify response style and tone</li>
+                <li><strong>Domain Knowledge:</strong> Include relevant expertise areas</li>
+                <li><strong>Constraints:</strong> Set clear boundaries and limitations</li>
+            </ul>
+        </div>
+        <div>
+            <h5>⚙️ Parameters</h5>
+            <ul>
+                <li><strong>temperature:</strong> 0.1-0.9 (creativity vs consistency)</li>
+                <li><strong>top_p:</strong> 0.1-1.0 (nucleus sampling)</li>
+                <li><strong>repeat_penalty:</strong> 1.0-1.2 (prevent repetition)</li>
+                <li><strong>num_ctx:</strong> 2048-8192 (context window)</li>
+            </ul>
+        </div>
+        <div>
+            <h5>💬 Training Examples</h5>
+            <ul>
+                <li><strong>Quality over Quantity:</strong> Use real, relevant conversations</li>
+                <li><strong>Diverse Scenarios:</strong> Cover different use cases</li>
+                <li><strong>Proper Formatting:</strong> Clean, consistent examples</li>
+                <li><strong>Role-specific:</strong> Match your intended use case</li>
+            </ul>
+        </div>
+        <div>
+            <h5>🔧 Advanced Features</h5>
+            <ul>
+                <li><strong>Templates:</strong> Define conversation structure</li>
+                <li><strong>Conditional Logic:</strong> Use if/else in system prompts</li>
+                <li><strong>Function Calling:</strong> Enable specific capabilities</li>
+                <li><strong>Multi-turn:</strong> Support conversation context</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<!-- Visual Representation -->
+<div style="margin-top: 30px;">
+    <h4>📊 Visual Model Analysis</h4>
+    <button onclick="generateModelDiagram()" style="background: #007acc; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer;">
+        🎨 Generate Model Diagram
+    </button>
+    <div id="modelDiagram" style="margin-top: 20px; padding: 20px; background: white; border: 1px solid #ddd; border-radius: 8px; min-height: 400px;">
+        <p style="text-align: center; color: #666;">Click "Generate Model Diagram" to create a visual representation of your model</p>
+    </div>
+</div>
 </div>
 
 </div>
@@ -1967,6 +2215,36 @@ function downloadModel(){
     }, 3000);
 }
 
+// Load available models for both selectors
+fetch('/models').then(r=>r.json()).then(models=>{
+    const select = document.getElementById('modelfileSelect');
+    const compare1 = document.getElementById('compareModel1');
+    const compare2 = document.getElementById('compareModel2');
+    
+    if (select && compare1 && compare2) {
+        select.innerHTML = '<option value="">Select a model...</option>';
+        compare1.innerHTML = '<option value="">Select first model...</option>';
+        compare2.innerHTML = '<option value="">Select second model...</option>';
+        
+        models.forEach(model => {
+            const option1 = document.createElement('option');
+            option1.value = model;
+            option1.textContent = model;
+            select.appendChild(option1);
+            
+            const option2 = document.createElement('option');
+            option2.value = model;
+            option2.textContent = model;
+            compare1.appendChild(option2);
+            
+            const option3 = document.createElement('option');
+            option3.value = model;
+            option3.textContent = model;
+            compare2.appendChild(option3);
+        });
+    }
+});
+
 function loadModelfile(){
     const model = document.getElementById('modelfileSelect').value;
     if(!model){
@@ -1977,33 +2255,194 @@ function loadModelfile(){
     const viewer = document.getElementById('modelfileViewer');
     viewer.innerHTML = 'Loading modelfile for ' + model + '...';
     
-    // This would fetch the actual modelfile
-    setTimeout(() => {
-        viewer.innerHTML = `# Modelfile for ${model}
+    // Fetch the actual modelfile from the API
+    fetch(`/modelfile/${model}`)
+        .then(r => r.json())
+        .then(data => {
+            if (data.error) {
+                viewer.innerHTML = `<div style="color: red;">❌ Error: ${data.error}</div>`;
+            } else {
+                viewer.innerHTML = `<pre style="background: #f8f9fa; padding: 15px; border-radius: 5px; overflow-x: auto;">${data.modelfile}</pre>`;
+            }
+        })
+        .catch(error => {
+            viewer.innerHTML = `<div style="color: red;">❌ Error loading modelfile: ${error}</div>`;
+        });
+}
 
-FROM llama3:latest
+function analyzeModelfile(){
+    const model = document.getElementById('modelfileSelect').value;
+    if(!model){
+        alert('Please select a model');
+        return;
+    }
+    
+    const results = document.getElementById('analysisResults');
+    const content = document.getElementById('analysisContent');
+    results.style.display = 'block';
+    content.innerHTML = 'Analyzing modelfile for ' + model + '...';
+    
+    fetch(`/modelfile/${model}/analysis`)
+        .then(r => r.json())
+        .then(data => {
+            if (data.error) {
+                content.innerHTML = `<div style="color: red;">❌ Error: ${data.error}</div>`;
+            } else {
+                content.innerHTML = `
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                        <div>
+                            <h5>📊 Model Information</h5>
+                            <p><strong>Name:</strong> ${data.model_name}</p>
+                            <p><strong>Base Model:</strong> ${data.base_model || 'N/A'}</p>
+                            <p><strong>Estimated Tokens:</strong> ${Math.round(data.estimated_tokens)}</p>
+                        </div>
+                        <div>
+                            <h5>🎯 Features</h5>
+                            <ul>${data.features.map(f => `<li>${f}</li>`).join('')}</ul>
+                        </div>
+                        <div>
+                            <h5>⚙️ Parameters</h5>
+                            <ul>${Object.entries(data.parameters).map(([k,v]) => `<li><strong>${k}:</strong> ${v}</li>`).join('')}</ul>
+                        </div>
+                        <div>
+                            <h5>💬 Training Examples</h5>
+                            <p><strong>Count:</strong> ${data.examples.length}</p>
+                            ${data.examples.length > 0 ? `<p><strong>Sample:</strong> ${data.examples[0].content.substring(0, 100)}...</p>` : ''}
+                        </div>
+                    </div>
+                    ${data.system_prompt ? `
+                        <div style="margin-top: 20px;">
+                            <h5>🧠 System Prompt</h5>
+                            <div style="background: #f8f9fa; padding: 15px; border-radius: 5px; max-height: 200px; overflow-y: auto;">
+                                ${data.system_prompt}
+                            </div>
+                        </div>
+                    ` : ''}
+                `;
+            }
+        })
+        .catch(error => {
+            content.innerHTML = `<div style="color: red;">❌ Error analyzing modelfile: ${error}</div>`;
+        });
+}
 
-SYSTEM """You are Jamie, an expert property manager. Respond concisely and professionally, focusing on providing actionable solutions to tenant inquiries. Do NOT simulate a conversation or ask follow-up questions unless explicitly necessary for the solution."""
+function compareModelfiles(){
+    const model1 = document.getElementById('compareModel1').value;
+    const model2 = document.getElementById('compareModel2').value;
+    
+    if(!model1 || !model2){
+        alert('Please select both models to compare');
+        return;
+    }
+    
+    if(model1 === model2){
+        alert('Please select different models to compare');
+        return;
+    }
+    
+    const results = document.getElementById('comparisonResults');
+    const content = document.getElementById('comparisonContent');
+    results.style.display = 'block';
+    content.innerHTML = 'Comparing modelfiles...';
+    
+    fetch(`/modelfile/compare/${model1}/${model2}`)
+        .then(r => r.json())
+        .then(data => {
+            if (data.error) {
+                content.innerHTML = `<div style="color: red;">❌ Error: ${data.error}</div>`;
+            } else {
+                content.innerHTML = `
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                        <div>
+                            <h5>📊 Comparison Summary</h5>
+                            <p><strong>Model 1:</strong> ${data.model1}</p>
+                            <p><strong>Model 2:</strong> ${data.model2}</p>
+                            <p><strong>Differences:</strong> ${data.differences.length} lines</p>
+                            <p><strong>Similarities:</strong> ${data.similarities.length} lines</p>
+                        </div>
+                        <div>
+                            <h5>🔍 Key Differences</h5>
+                            ${data.differences.length > 0 ? 
+                                data.differences.slice(0, 5).map(diff => 
+                                    `<div style="background: #fff3cd; padding: 10px; margin: 5px 0; border-radius: 3px;">
+                                        <strong>Line ${diff.line}:</strong><br>
+                                        <span style="color: #856404;">${diff.model1}</span><br>
+                                        <span style="color: #721c24;">${diff.model2}</span>
+                                    </div>`
+                                ).join('') : 
+                                '<p>No differences found</p>'
+                            }
+                        </div>
+                    </div>
+                `;
+            }
+        })
+        .catch(error => {
+            content.innerHTML = `<div style="color: red;">❌ Error comparing modelfiles: ${error}</div>`;
+        });
+}
 
-PARAMETER temperature 0.3
-PARAMETER repeat_penalty 1.3
-PARAMETER top_k 20
+function generateModelDiagram(){
+    const model = document.getElementById('modelfileSelect').value;
+    if(!model){
+        alert('Please select a model first');
+        return;
+    }
+    
+    const diagram = document.getElementById('modelDiagram');
+    diagram.innerHTML = 'Generating diagram for ' + model + '...';
+    
+    fetch(`/modelfile/${model}/analysis`)
+        .then(r => r.json())
+        .then(data => {
+            if (data.error) {
+                diagram.innerHTML = `<div style="color: red;">❌ Error: ${data.error}</div>`;
+            } else {
+                // Generate Mermaid diagram
+                const mermaidCode = generateMermaidCode(data);
+                diagram.innerHTML = `
+                    <div style="text-align: center; margin-bottom: 20px;">
+                        <h5>🎨 Model Architecture: ${data.model_name}</h5>
+                    </div>
+                    <div class="mermaid">
+                        ${mermaidCode}
+                    </div>
+                    <script>
+                        mermaid.initialize({ startOnLoad: true });
+                    </script>
+                `;
+            }
+        })
+        .catch(error => {
+            diagram.innerHTML = `<div style="color: red;">❌ Error generating diagram: ${error}</div>`;
+        });
+}
 
-TEMPLATE """{{ .System }}
-
-User: {{ .Prompt }}
-
-Jamie:"""
-
-MESSAGE user """My AC stopped working this morning and it's getting really hot in here"""
-MESSAGE assistant """I understand this is an emergency situation. I'm calling our HVAC contractor right now to get someone out there today. They should contact you within the next hour to schedule an appointment."""
-
-MESSAGE user """When is my rent due this month?"""
-MESSAGE assistant """Rent is due on the 1st of each month. You can pay online through your tenant portal or drop off a check at our office during business hours."""
-
-# Additional training examples would continue here...
-`;
-    }, 1000);
+function generateMermaidCode(analysis){
+    const features = analysis.features.join(', ');
+    const params = Object.entries(analysis.parameters).map(([k,v]) => `${k}: ${v}`).join('\\n');
+    const examples = analysis.examples.length;
+    
+    return `
+graph TD
+    A[${analysis.model_name}] --> B[Base: ${analysis.base_model || 'Unknown'}]
+    A --> C[System Prompt]
+    A --> D[Parameters]
+    A --> E[Training Examples]
+    A --> F[Features]
+    
+    C --> C1["${(analysis.system_prompt || '').substring(0, 50)}..."]
+    D --> D1["${params}"]
+    E --> E1["${examples} examples"]
+    F --> F1["${features}"]
+    
+    style A fill:#e1f5fe
+    style B fill:#f3e5f5
+    style C fill:#e8f5e8
+    style D fill:#fff3e0
+    style E fill:#fce4ec
+    style F fill:#f1f8e9
+    `;
 }
 
 // Model Management Functions
