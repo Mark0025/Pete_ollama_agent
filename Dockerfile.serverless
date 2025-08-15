@@ -1,0 +1,50 @@
+# PeteOllama V1 - RunPod Serverless Optimized
+# Optimized for cold starts and single endpoint deployment
+
+FROM python:3.11-slim
+
+# Install system dependencies (minimal for serverless)
+RUN apt-get update && apt-get install -y \
+    curl \
+    git \
+    build-essential \
+    # Database drivers
+    libpq-dev \
+    unixodbc-dev \
+    unixodbc \
+    # Cleanup
+    && rm -rf /var/lib/apt/lists/*
+
+# Set working directory
+WORKDIR /app
+
+# Copy requirements for dependency installation
+COPY requirements.txt ./
+
+# Install Python dependencies
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy application source code
+COPY src/ ./src/
+COPY config/ ./config/
+COPY .env ./
+
+# Create necessary directories
+RUN mkdir -p /app/data /app/logs /app/models /app/public
+
+# Copy public assets
+COPY src/public/ ./public/
+
+# Set Python path
+ENV PYTHONPATH=/app
+ENV PYTHONUNBUFFERED=1
+
+# Expose single port for serverless endpoint
+EXPOSE 8000
+
+# Health check for RunPod
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD curl -f http://localhost:8000/health || exit 1
+
+# Default command - serverless handler
+CMD ["python", "rp_handler.py"]
