@@ -200,12 +200,49 @@ else
     echo "⚠️ Skipping qwen3:30b - restart loop detected"
 fi
 
-# Create custom models if not exists
-echo "🔧 Setting up custom models..."
+# Install Python dependencies
+echo "🐍 Installing Python dependencies..."
+if command -v uv &> /dev/null; then
+    echo "📦 Using uv to install dependencies..."
+    uv sync || {
+        echo "❌ uv sync failed - this is required for the application to work"
+        exit 1
+    }
+else
+    echo "❌ uv not found - this is required for the application to work"
+    exit 1
+fi
+
+# Create database and extract real data FIRST
+echo "🗄️ Setting up database and extracting real conversation data..."
+# Copy pete.db to current directory if it exists in /app
+if [ -f "/app/pete.db" ]; then
+    cp /app/pete.db . || echo "⚠️ Failed to copy database"
+fi
+
+# Run the database extractor to get real property management conversations
+echo "📊 Extracting real property management conversations from database..."
+uv run python src/virtual_jamie_extractor.py || {
+    echo "❌ Database extraction failed - this is critical for Jamie models"
+    exit 1
+}
+
+# Generate enhanced Modelfile from real data
+echo "🔧 Generating Modelfile from real conversation data..."
+if command -v uv &> /dev/null; then
+    uv run python enhanced_model_trainer.py || {
+        echo "⚠️ Failed to generate enhanced Modelfile, using fallback"
+    }
+else
+    echo "⚠️ uv not available for enhanced Modelfile generation"
+fi
+
+# Create custom models from the real data
+echo "🔧 Setting up custom models from real conversation data..."
 if [ -f "models/Modelfile.enhanced" ]; then
     # Create property-manager model if not exists
     if ! ollama list | grep -q "peteollama:property-manager-v0.0.1"; then
-        echo "📥 Creating peteollama:property-manager-v0.0.1..."
+        echo "📥 Creating peteollama:property-manager-v0.0.1 from real data..."
         ollama create peteollama:property-manager-v0.0.1 -f models/Modelfile.enhanced || echo "⚠️ Failed to create property-manager model"
     else
         echo "✅ peteollama:property-manager-v0.0.1 already exists"
@@ -213,7 +250,7 @@ if [ -f "models/Modelfile.enhanced" ]; then
     
     # Create jamie-fixed model if not exists
     if ! ollama list | grep -q "peteollama:jamie-fixed"; then
-        echo "📥 Creating peteollama:jamie-fixed..."
+        echo "📥 Creating peteollama:jamie-fixed from real data..."
         ollama create peteollama:jamie-fixed -f models/Modelfile.enhanced || echo "⚠️ Failed to create jamie-fixed model"
     else
         echo "✅ peteollama:jamie-fixed already exists"
@@ -221,13 +258,13 @@ if [ -f "models/Modelfile.enhanced" ]; then
     
     # Create jamie-voice-complete model if not exists
     if ! ollama list | grep -q "peteollama:jamie-voice-complete"; then
-        echo "📥 Creating peteollama:jamie-voice-complete..."
+        echo "📥 Creating peteollama:jamie-voice-complete from real data..."
         ollama create peteollama:jamie-voice-complete -f models/Modelfile.enhanced || echo "⚠️ Failed to create jamie-voice-complete model"
     else
         echo "✅ peteollama:jamie-voice-complete already exists"
     fi
     
-    echo "✅ All required models created successfully"
+    echo "✅ All required models created successfully from real data"
 else
     echo "❌ Modelfile.enhanced not found - cannot create custom models"
 fi
@@ -248,27 +285,6 @@ for i in {1..30}; do
     echo "⏳ Waiting for models... (${i}/30)"
     sleep 2
 done
-
-# Install Python dependencies
-echo "🐍 Installing Python dependencies..."
-if command -v uv &> /dev/null; then
-    echo "📦 Using uv to install dependencies..."
-    uv sync || {
-        echo "❌ uv sync failed - this is required for the application to work"
-        exit 1
-    }
-else
-    echo "❌ uv not found - this is required for the application to work"
-    exit 1
-fi
-
-# Create database
-echo "🗄️ Setting up database..."
-# Copy pete.db to current directory if it exists in /app
-if [ -f "/app/pete.db" ]; then
-    cp /app/pete.db . || echo "⚠️ Failed to copy database"
-fi
-uv run python src/virtual_jamie_extractor.py || echo "⚠️ Database setup failed"
 
 # Start the app
 echo "🌐 Starting PeteOllama..."
