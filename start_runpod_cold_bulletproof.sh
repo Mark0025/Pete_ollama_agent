@@ -223,21 +223,6 @@ main() {
         log "✅ uv already installed"
     fi
     
-    # Install Python dependencies
-    log "📦 Installing Python dependencies..."
-    if ! uv sync; then
-        log "❌ uv sync failed - checking what went wrong..."
-        log "Current directory: $(pwd)"
-        log "Files in current directory: $(ls -la)"
-        if [ -f "pyproject.toml" ]; then
-            log "pyproject.toml exists, trying to debug uv sync..."
-            uv sync --verbose || log "⚠️ uv sync failed with verbose output"
-        else
-            log "❌ No pyproject.toml found - this is critical!"
-            return 1
-        fi
-    fi
-    
     # Step 4: Update code from GitHub
     log "🔄 Checking for latest code updates..."
     cd "$SCRIPT_DIR" || {
@@ -253,6 +238,21 @@ main() {
         log "✅ Updated to latest version"
     else
         log "⚠️ Not a git repository - using existing code"
+    fi
+    
+    # Install Python dependencies (NOW in the correct directory)
+    log "📦 Installing Python dependencies..."
+    if ! uv sync; then
+        log "❌ uv sync failed - checking what went wrong..."
+        log "Current directory: $(pwd)"
+        log "Files in current directory: $(ls -la)"
+        if [ -f "pyproject.toml" ]; then
+            log "pyproject.toml exists, trying to debug uv sync..."
+            uv sync --verbose || log "⚠️ uv sync failed with verbose output"
+        else
+            log "❌ No pyproject.toml found - this is critical!"
+            return 1
+        fi
     fi
     
     # Step 5: Stop existing processes
