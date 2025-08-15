@@ -72,19 +72,17 @@ start_existing() {
         # Try to install dependencies if possible
         if command -v uv &> /dev/null; then
             echo "📦 Installing dependencies with uv..."
-            uv sync 2>/dev/null || echo "⚠️ uv sync failed, continuing..."
+            uv sync || { echo "❌ uv sync failed - uv is required!"; exit 1; }
         else
-            echo "⚠️ uv not available, trying pip..."
-            pip install -r requirements.txt 2>/dev/null || echo "⚠️ pip install failed, continuing..."
+            echo "❌ uv not available - installing uv first..."
+            curl -LsSf https://astral.sh/uv/install.sh | sh
+            source ~/.cargo/env
+            uv sync || { echo "❌ uv sync failed after installation!"; exit 1; }
         fi
         
         # Start the app
         echo "🌐 Starting PeteOllama..."
-        if command -v uv &> /dev/null; then
-            uv run python src/main.py
-        else
-            python3 src/main.py
-        fi
+        uv run python src/main.py
     else
         echo "❌ main.py not found in src directory"
         echo "💡 Check your file structure or restart the pod"
@@ -117,8 +115,10 @@ if check_network; then
         if command -v uv &> /dev/null; then
             uv sync
         else
-            echo "⚠️ uv not available, trying pip..."
-            pip install -r requirements.txt
+            echo "❌ uv not available - installing uv first..."
+            curl -LsSf https://astral.sh/uv/install.sh | sh
+            source ~/.cargo/env
+            uv sync || { echo "❌ uv sync failed after installation!"; exit 1; }
         fi
         
         # Install ODBC drivers for SQL Server database connection
@@ -164,19 +164,11 @@ if check_network; then
         
         # Run the database extractor to get real property management conversations
         echo "📊 Extracting real property management conversations from database..."
-        if command -v uv &> /dev/null; then
-            uv run python src/virtual_jamie_extractor.py || echo "⚠️ Database extraction failed"
-        else
-            python3 src/virtual_jamie_extractor.py || echo "⚠️ Database extraction failed"
-        fi
+        uv run python src/virtual_jamie_extractor.py || { echo "❌ Database extraction failed - this is critical for Jamie models!"; exit 1; }
         
         # Generate enhanced Modelfile from real data
         echo "🔧 Generating Modelfile from real conversation data..."
-        if command -v uv &> /dev/null; then
-            uv run python enhanced_model_trainer.py || echo "⚠️ Failed to generate enhanced Modelfile"
-        else
-            python3 enhanced_model_trainer.py || echo "⚠️ Failed to generate enhanced Modelfile"
-        fi
+        uv run python enhanced_model_trainer.py || { echo "⚠️ Failed to generate enhanced Modelfile, using fallback"; }
         
         # Create latest Jamie model if Ollama is available
         if command -v ollama &> /dev/null; then
@@ -231,11 +223,7 @@ if check_network; then
         
         # Start the app
         echo "🌐 Starting PeteOllama..."
-        if command -v uv &> /dev/null; then
-            uv run python src/main.py
-        else
-            python3 src/main.py
-        fi
+        uv run python src/main.py
         
     else
         echo "⚠️ GitHub access failed but basic connectivity works"
@@ -262,8 +250,10 @@ else
             if command -v uv &> /dev/null; then
                 uv sync
             else
-                echo "⚠️ uv not available, trying pip..."
-                pip install -r requirements.txt
+                echo "❌ uv not available - installing uv first..."
+                curl -LsSf https://astral.sh/uv/install.sh | sh
+                source ~/.cargo/env
+                uv sync || { echo "❌ uv sync failed after installation!"; exit 1; }
             fi
             
             # Install ODBC drivers for SQL Server database connection
@@ -309,19 +299,11 @@ else
             
             # Run the database extractor to get real property management conversations
             echo "📊 Extracting real property management conversations from database..."
-            if command -v uv &> /dev/null; then
-                uv run python src/virtual_jamie_extractor.py || echo "⚠️ Database extraction failed"
-            else
-                python3 src/virtual_jamie_extractor.py || echo "⚠️ Database extraction failed"
-            fi
+            uv run python src/virtual_jamie_extractor.py || { echo "❌ Database extraction failed - this is critical for Jamie models!"; exit 1; }
             
             # Generate enhanced Modelfile from real data
             echo "🔧 Generating Modelfile from real conversation data..."
-            if command -v uv &> /dev/null; then
-                uv run python enhanced_model_trainer.py || echo "⚠️ Failed to generate enhanced Modelfile"
-            else
-                python3 enhanced_model_trainer.py || echo "⚠️ Failed to generate enhanced Modelfile"
-            fi
+            uv run python enhanced_model_trainer.py || { echo "⚠️ Failed to generate enhanced Modelfile, using fallback"; }
             
             # Create latest Jamie model if Ollama is available
             if command -v ollama &> /dev/null; then
