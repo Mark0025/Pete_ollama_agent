@@ -121,9 +121,32 @@ if check_network; then
             pip install -r requirements.txt
         fi
         
+        # Create database and extract real data FIRST
+        echo "🗄️ Setting up database and extracting real conversation data..."
+        # Copy pete.db to current directory if it exists in /app
+        if [ -f "/app/pete.db" ]; then
+            cp /app/pete.db . || echo "⚠️ Failed to copy database"
+        fi
+        
+        # Run the database extractor to get real property management conversations
+        echo "📊 Extracting real property management conversations from database..."
+        if command -v uv &> /dev/null; then
+            uv run python src/virtual_jamie_extractor.py || echo "⚠️ Database extraction failed"
+        else
+            python3 src/virtual_jamie_extractor.py || echo "⚠️ Database extraction failed"
+        fi
+        
+        # Generate enhanced Modelfile from real data
+        echo "🔧 Generating Modelfile from real conversation data..."
+        if command -v uv &> /dev/null; then
+            uv run python enhanced_model_trainer.py || echo "⚠️ Failed to generate enhanced Modelfile"
+        else
+            python3 enhanced_model_trainer.py || echo "⚠️ Failed to generate enhanced Modelfile"
+        fi
+        
         # Create latest Jamie model if Ollama is available
         if command -v ollama &> /dev/null; then
-            echo "🔧 Creating latest Jamie model..."
+            echo "🔧 Creating latest Jamie model from real data..."
             if [ -f "models/Modelfile.enhanced" ]; then
                 # Create property-manager model if not exists
                 if ! ollama list | grep -q "peteollama:property-manager-v0.0.1"; then
@@ -200,9 +223,32 @@ else
             echo "📦 Installing dependencies..."
             uv sync
             
+            # Create database and extract real data FIRST
+            echo "🗄️ Setting up database and extracting real conversation data..."
+            # Copy pete.db to current directory if it exists in /app
+            if [ -f "/app/pete.db" ]; then
+                cp /app/pete.db . || echo "⚠️ Failed to copy database"
+            fi
+            
+            # Run the database extractor to get real property management conversations
+            echo "📊 Extracting real property management conversations from database..."
+            if command -v uv &> /dev/null; then
+                uv run python src/virtual_jamie_extractor.py || echo "⚠️ Database extraction failed"
+            else
+                python3 src/virtual_jamie_extractor.py || echo "⚠️ Database extraction failed"
+            fi
+            
+            # Generate enhanced Modelfile from real data
+            echo "🔧 Generating Modelfile from real conversation data..."
+            if command -v uv &> /dev/null; then
+                uv run python enhanced_model_trainer.py || echo "⚠️ Failed to generate enhanced Modelfile"
+            else
+                python3 enhanced_model_trainer.py || echo "⚠️ Failed to generate enhanced Modelfile"
+            fi
+            
             # Create latest Jamie model if Ollama is available
             if command -v ollama &> /dev/null; then
-                echo "🔧 Creating latest Jamie model..."
+                echo "🔧 Creating latest Jamie model from real data..."
                 if [ -f "models/Modelfile.enhanced" ]; then
                     # Create property-manager model if not exists
                     if ! ollama list | grep -q "peteollama:property-manager-v0.0.1"; then
