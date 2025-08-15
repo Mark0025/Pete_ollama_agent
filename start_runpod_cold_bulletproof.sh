@@ -197,50 +197,25 @@ main() {
         log "✅ gcc already installed"
     fi
     
-    # Step 4: Install uv if not present
-    log "📦 Checking uv installation..."
+    # Install uv if not present
     if ! command -v uv &> /dev/null; then
-        log "📥 Installing uv..."
-        curl -Ls https://astral.sh/uv/install.sh | sh || {
-            log "❌ uv installation failed - this is critical!"
+        log "📦 Installing uv package manager..."
+        curl -LsSf https://astral.sh/uv/install.sh | sh
+        source ~/.cargo/env
+        if ! command -v uv &> /dev/null; then
+            log "❌ Failed to install uv - this is critical!"
             return 1
-        }
-        export PATH="$HOME/.local/bin:$PATH"
-    fi
-    
-    if ! command -v uv &> /dev/null; then
-        log "❌ uv still not available after installation"
-        return 1
-    fi
-    
-    log "✅ uv is available"
-    
-    # Step 5: Update code from GitHub
-    log "🔄 Checking for latest code updates..."
-    cd "$SCRIPT_DIR" || {
-        log "❌ Failed to change to script directory"
-        return 1
-    }
-    
-    if [ -d ".git" ]; then
-        log "📡 Pulling latest changes from GitHub..."
-        git fetch origin main || log "⚠️ git fetch failed"
-        git reset --hard origin/main --quiet || log "⚠️ git reset failed"
-        git clean -fd --quiet || log "⚠️ git clean failed"
-        log "✅ Updated to latest version"
+        fi
+        log "✅ uv installed successfully"
     else
-        log "⚠️ Not a git repository - using existing code"
+        log "✅ uv already installed"
     fi
     
-    # Step 6: Stop existing processes
-    log "🔄 Stopping existing processes..."
-    pkill ollama 2>/dev/null || log "⚠️ No ollama processes to stop"
-    pkill -f uvicorn 2>/dev/null || log "⚠️ No uvicorn processes to stop"
-    pkill -f "src/main.py" 2>/dev/null || log "⚠️ No main.py processes to stop"
-    log "✅ Process cleanup completed"
-    sleep 3
+    # Install Python dependencies
+    log "📦 Installing Python dependencies..."
+    uv sync || { log "❌ uv sync failed - this is critical!"; return 1; }
     
-    # Step 7: Install Ollama
+    # Step 4: Install Ollama
     log "🤖 Installing Ollama..."
     if ! command -v ollama &> /dev/null; then
         log "📥 Installing Ollama..."
@@ -250,7 +225,7 @@ main() {
         }
     fi
     
-    # Step 8: Start Ollama
+    # Step 5: Start Ollama
     log "🚀 Starting Ollama..."
     ollama serve &
     local OLLAMA_PID=$!
@@ -262,21 +237,14 @@ main() {
         return 1
     fi
     
-    # Step 9: Pull base models
+    # Step 6: Pull base models
     log "📥 Checking for base models..."
     if ! ollama list | grep -q "llama3:latest"; then
         log "📥 Pulling llama3:latest..."
         ollama pull llama3:latest || log "⚠️ Failed to pull llama3:latest"
     fi
     
-    # Step 10: Install Python dependencies
-    log "🐍 Installing Python dependencies..."
-    uv sync || {
-        log "❌ uv sync failed - this is critical!"
-        return 1
-    }
-    
-    # Step 11: Set up database and extract real data
+    # Step 7: Set up database and extract real data
     log "🗄️ Setting up database and extracting real conversation data..."
     if [ -f "/app/pete.db" ]; then
         cp /app/pete.db . || log "⚠️ Failed to copy database"
@@ -288,13 +256,13 @@ main() {
         return 1
     }
     
-    # Step 12: Generate enhanced Modelfile from real data
+    # Step 8: Generate enhanced Modelfile from real data
     log "🔧 Generating Modelfile from real conversation data..."
     uv run python enhanced_model_trainer.py || {
         log "⚠️ Failed to generate enhanced Modelfile, using fallback"
     }
     
-    # Step 13: Create custom models from real data
+    # Step 9: Create custom models from real data
     log "🔧 Setting up custom models from real conversation data..."
     if [ -f "models/Modelfile.enhanced" ]; then
         local models=("peteollama:property-manager-v0.0.1" "peteollama:jamie-fixed" "peteollama:jamie-voice-complete")
@@ -317,7 +285,7 @@ main() {
         return 1
     fi
     
-    # Step 14: Wait for models to be fully loaded
+    # Step 10: Wait for models to be fully loaded
     log "⏳ Waiting for models to be fully loaded..."
     local model_check_attempts=0
     local max_model_checks=60  # 2 minutes with 2-second intervals
@@ -340,7 +308,7 @@ main() {
         sleep 2
     done
     
-    # Step 15: Start the app
+    # Step 11: Start the app
     log "🌐 Starting PeteOllama..."
     uv run python src/main.py &
     STARTUP_PID=$!
@@ -355,7 +323,7 @@ main() {
         return 1
     fi
     
-    # Step 16: Show final status
+    # Step 12: Show final status
     log "📊 System Status:"
     log "=================="
     df -h /workspace | tee -a "$LOG_FILE"
@@ -372,7 +340,7 @@ main() {
     # Reset restart count on successful startup
     echo "0" > /workspace/restart_count 2>/dev/null || log "⚠️ Could not reset restart count"
     
-    # Step 17: Memory monitoring loop
+    # Step 13: Memory monitoring loop
     log "🔄 Starting memory monitoring..."
     while true; do
         # Check memory usage
