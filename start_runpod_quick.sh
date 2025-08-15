@@ -121,6 +121,14 @@ if check_network; then
             pip install -r requirements.txt
         fi
         
+        # Create latest Jamie model if Ollama is available
+        if command -v ollama &> /dev/null; then
+            echo "🔧 Creating latest Jamie model..."
+            if [ -f "models/Modelfile.enhanced" ]; then
+                ollama create peteollama:jamie-fixed -f models/Modelfile.enhanced 2>/dev/null || echo "⚠️ Failed to create Jamie model"
+            fi
+        fi
+        
         # Start the app
         echo "🌐 Starting PeteOllama..."
         if command -v uv &> /dev/null; then
@@ -148,6 +156,15 @@ else
             git pull origin main
             echo "📦 Installing dependencies..."
             uv sync
+            
+            # Create latest Jamie model if Ollama is available
+            if command -v ollama &> /dev/null; then
+                echo "🔧 Creating latest Jamie model..."
+                if [ -f "models/Modelfile.enhanced" ]; then
+                    ollama create peteollama:jamie-fixed -f models/Modelfile.enhanced 2>/dev/null || echo "⚠️ Failed to create Jamie model"
+                fi
+            fi
+            
             echo "🌐 Starting PeteOllama..."
             uv run python src/main.py
         else
