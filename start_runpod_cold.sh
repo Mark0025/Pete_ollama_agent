@@ -172,15 +172,26 @@ main() {
             log "❌ uv installation failed - this is critical!"
             return 1
         }
+        # Source the environment to get uv in PATH
         export PATH="$HOME/.local/bin:$PATH"
+        export PATH="$HOME/.cargo/bin:$PATH"
+        # Also try to source cargo environment
+        if [ -f "$HOME/.cargo/env" ]; then
+            source "$HOME/.cargo/env"
+        fi
     fi
     
+    # Check again after PATH updates
     if ! command -v uv &> /dev/null; then
-        log "❌ uv still not available after installation"
+        log "❌ uv still not available after installation and PATH update"
+        log "🔍 Current PATH: $PATH"
+        log "🔍 Checking for uv in common locations..."
+        ls -la "$HOME/.local/bin/uv" 2>/dev/null || log "⚠️ uv not in ~/.local/bin"
+        ls -la "$HOME/.cargo/bin/uv" 2>/dev/null || log "⚠️ uv not in ~/.cargo/bin"
         return 1
     fi
     
-    log "✅ uv is available"
+    log "✅ uv is available at: $(which uv)"
     
     # Step 5: Update code from GitHub
     log "🔄 Checking for latest code updates..."
@@ -238,10 +249,21 @@ main() {
     
     # Step 10: Install Python dependencies
     log "🐍 Installing Python dependencies..."
-    uv sync || {
-        log "❌ uv sync failed - this is critical!"
+    
+    # Try to use uv from virtual environment if available
+    if [ -f ".venv/bin/uv" ]; then
+        log "🔧 Using uv from virtual environment"
+        export PATH="$(pwd)/.venv/bin:$PATH"
+    fi
+    
+    # Try to install dependencies
+    if uv sync; then
+        log "✅ Python dependencies installed successfully"
+    else
+        log "❌ Failed to install Python dependencies with uv"
+        log "🔍 uv is required - no fallback available"
         return 1
-    }
+    fi
     
     # Step 11: Set up database and extract real data
     log "🗄️ Setting up database and extracting real conversation data..."
