@@ -121,6 +121,40 @@ if check_network; then
             pip install -r requirements.txt
         fi
         
+        # Install ODBC drivers for SQL Server database connection
+        echo "🗄️ Installing ODBC drivers for database connection..."
+        apt-get update -qq || echo "⚠️ apt-get update failed, continuing..."
+        
+        if ! dpkg -l | grep -q "unixodbc-dev"; then
+            echo "📥 Installing unixodbc-dev..."
+            apt-get install -y unixodbc-dev || echo "⚠️ Failed to install unixodbc-dev"
+        else
+            echo "✅ unixodbc-dev already installed"
+        fi
+        
+        if ! dpkg -l | grep -q "unixodbc"; then
+            echo "📥 Installing unixodbc..."
+            apt-get install -y unixodbc || echo "⚠️ Failed to install unixodbc"
+        else
+            echo "✅ unixodbc already installed"
+        fi
+        
+        # Install additional database dependencies
+        echo "📊 Installing database connection dependencies..."
+        if ! dpkg -l | grep -q "python3-dev"; then
+            echo "📥 Installing python3-dev..."
+            apt-get install -y python3-dev || echo "⚠️ Failed to install python3-dev"
+        else
+            echo "✅ python3-dev already installed"
+        fi
+        
+        if ! dpkg -l | grep -q "gcc"; then
+            echo "📥 Installing gcc..."
+            apt-get install -y gcc g++ || echo "⚠️ Failed to install gcc"
+        else
+            echo "✅ gcc already installed"
+        fi
+        
         # Create database and extract real data FIRST
         echo "🗄️ Setting up database and extracting real conversation data..."
         # Copy pete.db to current directory if it exists in /app
@@ -222,6 +256,49 @@ else
             git pull origin main
             echo "📦 Installing dependencies..."
             uv sync
+            
+            # Install/update dependencies
+            echo "📦 Installing Python dependencies..."
+            if command -v uv &> /dev/null; then
+                uv sync
+            else
+                echo "⚠️ uv not available, trying pip..."
+                pip install -r requirements.txt
+            fi
+            
+            # Install ODBC drivers for SQL Server database connection
+            echo "🗄️ Installing ODBC drivers for database connection..."
+            apt-get update -qq || echo "⚠️ apt-get update failed, continuing..."
+            
+            if ! dpkg -l | grep -q "unixodbc-dev"; then
+                echo "📥 Installing unixodbc-dev..."
+                apt-get install -y unixodbc-dev || echo "⚠️ Failed to install unixodbc-dev"
+            else
+                echo "✅ unixodbc-dev already installed"
+            fi
+            
+            if ! dpkg -l | grep -q "unixodbc"; then
+                echo "📥 Installing unixodbc..."
+                apt-get install -y unixodbc || echo "⚠️ Failed to install unixodbc"
+            else
+                echo "✅ unixodbc already installed"
+            fi
+            
+            # Install additional database dependencies
+            echo "📊 Installing database connection dependencies..."
+            if ! dpkg -l | grep -q "python3-dev"; then
+                echo "📥 Installing python3-dev..."
+                apt-get install -y python3-dev || echo "⚠️ Failed to install python3-dev"
+            else
+                echo "✅ python3-dev already installed"
+            fi
+            
+            if ! dpkg -l | grep -q "gcc"; then
+                echo "📥 Installing gcc..."
+                apt-get install -y gcc g++ || echo "⚠️ Failed to install gcc"
+            else
+                echo "✅ gcc already installed"
+            fi
             
             # Create database and extract real data FIRST
             echo "🗄️ Setting up database and extracting real conversation data..."

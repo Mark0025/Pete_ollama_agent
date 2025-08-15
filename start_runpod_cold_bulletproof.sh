@@ -152,17 +152,50 @@ main() {
     echo 3 > /proc/sys/vm/drop_caches 2>/dev/null || log "⚠️ Could not clear cache (normal if not root)"
     
     # Step 3: Install system dependencies
-    echo "📦 Installing system dependencies..."
-    apt-get update -qq || echo "⚠️ apt-get update failed, continuing..."
-    apt-get install -y tree xsel curl git || echo "⚠️ Some packages failed to install, continuing..."
+    log "📦 Installing system dependencies..."
+    apt-get update -qq || log "⚠️ apt-get update failed, continuing..."
+    
+    local deps=("tree" "xsel" "curl" "git")
+    for dep in "${deps[@]}"; do
+        if ! command -v "$dep" &> /dev/null; then
+            log "📥 Installing $dep..."
+            apt-get install -y "$dep" || log "⚠️ Failed to install $dep"
+        else
+            log "✅ $dep already installed"
+        fi
+    done
     
     # Install ODBC drivers for SQL Server database connection
-    echo "🗄️ Installing ODBC drivers for database connection..."
-    apt-get install -y unixodbc-dev unixodbc || echo "⚠️ ODBC installation failed, continuing..."
+    log "🗄️ Installing ODBC drivers for database connection..."
+    if ! dpkg -l | grep -q "unixodbc-dev"; then
+        log "📥 Installing unixodbc-dev..."
+        apt-get install -y unixodbc-dev || log "⚠️ Failed to install unixodbc-dev"
+    else
+        log "✅ unixodbc-dev already installed"
+    fi
+    
+    if ! dpkg -l | grep -q "unixodbc"; then
+        log "📥 Installing unixodbc..."
+        apt-get install -y unixodbc || log "⚠️ Failed to install unixodbc"
+    else
+        log "✅ unixodbc already installed"
+    fi
     
     # Install additional database dependencies
-    echo "📊 Installing database connection dependencies..."
-    apt-get install -y python3-dev gcc g++ || echo "⚠️ Some build dependencies failed to install, continuing..."
+    log "📊 Installing database connection dependencies..."
+    if ! dpkg -l | grep -q "python3-dev"; then
+        log "📥 Installing python3-dev..."
+        apt-get install -y python3-dev || log "⚠️ Failed to install python3-dev"
+    else
+        log "✅ python3-dev already installed"
+    fi
+    
+    if ! dpkg -l | grep -q "gcc"; then
+        log "📥 Installing gcc..."
+        apt-get install -y gcc g++ || log "⚠️ Failed to install gcc"
+    else
+        log "✅ gcc already installed"
+    fi
     
     # Step 4: Install uv if not present
     log "📦 Checking uv installation..."
