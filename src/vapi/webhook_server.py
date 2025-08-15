@@ -2081,6 +2081,61 @@ input[type="number"], input[type="text"], select{padding:8px;margin:5px;border:1
 </div>
 
 <div class="section">
+<h3>🗄️ Database Schema & Training Data</h3>
+<p>Explore your training database and control what Jamie learns from</p>
+
+<!-- Database Schema Explorer -->
+<div style="margin-bottom: 20px;">
+    <h4>📊 Database Schema</h4>
+    <button onclick="exploreDatabase()" style="background: #28a745; color: white; padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer;">
+        🔍 Explore Database
+    </button>
+    <div id="databaseSchema" style="margin-top: 15px; padding: 15px; background: #f8f9fa; border-radius: 5px; display: none;">
+        <h5>📋 Database Structure</h5>
+        <div id="schemaContent"></div>
+    </div>
+</div>
+
+<!-- Training Data Controls -->
+<div style="margin-bottom: 20px;">
+    <h4>🎯 Training Data Controls</h4>
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+        <div>
+            <label><strong>Conversation Count:</strong>
+                <input type="number" id="trainingCount" value="100" min="10" max="1000" style="width: 100px;"/>
+                <small style="color:#666;">How many conversations to use for training</small>
+            </label>
+        </div>
+        <div>
+            <label><strong>Quality Threshold:</strong>
+                <select id="qualityThreshold" style="width: 120px;">
+                    <option value="high">High Quality Only</option>
+                    <option value="medium" selected>Medium Quality</option>
+                    <option value="low">All Conversations</option>
+                </select>
+                <small style="color:#666;">Filter training data quality</small>
+            </label>
+        </div>
+    </div>
+    <button onclick="updateTrainingData()" style="background: #17a2b8; color: white; padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer; margin-top: 10px;">
+        🔄 Update Training Data
+    </button>
+    <div id="trainingStatus" style="margin-top: 10px;"></div>
+</div>
+
+<!-- Training Data Preview -->
+<div style="margin-bottom: 20px;">
+    <h4>👀 Training Data Preview</h4>
+    <button onclick="previewTrainingData()" style="background: #6f42c1; color: white; padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer;">
+        👁️ Preview Data
+    </button>
+    <div id="trainingPreview" style="margin-top: 15px; padding: 15px; background: #f8f9fa; border-radius: 5px; display: none;">
+        <div id="previewContent"></div>
+    </div>
+</div>
+</div>
+
+<div class="section">
 <h3>📋 Modelfile Management & Analysis</h3>
 <p>View, compare, and analyze your model files with best practices and visual representations</p>
 
@@ -2260,13 +2315,13 @@ function loadModelfile(){
         .then(r => r.json())
         .then(data => {
             if (data.error) {
-                viewer.innerHTML = `<div style="color: red;">❌ Error: ${data.error}</div>`;
+                viewer.innerHTML = '<div style="color: red;">❌ Error: ' + data.error + '</div>';
             } else {
-                viewer.innerHTML = `<pre style="background: #f8f9fa; padding: 15px; border-radius: 5px; overflow-x: auto;">${data.modelfile}</pre>`;
+                viewer.innerHTML = '<pre style="background: #f8f9fa; padding: 15px; border-radius: 5px; overflow-x: auto;">' + data.modelfile + '</pre>';
             }
         })
         .catch(error => {
-            viewer.innerHTML = `<div style="color: red;">❌ Error loading modelfile: ${error}</div>`;
+            viewer.innerHTML = '<div style="color: red;">❌ Error loading modelfile: ' + error + '</div>';
         });
 }
 
@@ -2286,43 +2341,41 @@ function analyzeModelfile(){
         .then(r => r.json())
         .then(data => {
             if (data.error) {
-                content.innerHTML = `<div style="color: red;">❌ Error: ${data.error}</div>`;
+                content.innerHTML = '<div style="color: red;">❌ Error: ' + data.error + '</div>';
             } else {
-                content.innerHTML = `
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-                        <div>
-                            <h5>📊 Model Information</h5>
-                            <p><strong>Name:</strong> ${data.model_name}</p>
-                            <p><strong>Base Model:</strong> ${data.base_model || 'N/A'}</p>
-                            <p><strong>Estimated Tokens:</strong> ${Math.round(data.estimated_tokens)}</p>
-                        </div>
-                        <div>
-                            <h5>🎯 Features</h5>
-                            <ul>${data.features.map(f => `<li>${f}</li>`).join('')}</ul>
-                        </div>
-                        <div>
-                            <h5>⚙️ Parameters</h5>
-                            <ul>${Object.entries(data.parameters).map(([k,v]) => `<li><strong>${k}:</strong> ${v}</li>`).join('')}</ul>
-                        </div>
-                        <div>
-                            <h5>💬 Training Examples</h5>
-                            <p><strong>Count:</strong> ${data.examples.length}</p>
-                            ${data.examples.length > 0 ? `<p><strong>Sample:</strong> ${data.examples[0].content.substring(0, 100)}...</p>` : ''}
-                        </div>
-                    </div>
-                    ${data.system_prompt ? `
-                        <div style="margin-top: 20px;">
-                            <h5>🧠 System Prompt</h5>
-                            <div style="background: #f8f9fa; padding: 15px; border-radius: 5px; max-height: 200px; overflow-y: auto;">
-                                ${data.system_prompt}
-                            </div>
-                        </div>
-                    ` : ''}
-                `;
+                const features = data.features ? data.features.map(f => '<li>' + f + '</li>').join('') : '<li>None</li>';
+                const parameters = data.parameters ? Object.entries(data.parameters).map(([k,v]) => '<li><strong>' + k + ':</strong> ' + v + '</li>').join('') : '<li>None</li>';
+                const sampleExample = data.examples && data.examples.length > 0 ? '<p><strong>Sample:</strong> ' + data.examples[0].content.substring(0, 100) + '...</p>' : '';
+                const systemPromptSection = data.system_prompt ? 
+                    '<div style="margin-top: 20px;"><h5>🧠 System Prompt</h5><div style="background: #f8f9fa; padding: 15px; border-radius: 5px; max-height: 200px; overflow-y: auto;">' + data.system_prompt + '</div></div>' : '';
+                
+                content.innerHTML = 
+                    '<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">' +
+                        '<div>' +
+                            '<h5>📊 Model Information</h5>' +
+                            '<p><strong>Name:</strong> ' + data.model_name + '</p>' +
+                            '<p><strong>Base Model:</strong> ' + (data.base_model || 'N/A') + '</p>' +
+                            '<p><strong>Estimated Tokens:</strong> ' + Math.round(data.estimated_tokens) + '</p>' +
+                        '</div>' +
+                        '<div>' +
+                            '<h5>🎯 Features</h5>' +
+                            '<ul>' + features + '</ul>' +
+                        '</div>' +
+                        '<div>' +
+                            '<h5>⚙️ Parameters</h5>' +
+                            '<ul>' + parameters + '</ul>' +
+                        '</div>' +
+                        '<div>' +
+                            '<h5>💬 Training Examples</h5>' +
+                            '<p><strong>Count:</strong> ' + data.examples.length + '</p>' +
+                            sampleExample +
+                        '</div>' +
+                    '</div>' +
+                    systemPromptSection;
             }
         })
         .catch(error => {
-            content.innerHTML = `<div style="color: red;">❌ Error analyzing modelfile: ${error}</div>`;
+            content.innerHTML = '<div style="color: red;">❌ Error analyzing modelfile: ' + error + '</div>';
         });
 }
 
@@ -2349,36 +2402,39 @@ function compareModelfiles(){
         .then(r => r.json())
         .then(data => {
             if (data.error) {
-                content.innerHTML = `<div style="color: red;">❌ Error: ${data.error}</div>`;
+                content.innerHTML = '<div style="color: red;">❌ Error: ' + data.error + '</div>';
             } else {
-                content.innerHTML = `
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-                        <div>
-                            <h5>📊 Comparison Summary</h5>
-                            <p><strong>Model 1:</strong> ${data.model1}</p>
-                            <p><strong>Model 2:</strong> ${data.model2}</p>
-                            <p><strong>Differences:</strong> ${data.differences.length} lines</p>
-                            <p><strong>Similarities:</strong> ${data.similarities.length} lines</p>
-                        </div>
-                        <div>
-                            <h5>🔍 Key Differences</h5>
-                            ${data.differences.length > 0 ? 
-                                data.differences.slice(0, 5).map(diff => 
-                                    `<div style="background: #fff3cd; padding: 10px; margin: 5px 0; border-radius: 3px;">
-                                        <strong>Line ${diff.line}:</strong><br>
-                                        <span style="color: #856404;">${diff.model1}</span><br>
-                                        <span style="color: #721c24;">${diff.model2}</span>
-                                    </div>`
-                                ).join('') : 
-                                '<p>No differences found</p>'
-                            }
-                        </div>
-                    </div>
-                `;
+                let differencesHtml = '';
+                if (data.differences && data.differences.length > 0) {
+                    differencesHtml = data.differences.slice(0, 5).map(diff => 
+                        '<div style="background: #fff3cd; padding: 10px; margin: 5px 0; border-radius: 3px;">' +
+                            '<strong>Line ' + diff.line + ':</strong><br>' +
+                            '<span style="color: #856404;">' + diff.model1 + '</span><br>' +
+                            '<span style="color: #721c24;">' + diff.model2 + '</span>' +
+                        '</div>'
+                    ).join('');
+                } else {
+                    differencesHtml = '<p>No differences found</p>';
+                }
+                
+                content.innerHTML = 
+                    '<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">' +
+                        '<div>' +
+                            '<h5>📊 Comparison Summary</h5>' +
+                            '<p><strong>Model 1:</strong> ' + data.model1 + '</p>' +
+                            '<p><strong>Model 2:</strong> ' + data.model2 + '</p>' +
+                            '<p><strong>Differences:</strong> ' + (data.differences ? data.differences.length : 0) + ' lines</p>' +
+                            '<p><strong>Similarities:</strong> ' + (data.similarities ? data.similarities.length : 0) + ' lines</p>' +
+                        '</div>' +
+                        '<div>' +
+                            '<h5>🔍 Key Differences</h5>' +
+                            differencesHtml +
+                        '</div>' +
+                    '</div>';
             }
         })
         .catch(error => {
-            content.innerHTML = `<div style="color: red;">❌ Error comparing modelfiles: ${error}</div>`;
+            content.innerHTML = '<div style="color: red;">❌ Error comparing modelfiles: ' + error + '</div>';
         });
 }
 
@@ -2396,42 +2452,43 @@ function generateModelDiagram(){
         .then(r => r.json())
         .then(data => {
             if (data.error) {
-                diagram.innerHTML = `<div style="color: red;">❌ Error: ${data.error}</div>`;
+                diagram.innerHTML = '<div style="color: red;">❌ Error: ' + data.error + '</div>';
             } else {
                 // Generate Mermaid diagram
                 const mermaidCode = generateMermaidCode(data);
-                diagram.innerHTML = `
-                    <div style="text-align: center; margin-bottom: 20px;">
-                        <h5>🎨 Model Architecture: ${data.model_name}</h5>
-                    </div>
-                    <div class="mermaid">
-                        ${mermaidCode}
-                    </div>
-                    <script>
-                        mermaid.initialize({ startOnLoad: true });
-                    </script>
-                `;
+                diagram.innerHTML = 
+                    '<div style="text-align: center; margin-bottom: 20px;">' +
+                        '<h5>🎨 Model Architecture: ' + data.model_name + '</h5>' +
+                    '</div>' +
+                    '<div class="mermaid">' +
+                        mermaidCode +
+                    '</div>' +
+                    '<script>' +
+                        'mermaid.initialize({ startOnLoad: true });' +
+                    '</script>';
             }
         })
         .catch(error => {
-            diagram.innerHTML = `<div style="color: red;">❌ Error generating diagram: ${error}</div>`;
+            diagram.innerHTML = '<div style="color: red;">❌ Error generating diagram: ' + error + '</div>';
         });
 }
 
 function generateMermaidCode(analysis){
-    const features = analysis.features.join(', ');
-    const params = Object.entries(analysis.parameters).map(([k,v]) => `${k}: ${v}`).join('\\n');
-    const examples = analysis.examples.length;
+    try {
+        const features = analysis.features ? analysis.features.join(', ') : 'None';
+        const params = analysis.parameters ? Object.entries(analysis.parameters).map(([k,v]) => k + ': ' + v).join('\\n') : 'None';
+        const examples = analysis.examples ? analysis.examples.length : 0;
+        const systemPrompt = analysis.system_prompt ? analysis.system_prompt.substring(0, 50) + '...' : 'Not specified';
+        const baseModel = analysis.base_model ? analysis.base_model.split('/').pop() : 'Unknown';
+        
+        return `graph TD
+    A["${analysis.model_name}"] --> B["Base: ${baseModel}"]
+    A --> C["System Prompt"]
+    A --> D["Parameters"]
+    A --> E["Training Examples"]
+    A --> F["Features"]
     
-    return `
-graph TD
-    A[${analysis.model_name}] --> B[Base: ${analysis.base_model || 'Unknown'}]
-    A --> C[System Prompt]
-    A --> D[Parameters]
-    A --> E[Training Examples]
-    A --> F[Features]
-    
-    C --> C1["${(analysis.system_prompt || '').substring(0, 50)}..."]
+    C --> C1["${systemPrompt}"]
     D --> D1["${params}"]
     E --> E1["${examples} examples"]
     F --> F1["${features}"]
@@ -2441,8 +2498,14 @@ graph TD
     style C fill:#e8f5e8
     style D fill:#fff3e0
     style E fill:#fce4ec
-    style F fill:#f1f8e9
-    `;
+    style F fill:#f1f8e9`;
+    } catch (error) {
+        console.error('Error generating Mermaid code:', error);
+        return `graph TD
+    A["Error"] --> B["Failed to generate diagram"]
+    style A fill:#ffebee
+    style B fill:#ffebee`;
+    }
 }
 
 // Model Management Functions
