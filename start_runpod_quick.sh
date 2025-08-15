@@ -155,6 +155,23 @@ if check_network; then
             fi
         fi
         
+        # Wait for models to be fully loaded before starting app
+        echo "⏳ Waiting for models to be fully loaded..."
+        for i in {1..30}; do
+            if ollama list | grep -q "peteollama:property-manager-v0.0.1" && \
+               ollama list | grep -q "peteollama:jamie-fixed" && \
+               ollama list | grep -q "peteollama:jamie-voice-complete"; then
+                echo "✅ All Jamie models are loaded and ready!"
+                break
+            fi
+            if [ $i -eq 30 ]; then
+                echo "⚠️ Timeout waiting for models - starting app anyway"
+                break
+            fi
+            echo "⏳ Waiting for models... (${i}/30)"
+            sleep 2
+        done
+        
         # Start the app
         echo "🌐 Starting PeteOllama..."
         if command -v uv &> /dev/null; then
@@ -216,6 +233,23 @@ else
                     echo "❌ Modelfile.enhanced not found - cannot create models"
                 fi
             fi
+            
+            # Wait for models to be fully loaded before starting app
+            echo "⏳ Waiting for models to be fully loaded..."
+            for i in {1..30}; do
+                if ollama list | grep -q "peteollama:property-manager-v0.0.1" && \
+                   ollama list | grep -q "peteollama:jamie-fixed" && \
+                   ollama list | grep -q "peteollama:jamie-voice-complete"; then
+                    echo "✅ All Jamie models are loaded and ready!"
+                    break
+                fi
+                if [ $i -eq 30 ]; then
+                    echo "⚠️ Timeout waiting for models - starting app anyway"
+                    break
+                fi
+                echo "⏳ Waiting for models... (${i}/30)"
+                sleep 2
+            done
             
             echo "🌐 Starting PeteOllama..."
             uv run python src/main.py
