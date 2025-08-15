@@ -153,6 +153,11 @@ main() {
     
     # Step 3: Install system dependencies
     log "📦 Installing system dependencies..."
+    
+    # Set non-interactive environment to prevent prompts
+    export DEBIAN_FRONTEND=noninteractive
+    export TZ=America/Chicago
+    
     apt-get update -qq || log "⚠️ apt-get update failed, continuing..."
     
     local deps=("tree" "xsel" "curl" "git")
@@ -167,6 +172,13 @@ main() {
     
     # Install ODBC drivers for SQL Server database connection
     log "🗄️ Installing ODBC drivers for database connection..."
+    
+    # Set non-interactive environment to prevent prompts
+    export DEBIAN_FRONTEND=noninteractive
+    export TZ=America/Chicago
+    
+    apt-get update -qq || log "⚠️ apt-get update failed, continuing..."
+    
     if ! dpkg -l | grep -q "unixodbc-dev"; then
         log "📥 Installing unixodbc-dev..."
         apt-get install -y unixodbc-dev || log "⚠️ Failed to install unixodbc-dev"
@@ -213,7 +225,18 @@ main() {
     
     # Install Python dependencies
     log "📦 Installing Python dependencies..."
-    uv sync || { log "❌ uv sync failed - this is critical!"; return 1; }
+    if ! uv sync; then
+        log "❌ uv sync failed - checking what went wrong..."
+        log "Current directory: $(pwd)"
+        log "Files in current directory: $(ls -la)"
+        if [ -f "pyproject.toml" ]; then
+            log "pyproject.toml exists, trying to debug uv sync..."
+            uv sync --verbose || log "⚠️ uv sync failed with verbose output"
+        else
+            log "❌ No pyproject.toml found - this is critical!"
+            return 1
+        fi
+    fi
     
     # Step 4: Update code from GitHub
     log "🔄 Checking for latest code updates..."
