@@ -138,12 +138,38 @@ main() {
     log "Memory: $(free -h | grep Mem | awk '{print $2}')"
     log "Disk: $(df -h / | tail -1 | awk '{print $4}') available"
     
-    # Step 1: Check network connectivity
+    # Step 1: Check and fix network connectivity
     log "🔍 Checking network connectivity..."
     if ping -c 1 8.8.8.8 >/dev/null 2>&1; then
         log "✅ Network connectivity confirmed"
     else
-        log "❌ Network connectivity failed - continuing anyway"
+        log "❌ Network connectivity failed - attempting to fix..."
+        
+        # Try to fix DNS issues
+        if [ -f "/etc/resolv.conf" ]; then
+            log "🔧 Fixing DNS configuration..."
+            cp /etc/resolv.conf /etc/resolv.conf.backup 2>/dev/null || true
+            echo "nameserver 8.8.8.8" > /etc/resolv.conf
+            echo "nameserver 8.8.4.4" >> /etc/resolv.conf
+            echo "nameserver 1.1.1.1" >> /etc/resolv.conf
+            
+            # Test if DNS fix worked
+            if ping -c 1 8.8.8.8 >/dev/null 2>&1; then
+                log "✅ DNS fix successful - network now working"
+            else
+                log "⚠️ DNS fix failed - trying alternative DNS"
+                echo "nameserver 208.67.222.222" > /etc/resolv.conf
+                echo "nameserver 208.67.220.220" >> /etc/resolv.conf
+                
+                if ping -c 1 8.8.8.8 >/dev/null 2>&1; then
+                    log "✅ Alternative DNS fix successful"
+                else
+                    log "❌ Network connectivity still failed - continuing anyway"
+                fi
+            fi
+        else
+            log "⚠️ No resolv.conf found - continuing anyway"
+        fi
     fi
     
     # Step 2: Clear cache and optimize memory
@@ -164,31 +190,40 @@ main() {
     echo "📊 Installing database connection dependencies..."
     apt-get install -y python3-dev gcc g++ || echo "⚠️ Some build dependencies failed to install, continuing..."
     
-    # Step 4: Install uv if not present
+    # Step 4: Check for uv (prefer existing virtual environment)
     log "📦 Checking uv installation..."
-    if ! command -v uv &> /dev/null; then
-        log "📥 Installing uv..."
-        curl -Ls https://astral.sh/uv/install.sh | sh || {
-            log "❌ uv installation failed - this is critical!"
-            return 1
-        }
-        # Source the environment to get uv in PATH
-        export PATH="$HOME/.local/bin:$PATH"
-        export PATH="$HOME/.cargo/bin:$PATH"
-        # Also try to source cargo environment
-        if [ -f "$HOME/.cargo/env" ]; then
-            source "$HOME/.cargo/env"
-        fi
-    fi
     
-    # Check again after PATH updates
-    if ! command -v uv &> /dev/null; then
-        log "❌ uv still not available after installation and PATH update"
-        log "🔍 Current PATH: $PATH"
-        log "🔍 Checking for uv in common locations..."
-        ls -la "$HOME/.local/bin/uv" 2>/dev/null || log "⚠️ uv not in ~/.local/bin"
-        ls -la "$HOME/.cargo/bin/uv" 2>/dev/null || log "⚠️ uv not in ~/.cargo/bin"
-        return 1
+    # First, try to use existing uv from virtual environment
+    if [ -f ".venv/bin/uv" ]; then
+        log "🔧 Found uv in virtual environment - using it"
+        export PATH="$(pwd)/.venv/bin:$PATH"
+        log "✅ uv is available from virtual environment at: $(which uv)"
+    elif command -v uv &> /dev/null; then
+        log "✅ uv is available in PATH at: $(which uv)"
+    else
+        log "📥 Installing uv using pip..."
+        if command -v pip3 &> /dev/null; then
+            pip3 install uv || {
+                log "❌ pip3 installation of uv failed"
+                return 1
+            }
+            export PATH="$HOME/.local/bin:$PATH"
+        elif command -v pip &> /dev/null; then
+            pip install uv || {
+                log "❌ pip installation of uv failed"
+                return 1
+            }
+            export PATH="$HOME/.local/bin:$PATH"
+        else
+            log "❌ No pip available - cannot install uv"
+            return 1
+        fi
+        
+        # Verify uv is now available
+        if ! command -v uv &> /dev/null; then
+            log "❌ uv still not available after pip installation"
+            return 1
+        fi
     fi
     
     log "✅ uv is available at: $(which uv)"
