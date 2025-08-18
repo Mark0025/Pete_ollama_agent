@@ -57,3 +57,4 @@ concatenated_output.txt
 *.db
 langchain_indexed_conversations.json
 .cursor/
+.vercel

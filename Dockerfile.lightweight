@@ -1,0 +1,54 @@
+# PeteOllama V1 - Lightweight Production Dockerfile
+# Optimized for serverless deployments with RunPod backend
+FROM python:3.11-slim
+
+# Set environment variables
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PIP_NO_CACHE_DIR=1 \
+    PYTHONPATH=/app/src \
+    PORT=8000
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    curl \
+    ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create non-root user for security
+RUN useradd --create-home --shell /bin/bash peteollama
+
+# Set working directory
+WORKDIR /app
+
+# Copy lightweight requirements first (for better caching)
+COPY requirements.lightweight.txt .
+RUN pip install --no-cache-dir -r requirements.lightweight.txt
+
+# Copy application code
+COPY --chown=peteollama:peteollama src/ ./src/
+COPY --chown=peteollama:peteollama runpod_handler.py ./
+
+# Copy environment template
+COPY --chown=peteollama:peteollama .env.example ./
+
+# Note: langchain_indexed_conversations.json is excluded by .dockerignore
+# The app will create fallback conversation samples if this file is missing
+
+# Create necessary directories
+RUN mkdir -p /app/data /app/logs && \
+    chown -R peteollama:peteollama /app
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
+    CMD curl -f http://localhost:${PORT}/health || exit 1
+
+# Switch to non-root user
+USER peteollama
+
+# Expose port
+EXPOSE ${PORT}
+
+# Run the application
+CMD ["python", "src/main.py"]

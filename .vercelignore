@@ -1,0 +1,80 @@
+# Large files and directories to exclude from Vercel deployment
+
+# Git
+.git/
+.gitignore
+
+# Python
+__pycache__/
+src/__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+.venv/
+venv/
+
+# Development files
+DEV_MAN/
+_deprecated/
+tests/
+*.test.py
+pytest.ini
+
+# Logs and databases
+logs/
+*.log
+*.db
+*.sqlite3
+data/
+models/
+
+# Large data files
+*.csv
+langchain_indexed_conversations.json
+concatenated_output.txt
+src/langchain_indexed_conversations.json
+src/pete.db
+src/training_data.db
+
+# Docker files
+Dockerfile*
+docker-compose*.yml
+.dockerignore
+
+# Documentation
+*.md
+DOCKER.md
+architecture_analysis.md
+
+# IDE
+.vscode/
+.idea/
+.cursor/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Build artifacts
+build/
+dist/
+*.egg-info/
+
+# Node modules (if any)
+node_modules/
+
+# Large model files
+*.bin
+*.model
+*.pkl
+*.pt
+*.pth
+
+# Environment files (will be set in Vercel dashboard)
+.env
+.env.*
+
+# Lock files
+uv.lock
+*.lock

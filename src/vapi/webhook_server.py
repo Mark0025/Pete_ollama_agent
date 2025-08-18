@@ -6,7 +6,7 @@ FastAPI server for handling VAPI voice interactions.
 Receives voice calls and responds using the trained AI model.
 """
 
-from fastapi import FastAPI, Request, HTTPException
+from fastapi import FastAPI, Request, HTTPException, Depends, Header
 from fastapi.responses import JSONResponse, HTMLResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 import uvicorn
@@ -14,9 +14,10 @@ import os
 import json
 import sqlite3
 from datetime import datetime
-from typing import Dict, Any
+from typing import Dict, Any, List, Optional, Annotated
 from pathlib import Path
 import sys
+from pydantic import BaseModel
 
 # Add src to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
@@ -27,6 +28,26 @@ from database.pete_db_manager import PeteDBManager
 from utils.logger import logger
 from config.model_settings import model_settings
 from analytics.response_validator import response_validator
+
+# Pydantic models for VAPI custom LLM
+class VAPIMessage(BaseModel):
+    role: str
+    content: str
+
+class VAPIChatRequest(BaseModel):
+    model: Optional[str] = None
+    messages: List[VAPIMessage]
+    temperature: Optional[float] = 0.7
+    max_tokens: Optional[int] = 1000
+    stream: Optional[bool] = False
+
+class VAPIChatResponse(BaseModel):
+    id: str
+    object: str = "chat.completion"
+    created: int
+    model: str
+    choices: List[Dict[str, Any]]
+    usage: Dict[str, int]
 
 class VAPIWebhookServer:
     """VAPI webhook server for voice interactions"""
@@ -43,11 +64,28 @@ class VAPIWebhookServer:
         self.model_manager = ModelManager()
         self.db_manager = PeteDBManager()
         
+        # VAPI configuration
+        self.vapi_api_key = os.getenv("VAPI_API_KEY", "pete-vapi-secret-key-2024")
+        
         # Serve static assets from /public for logos etc.
         public_dir = Path(__file__).parent.parent / "public"
         if public_dir.exists():
             self.app.mount("/public", StaticFiles(directory=str(public_dir)), name="public")
         self.setup_routes()
+    
+    def verify_vapi_auth(self, authorization: Annotated[str, Header()] = None):
+        """Verify VAPI API key from Authorization header"""
+        if not authorization:
+            raise HTTPException(status_code=401, detail="Authorization header required")
+        
+        # Handle both "Bearer token" and "token" formats
+        token = authorization.replace("Bearer ", "").strip()
+        
+        if token != self.vapi_api_key:
+            logger.warning(f"Invalid VAPI API key attempt: {token[:10]}...")
+            raise HTTPException(status_code=401, detail="Invalid API key")
+        
+        return token
     
     def setup_routes(self):
         """Setup FastAPI routes"""
@@ -304,6 +342,87 @@ class VAPIWebhookServer:
         async def train_pm():
             ok = self.model_manager.train_property_manager()
             return {"status": "started" if ok else "failed"}
+        
+        @self.app.post("/chat/completions")
+        async def vapi_chat_completions(request: VAPIChatRequest, api_key: str = Depends(self.verify_vapi_auth)):
+            """VAPI Custom LLM endpoint - OpenAI-compatible chat completions"""
+            import time
+            
+            try:
+                start_time = time.time()
+                
+                # Extract the latest user message from the conversation
+                user_messages = [msg for msg in request.messages if msg.role == "user"]
+                if not user_messages:
+                    raise HTTPException(status_code=400, detail="No user messages found")
+                
+                current_message = user_messages[-1].content
+                
+                # Build conversation context from message history
+                context = ""
+                for msg in request.messages[:-1]:  # All except the last message
+                    if msg.role == "system":
+                        context += f"System: {msg.content}\n\n"
+                    elif msg.role == "user":
+                        context += f"User: {msg.content}\n"
+                    elif msg.role == "assistant":
+                        context += f"Assistant: {msg.content}\n"
+                
+                # Use the specified model or fall back to the best Jamie model
+                model_to_use = request.model
+                if not model_to_use:
+                    # Get the best Jamie model from settings
+                    ui_models = model_settings.get_ui_models()
+                    jamie_models = [m for m in ui_models if m.is_jamie_model]
+                    model_to_use = jamie_models[0].name if jamie_models else "llama3:latest"
+                
+                logger.info(f"🗣️ VAPI Chat Completion - Model: {model_to_use}, Message: {current_message[:50]}...")
+                
+                # Generate AI response using the model manager
+                ai_response = self.model_manager.generate_response(
+                    current_message, 
+                    model_name=model_to_use,
+                    context=context
+                )
+                
+                end_time = time.time()
+                duration_ms = int((end_time - start_time) * 1000)
+                
+                # Log the interaction for training data
+                self._store_vapi_interaction({
+                    'messages': [msg.dict() for msg in request.messages],
+                    'model_used': model_to_use,
+                    'response': ai_response,
+                    'duration_ms': duration_ms,
+                    'timestamp': datetime.now().isoformat()
+                })
+                
+                # Create OpenAI-compatible response
+                chat_response = VAPIChatResponse(
+                    id="chatcmpl-" + str(hash(ai_response))[:8],
+                    created=int(time.time()),
+                    model=model_to_use,
+                    choices=[{
+                        "index": 0,
+                        "message": {
+                            "role": "assistant",
+                            "content": ai_response
+                        },
+                        "finish_reason": "stop"
+                    }],
+                    usage={
+                        "prompt_tokens": len(context.split()) + len(current_message.split()),
+                        "completion_tokens": len(ai_response.split()),
+                        "total_tokens": len(context.split()) + len(current_message.split()) + len(ai_response.split())
+                    }
+                )
+                
+                logger.info(f"✅ VAPI Chat Completion successful - {duration_ms}ms, Model: {model_to_use}")
+                return chat_response
+                
+            except Exception as e:
+                logger.error(f"VAPI chat completion error: {str(e)}")
+                raise HTTPException(status_code=500, detail=str(e))
         
         @self.app.post("/vapi/webhook")
         async def vapi_webhook(request: Request):
@@ -3902,6 +4021,48 @@ document.getElementById('lastUpdate').textContent = new Date().toLocaleString();
             
         except Exception as e:
             logger.error(f"Error storing training data: {str(e)}")
+    
+    def _store_vapi_interaction(self, data: Dict[str, Any]):
+        """Store VAPI chat completion interaction for analysis"""
+        try:
+            # Create VAPI interactions table if it doesn't exist
+            conn = sqlite3.connect('vapi_interactions.db')
+            cursor = conn.cursor()
+            
+            cursor.execute("""
+                CREATE TABLE IF NOT EXISTS vapi_chat_completions (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    messages TEXT,
+                    model_used TEXT,
+                    response TEXT,
+                    duration_ms INTEGER,
+                    timestamp TEXT,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                )
+            """)
+            
+            import json
+            
+            # Insert VAPI interaction data
+            cursor.execute("""
+                INSERT INTO vapi_chat_completions (
+                    messages, model_used, response, duration_ms, timestamp
+                ) VALUES (?, ?, ?, ?, ?)
+            """, (
+                json.dumps(data.get('messages', [])),
+                data.get('model_used'),
+                data.get('response'),
+                data.get('duration_ms'),
+                data.get('timestamp')
+            ))
+            
+            conn.commit()
+            conn.close()
+            
+            logger.info(f"💾 Stored VAPI interaction - Model: {data.get('model_used')}, Duration: {data.get('duration_ms')}ms")
+            
+        except Exception as e:
+            logger.error(f"Error storing VAPI interaction: {str(e)}")
     
     async def start(self):
         """Start the webhook server"""

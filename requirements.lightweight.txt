@@ -1,0 +1,100 @@
+# PeteOllama V1 - Lightweight Dependencies
+# Optimized for Vercel/serverless deployments without heavy ML packages
+# AI inference handled by RunPod serverless endpoint
+
+# ========================================
+# CORE WEB FRAMEWORK (Essential)
+# ========================================
+fastapi>=0.104.1
+uvicorn>=0.24.0
+pydantic>=2.5.0
+python-multipart>=0.0.6
+
+# ========================================
+# HTTP CLIENT LIBRARIES (Essential)
+# ========================================
+requests>=2.31.0
+httpx>=0.25.0
+aiohttp>=3.9.0
+websockets>=11.0.0
+
+# ========================================
+# DATABASE DRIVERS (Essential)
+# ========================================
+psycopg2-binary>=2.9.9
+sqlalchemy>=2.0.30
+
+# ========================================
+# UTILITIES (Essential)
+# ========================================
+python-dotenv>=1.0.0
+loguru>=0.7.2
+pendulum>=3.0.0
+
+# ========================================
+# DATA PROCESSING (Lightweight only)
+# ========================================
+pandas>=2.2.2
+
+# ========================================
+# OLLAMA CLIENT (Essential for local dev)
+# ========================================
+ollama>=0.1.8
+
+# ========================================
+# LANGCHAIN (Latest 0.3.x versions)
+# ========================================
+# Keep LangChain for conversation analysis and text processing
+langchain>=0.3.27
+langchain-community>=0.3.27
+langchain-core>=0.3.27
+langchain-text-splitters>=0.3.0
+langchain-ollama>=0.3.6
+
+# ========================================
+# REMOVED HEAVY ML DEPENDENCIES ONLY
+# ========================================
+# The following are excluded to reduce build size and memory usage:
+# - sentence-transformers>=2.2.2  (~500MB+ with models and torch)
+# - faiss-cpu>=1.7.4              (~100MB+)
+# - langchain-huggingface          (~300MB+ with transformers)
+# - torch                          (~1GB+)
+# - transformers                   (~500MB+)
+# - numpy<2.0.0                    (conflicts resolved, not needed with pandas)
+# - pyodbc>=5.0.1                  (Windows-specific, not needed on Linux)
+
+# ========================================
+# FUNCTIONALITY IMPACT
+# ========================================
+# ✅ PRESERVED: All core app functionality
+# ✅ PRESERVED: FastAPI web server and UI
+# ✅ PRESERVED: Database connectivity
+# ✅ PRESERVED: RunPod serverless AI inference
+# ✅ PRESERVED: User authentication and admin panel
+# ✅ PRESERVED: Logging and monitoring
+# ✅ PRESERVED: LangChain conversation analysis and text processing
+# ✅ PRESERVED: Conversation indexing and similarity analysis
+# 
+# 📉 GRACEFULLY DEGRADED: Semantic similarity analysis
+#    - Falls back from HuggingFace embeddings to keyword-based matching
+#    - Conversation analysis still works, just uses simpler algorithms
+#    - No functionality loss, just reduced accuracy in similarity scoring
+# 
+# ❌ REMOVED: Advanced ML features only
+#    - Semantic embeddings (sentence-transformers)
+#    - Vector databases (FAISS)
+#    - These provide enhanced accuracy but aren't required for core functionality
+
+# ========================================
+# ESTIMATED SIZE REDUCTION
+# ========================================
+# Before: ~2GB+ with all ML dependencies (torch, transformers, sentence-transformers)
+# After:  ~400MB lightweight deployment (with LangChain but no heavy ML)
+# Reduction: ~80% smaller build size
+# 
+# Main space saved by removing:
+# - PyTorch/Torch: ~1GB
+# - Transformers: ~500MB  
+# - Sentence-transformers models: ~300MB
+# - FAISS: ~100MB
+# - Associated dependencies: ~200MB

@@ -6,9 +6,9 @@ Ollama OpenAI Proxy
 Converts OpenAI-compatible requests to Ollama format for VAPI integration.
 """
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Depends, Header
 from pydantic import BaseModel
-from typing import List, Optional, Dict, Any
+from typing import List, Optional, Dict, Any, Annotated
 import httpx
 import json
 import os
@@ -19,6 +19,22 @@ app = FastAPI(title="Ollama OpenAI Proxy", version="1.0.0")
 # Configuration
 OLLAMA_BASE_URL = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
 DEFAULT_MODEL = os.getenv("DEFAULT_MODEL", "peteollama:property-manager-v0.0.1")
+VAPI_API_KEY = os.getenv("VAPI_API_KEY", "your-secret-api-key")
+
+# Authentication function for VAPI
+def verify_api_key(authorization: Annotated[str, Header()] = None):
+    """Verify API key from Authorization header"""
+    if not authorization:
+        raise HTTPException(status_code=401, detail="Authorization header required")
+    
+    # Handle both "Bearer token" and "token" formats
+    token = authorization.replace("Bearer ", "").strip()
+    
+    if token != VAPI_API_KEY:
+        logger.warning(f"Invalid API key attempt: {token[:10]}...")
+        raise HTTPException(status_code=401, detail="Invalid API key")
+    
+    return token
 
 class ChatMessage(BaseModel):
     role: str
@@ -54,7 +70,7 @@ async def health_check():
     return {"status": "healthy"}
 
 @app.post("/chat/completions")
-async def chat_completions(request: ChatCompletionRequest):
+async def chat_completions(request: ChatCompletionRequest, api_key: str = Depends(verify_api_key)):
     """Convert OpenAI chat completion request to Ollama format"""
     
     # Convert messages to Ollama prompt format

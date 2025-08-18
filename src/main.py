@@ -73,17 +73,23 @@ def main() -> None:
     atexit.register(cleanup_resources)
     
     logger.info(f"🚀 Starting PeteOllama API server on port {port}")
-    logger.info("🔥 Warming up RunPod serverless endpoint...")
     
-    # Warm up the serverless endpoint on startup
-    try:
-        warmup_success = run_warmup()
-        if warmup_success:
-            logger.info("✅ Serverless endpoint warmed up successfully")
-        else:
-            logger.warning("⚠️ Serverless endpoint warmup failed - continuing anyway")
-    except Exception as e:
-        logger.warning(f"⚠️ Warmup exception: {e} - continuing anyway")
+    # Start warmup in background - don't block server startup
+    logger.info("🔥 Starting RunPod warmup in background...")
+    import threading
+    def background_warmup():
+        try:
+            warmup_success = run_warmup()
+            if warmup_success:
+                logger.info("✅ Background serverless endpoint warmup completed successfully")
+            else:
+                logger.warning("⚠️ Background serverless endpoint warmup failed")
+        except Exception as e:
+            logger.warning(f"⚠️ Background warmup exception: {e}")
+    
+    # Start warmup thread
+    warmup_thread = threading.Thread(target=background_warmup, daemon=True)
+    warmup_thread.start()
     
     logger.info("🔗 Starting VAPI webhook server with serverless backend")
     

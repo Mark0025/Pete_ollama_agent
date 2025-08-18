@@ -1,0 +1,247 @@
+{
+  "instant_response_tests": [
+    {
+      "question": "Hey, it's Jamie",
+      "frequency": 29,
+      "category": "General",
+      "sample_responses": [
+        "OK, so I can send our contractor to look at it",
+        "Those just aren't as, I can't get like a foundation company out as quickly as I can a plumber",
+        "I don't think I can get anybody there to put a lock box on the property before you're out"
+      ],
+      "expected_similarity_threshold": 0.75,
+      "test_variations": []
+    },
+    {
+      "question": "Give me one second",
+      "frequency": 25,
+      "category": "General",
+      "sample_responses": [
+        "Umm can you give me the what the website is? I can type it in",
+        "OK, alright, let me see",
+        "Let me see if I have it notated on the account"
+      ],
+      "expected_similarity_threshold": 0.75,
+      "test_variations": []
+    },
+    {
+      "question": "Hey, good morning",
+      "frequency": 20,
+      "category": "General",
+      "sample_responses": [
+        "This is Jamie with Nolan Properties",
+        "This is Jamie with Nolan Properties",
+        "This is Jamie with Nolan Properties"
+      ],
+      "expected_similarity_threshold": 0.75,
+      "test_variations": []
+    },
+    {
+      "question": "I was just returning your call",
+      "frequency": 14,
+      "category": "General",
+      "sample_responses": [
+        "Let me turn my volume up",
+        "Hi, this is Jamie with Nolan Properties",
+        "If you're interested, I can help you schedule but"
+      ],
+      "expected_similarity_threshold": 0.75,
+      "test_variations": []
+    },
+    {
+      "question": "Your call has been forwarded to voicemail",
+      "frequency": 14,
+      "category": "General",
+      "sample_responses": [
+        "So I will say that the security deposit is due at lease signing",
+        "Hi Cooper, this is Jamie with known properties",
+        "Hi, Crystal, this is Jamie"
+      ],
+      "expected_similarity_threshold": 0.75,
+      "test_variations": []
+    },
+    {
+      "question": "Calls are monitored for quality assurance",
+      "frequency": 14,
+      "category": "General",
+      "sample_responses": [
+        "Sure, I'll be more than happy to help you to start a service",
+        "And then if I can ask, who am I speaking with? My name is Jamie Brown, the office manager",
+        "And I'm saving everything now so I can get your account number for this one"
+      ],
+      "expected_similarity_threshold": 0.75,
+      "test_variations": []
+    },
+    {
+      "question": "This is Jenny",
+      "frequency": 11,
+      "category": "General",
+      "sample_responses": [
+        "How can I help you?\nLet me get my applic",
+        "Alright, let me get you pulled up",
+        "OK, like I said, I can send her a message"
+      ],
+      "expected_similarity_threshold": 0.75,
+      "test_variations": []
+    },
+    {
+      "question": "How are you?\nI'm good",
+      "frequency": 10,
+      "category": "General",
+      "sample_responses": [
+        "And if we get another applicant for this one, I'll just give you a heads up, OK? Someone else is interested",
+        "Well, I'll keep an eye out for that",
+        "We'll push it out till Monday and I'll try to call and then give them a heads up about it"
+      ],
+      "expected_similarity_threshold": 0.75,
+      "test_variations": []
+    },
+    {
+      "question": "How are you?\nGood",
+      "frequency": 9,
+      "category": "General",
+      "sample_responses": [
+        "And so you may may just get with him and let me know what move in date you guys wanted",
+        "Did she get going?\nHey, Scott, this is Jamie with Nolan Properties",
+        "I, I, I'll give you the keys for the lock box code or I'm sorry, I'll give you the lock box code so you can get the keys out of the lock box on the do..."
+      ],
+      "expected_similarity_threshold": 0.75,
+      "test_variations": []
+    },
+    {
+      "question": "How are you? Hey, doing well",
+      "frequency": 9,
+      "category": "General",
+      "sample_responses": [
+        "So just whenever you're ready, if you need to transfer someone and call me back, just let me know what you need to do",
+        "So I will, is it okay if I give you a call back to get this on the schedule then? Yes, yes",
+        "Okay, well let me, yeah, no, that might have been the issue"
+      ],
+      "expected_similarity_threshold": 0.75,
+      "test_variations": []
+    }
+  ],
+  "fallback_tests": [
+    {
+      "question": "I just missed your call",
+      "frequency": 4,
+      "category": "General",
+      "sample_responses": [
+        "Hey, this is Jamie with Known Properties",
+        "Hey, this is Jamie with Nolan Properties",
+        "Hey, this is Jamie with Known Properties"
+      ],
+      "expected_similarity_threshold": 0.7,
+      "test_variations": []
+    },
+    {
+      "question": "Hello, Jamie",
+      "frequency": 4,
+      "category": "General",
+      "sample_responses": [
+        "This is Jamie",
+        "This is Jamie",
+        "This is Jamie"
+      ],
+      "expected_similarity_threshold": 0.7,
+      "test_variations": []
+    },
+    {
+      "question": "How are you? Good",
+      "frequency": 4,
+      "category": "General",
+      "sample_responses": [
+        "Let me see if I have any maybe that are coming",
+        "I'll get this canceled for you",
+        "Hello? Hey, Josh, this is Jamie with Nolan Properties"
+      ],
+      "expected_similarity_threshold": 0.7,
+      "test_variations": []
+    },
+    {
+      "question": "This is Jane",
+      "frequency": 4,
+      "category": "General",
+      "sample_responses": [
+        "If you'll let me know",
+        "I will update his account",
+        "Let me get Let me get you pulled up"
+      ],
+      "expected_similarity_threshold": 0.7,
+      "test_variations": []
+    },
+    {
+      "question": "Para espanol, o prima ocho",
+      "frequency": 4,
+      "category": "General",
+      "sample_responses": [
+        "I will get that taken care of online",
+        "Let me just check with that one, okay? Okay, it's the 4700 East Reno",
+        "So Hold on, I will submit our request, okay? So now, Carol, I would like to ask you, would you like to get your account number? Sure"
+      ],
+      "expected_similarity_threshold": 0.7,
+      "test_variations": []
+    },
+    {
+      "question": "If you're calling for a residential account, press 1",
+      "frequency": 4,
+      "category": "Maintenance & Repairs",
+      "sample_responses": [
+        "And let me get this set up for you",
+        "Okay, I'll be right back",
+        "Let me just check if we can able to waive the deposit here"
+      ],
+      "expected_similarity_threshold": 0.7,
+      "test_variations": []
+    },
+    {
+      "question": "I'm so sorry",
+      "frequency": 3,
+      "category": "General",
+      "sample_responses": [
+        "And if you need anything else from me, just let me know",
+        "Alright, OK, so I will",
+        "So I'll just link them together and I'll know that"
+      ],
+      "expected_similarity_threshold": 0.7,
+      "test_variations": []
+    },
+    {
+      "question": "How are you? I'm doing well",
+      "frequency": 3,
+      "category": "General",
+      "sample_responses": [
+        "Yeah, let me give my quick cleaning pulled up",
+        "Let me get your task pulled up and see",
+        "I'll make a note on your account that"
+      ],
+      "expected_similarity_threshold": 0.7,
+      "test_variations": []
+    },
+    {
+      "question": "Thank you for calling me back",
+      "frequency": 3,
+      "category": "Maintenance & Repairs",
+      "sample_responses": [
+        "Um, I will get the",
+        "So do you want to unlock only on that one or do you want them to meet out there tomorrow between 1:00 and 4:00? Um, I can't",
+        "OK, well, I will go ahead and um, I'll get this check sent over to our accounting and we'll get that mailed out to you on Friday"
+      ],
+      "expected_similarity_threshold": 0.7,
+      "test_variations": []
+    },
+    {
+      "question": "I'm doing good",
+      "frequency": 3,
+      "category": "General",
+      "sample_responses": [
+        "I'll, I'll be home",
+        "Let me try this",
+        "I canceled her application and I did not charge her application fee, so she won't be missing out on any of that"
+      ],
+      "expected_similarity_threshold": 0.7,
+      "test_variations": []
+    }
+  ],
+  "edge_case_tests": []
+}

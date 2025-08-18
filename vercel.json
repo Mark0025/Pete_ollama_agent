@@ -1,0 +1,19 @@
+{
+  "functions": {
+    "api/index.py": {
+      "maxDuration": 30,
+      "memory": 1024
+    }
+  },
+  "env": {
+    "PYTHONPATH": "/var/task/src",
+    "PETEOLLAMA_VERSION": "1.0",
+    "PETEOLLAMA_PURPOSE": "Property Management Agent - Lightweight"
+  },
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/api/index.py"
+    }
+  ]
+}
