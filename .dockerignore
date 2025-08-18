@@ -1,0 +1,62 @@
+# Large files that shouldn't be in Docker context
+concatenated_output.txt
+*.db
+*.sqlite
+*.sqlite3
+
+# Git directory
+.git
+.gitignore
+
+# Python virtual environments
+.venv/
+venv/
+env/
+.env
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# Logs
+*.log
+logs/
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Development and testing
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Documentation
+README.md
+docs/
+
+# Development planning (as per your DEV_MAN rule)
+DEV_MAN/
+
+# Deprecated code
+_deprecated/
+
+# Model files (if not needed in container)
+models/
+*.model
+
+# Large JSON files (but keep config files)
+# langchain_indexed_conversations.json  # REQUIRED for conversation similarity system
+concatenated_output.txt
+
+# Tests (unless you need them in production)
+tests/
