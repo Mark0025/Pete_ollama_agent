@@ -55,7 +55,7 @@ class ModelManager:
         
         # Model configuration
         self.temperature = 0.7
-        self.max_tokens = 2048
+        self.max_tokens = int(os.getenv('MAX_TOKENS', '4096'))  # Increased for longer responses
         self.context_window = 128000
         
         # Initialize conversation similarity analyzer for intelligent responses
