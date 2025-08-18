@@ -360,6 +360,7 @@ class VAPIWebhookServer:
             return {"status": "started" if ok else "failed"}
         
         @self.app.post("/chat/completions")
+        @self.app.post("/v1/chat/completions")
         async def vapi_chat_completions(request: VAPIChatRequest, api_key: str = Depends(self.verify_vapi_auth)):
             """VAPI Custom LLM endpoint - OpenAI-compatible chat completions"""
             import time
