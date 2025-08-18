@@ -1,0 +1,88 @@
+version: '3.8'
+
+services:
+  # Jamie App Service
+  jamie-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: jamie-app
+    ports:
+      - "8000:8000"
+    environment:
+      # Database Configuration
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_USER=jamie
+      - DB_PASSWORD=jamie_dev_pass
+      - DB_NAME=jamie_db
+      
+      # RunPod Configuration (from your .env)
+      - RUNPOD_API_KEY=${RUNPOD_API_KEY}
+      - RUNPOD_SERVERLESS_ENDPOINT=${RUNPOD_SERVERLESS_ENDPOINT}
+      
+      # App Configuration
+      - JAMIE_VERSION=2.0
+      - JAMIE_PURPOSE=Property Management Agent
+      - PORT=8000
+    depends_on:
+      - postgres
+    volumes:
+      # Mount for persistent logs and data (optional)
+      - jamie-logs:/app/logs
+      - jamie-data:/app/data
+    networks:
+      - jamie-network
+    restart: unless-stopped
+
+  # PostgreSQL Database Service
+  postgres:
+    image: postgres:15-alpine
+    container_name: jamie-postgres
+    environment:
+      - POSTGRES_USER=jamie
+      - POSTGRES_PASSWORD=jamie_dev_password
+      - POSTGRES_DB=jamie_db
+      - POSTGRES_INITDB_ARGS=--auth-host=scram-sha-256
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./init-db.sql:/docker-entrypoint-initdb.d/init-db.sql:ro
+    networks:
+      - jamie-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U jamie -d jamie_db"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  # Redis (optional - for caching/session management)
+  redis:
+    image: redis:7-alpine
+    container_name: jamie-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    networks:
+      - jamie-network
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+
+# Persistent volumes
+volumes:
+  postgres-data:
+    driver: local
+  redis-data:
+    driver: local
+  jamie-logs:
+    driver: local
+  jamie-data:
+    driver: local
+
+# Network for service communication
+networks:
+  jamie-network:
+    driver: bridge

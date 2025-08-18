@@ -13,8 +13,26 @@ from pathlib import Path
 import sys
 
 # Import our working RunPod handler
-sys.path.insert(0, str(Path(__file__).parent.parent.parent))
-from runpod_handler import pete_handler
+# Try multiple paths for different deployment environments
+try:
+    from runpod_handler import pete_handler
+except ImportError:
+    sys.path.insert(0, str(Path(__file__).parent.parent.parent))
+    from runpod_handler import pete_handler
+
+# Import conversation similarity system for intelligent instant responses
+try:
+    from analytics.conversation_similarity import ConversationSimilarityAnalyzer
+except ImportError:
+    sys.path.insert(0, str(Path(__file__).parent.parent))
+    from analytics.conversation_similarity import ConversationSimilarityAnalyzer
+
+# Import response cache for fallback caching
+try:
+    from ai.response_cache import get_instant_response, response_cache
+except ImportError:
+    sys.path.insert(0, str(Path(__file__).parent))
+    from response_cache import get_instant_response, response_cache
 
 class ModelManager:
     """Manages AI model interactions and training"""
@@ -39,6 +57,23 @@ class ModelManager:
         self.temperature = 0.7
         self.max_tokens = 2048
         self.context_window = 128000
+        
+        # Initialize conversation similarity analyzer for intelligent responses
+        # Set similarity threshold for instant responses (0.75 = 75% similarity)
+        self.similarity_threshold = float(os.getenv('SIMILARITY_THRESHOLD', '0.75'))
+        self.similarity_analyzer = None  # Lazy load to avoid startup delays
+    
+    def _get_similarity_analyzer(self):
+        """Lazy load the conversation similarity analyzer"""
+        if self.similarity_analyzer is None:
+            try:
+                print("🧠 Loading conversation similarity analyzer...")
+                self.similarity_analyzer = ConversationSimilarityAnalyzer()
+                print(f"✅ Loaded {len(self.similarity_analyzer.conversation_samples)} conversation samples")
+            except Exception as e:
+                print(f"⚠️ Failed to load similarity analyzer: {e}")
+                self.similarity_analyzer = None
+        return self.similarity_analyzer
     
     def _load_default_model(self) -> Optional[str]:
         """Load the default model from settings file"""
@@ -124,21 +159,73 @@ class ModelManager:
             return False
     
     def generate_response(self, prompt: str, context: str = None, model_name: str | None = None) -> str:
-        """Generate AI response to a prompt using RunPod serverless"""
+        """Generate AI response using intelligent similarity matching + RunPod serverless fallback"""
         try:
-            # Prepare the full prompt with context
-            full_prompt = self._prepare_prompt(prompt, context)
+            import time
             
-            # Determine which model to use - default to llama3:latest for RunPod
+            # STEP 1: Try conversation similarity matching for instant responses
+            similarity_start = time.time()
+            
+            analyzer = self._get_similarity_analyzer()
+            if analyzer:
+                try:
+                    similarity_result = analyzer.calculate_similarity(prompt, context or '')
+                    similarity_time = (time.time() - similarity_start) * 1000
+                    
+                    # Check if similarity is high enough for instant response
+                    if similarity_result.similarity_score >= self.similarity_threshold and similarity_result.best_match:
+                        response = similarity_result.best_match.agent_response
+                        print(f"🎯 SIMILARITY HIT ({similarity_time:.0f}ms, {similarity_result.similarity_score:.3f}): {prompt[:50]}...")
+                        print(f"   📝 Response: {response[:80]}...")
+                        
+                        # Add to fallback cache for future use
+                        try:
+                            response_cache.add_response_to_cache(prompt, response)
+                        except Exception as cache_error:
+                            print(f"⚠️ Cache update failed: {cache_error}")
+                        
+                        return response
+                    else:
+                        print(f"📊 Similarity too low ({similarity_time:.0f}ms, {similarity_result.similarity_score:.3f} < {self.similarity_threshold})")
+                        
+                except Exception as sim_error:
+                    similarity_time = (time.time() - similarity_start) * 1000
+                    print(f"⚠️ Similarity analysis failed ({similarity_time:.0f}ms): {sim_error}")
+            else:
+                print("🔧 Similarity analyzer not available, checking fallback cache...")
+            
+            # STEP 2: Try fallback cache lookup
+            cache_start = time.time()
+            cached_response = get_instant_response(prompt)
+            if cached_response:
+                cache_time = (time.time() - cache_start) * 1000
+                print(f"⚡ FALLBACK CACHE HIT ({cache_time:.1f}ms): {prompt[:50]}...")
+                return cached_response
+            
+            cache_time = (time.time() - cache_start) * 1000
+            print(f"🔍 All caches miss ({cache_time:.1f}ms), routing to RunPod...")
+            
+            # STEP 3: Fallback to RunPod serverless
+            full_prompt = self._prepare_prompt(prompt, context)
             model_to_use = model_name or "llama3:latest"
             
             print(f"🚀 ModelManager routing to RunPod: {model_to_use}")
             
-            # Use our working RunPod handler
+            runpod_start = time.time()
             result = pete_handler.chat_completion(full_prompt, model=model_to_use)
+            runpod_time = (time.time() - runpod_start) * 1000
             
             if result.get('status') == 'success':
-                return result.get('response', 'No response generated.')
+                response = result.get('response', 'No response generated.')
+                print(f"✅ RunPod response ({runpod_time:.0f}ms): {response[:50]}...")
+                
+                # STEP 4: Add successful response to cache for future instant replies
+                try:
+                    response_cache.add_response_to_cache(prompt, response)
+                except Exception as cache_error:
+                    print(f"⚠️ Cache update failed: {cache_error}")
+                
+                return response
             else:
                 return f"❌ RunPod Error: {result.get('error', 'Unknown error')}"
         
@@ -146,7 +233,7 @@ class ModelManager:
             return f"❌ Error: {str(e)}"
 
     def generate_stream(self, prompt: str, context: str = None, model_name: str | None = None) -> Iterable[str]:
-        """Stream AI response using RunPod serverless (simulated streaming)"""
+        """Stream AI response using RunPod serverless with improved simulated streaming"""
         try:
             # Prepare prompt
             full_prompt = self._prepare_prompt(prompt, context)
@@ -154,21 +241,46 @@ class ModelManager:
             
             print(f"🚀 ModelManager streaming via RunPod: {model_to_use}")
             
-            # Get response from RunPod (non-streaming)
+            # Send immediate feedback to user
+            yield "[Thinking...]"
+            
+            # Get response from RunPod (non-streaming - this is the limitation)
             result = pete_handler.chat_completion(full_prompt, model=model_to_use)
+            
+            # Clear the "thinking" message
+            yield "\b" * 13 + " " * 13 + "\b" * 13  # Clear "[Thinking...]"
             
             if result.get('status') == 'success':
                 response_text = result.get('response', 'No response generated.')
                 
-                # Simulate streaming by yielding words with small delays
+                # Enhanced streaming simulation with natural pacing
                 import time
-                words = response_text.split()
-                for i, word in enumerate(words):
-                    if i == 0:
-                        yield word
-                    else:
-                        yield " " + word
-                    time.sleep(0.05)  # Small delay to simulate streaming
+                import re
+                
+                # Split by sentences for more natural streaming
+                sentences = re.split(r'(?<=[.!?])\s+', response_text)
+                
+                for i, sentence in enumerate(sentences):
+                    if sentence.strip():
+                        # Stream each sentence word by word
+                        words = sentence.split()
+                        for j, word in enumerate(words):
+                            if i == 0 and j == 0:
+                                yield word
+                            else:
+                                yield " " + word
+                            
+                            # Faster streaming with minimal delays
+                            if word.endswith(('.', '!', '?')):
+                                time.sleep(0.08)  # Reduced sentence pause
+                            elif word.endswith((',', ';')):
+                                time.sleep(0.05)  # Reduced comma pause  
+                            else:
+                                time.sleep(0.02)  # Faster word delay
+                        
+                        # Small pause between sentences
+                        if i < len(sentences) - 1:
+                            time.sleep(0.1)
             else:
                 yield f"❌ RunPod Error: {result.get('error', 'Unknown error')}"
                 
