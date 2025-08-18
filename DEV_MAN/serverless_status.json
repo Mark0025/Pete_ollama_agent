@@ -1,0 +1,160 @@
+{
+  "overall": "\u26a0\ufe0f 3/5 checks passed",
+  "ready_for_deployment": false,
+  "checks": {
+    "environment": {
+      "status": "\u274c Missing vars",
+      "details": {
+        "RUNPOD_API_KEY": {
+          "set": false,
+          "value_preview": null
+        },
+        "RUNPOD_SERVERLESS_ENDPOINT": {
+          "set": false,
+          "value_preview": null
+        },
+        "env_file_exists": true
+      }
+    },
+    "files": {
+      "status": "\u2705 All files present",
+      "details": {
+        "runpod_handler.py": {
+          "exists": true,
+          "size": 15011,
+          "modified": 1755537260.3995743
+        },
+        "api_server.py": {
+          "exists": true,
+          "size": 7443,
+          "modified": 1755537330.4180698
+        },
+        "requirements.serverless.minimal.txt": {
+          "exists": true,
+          "size": 522,
+          "modified": 1755537407.2997568
+        },
+        "tests/test_runpod_handler.py": {
+          "exists": true,
+          "size": 9190,
+          "modified": 1755537373.2335238
+        }
+      }
+    },
+    "api_structure": {
+      "status": "\u2705 API structure valid",
+      "details": {
+        "total_routes": 11,
+        "routes": [
+          {
+            "path": "/openapi.json",
+            "methods": [
+              "GET",
+              "HEAD"
+            ],
+            "name": "openapi"
+          },
+          {
+            "path": "/docs",
+            "methods": [
+              "GET",
+              "HEAD"
+            ],
+            "name": "swagger_ui_html"
+          },
+          {
+            "path": "/docs/oauth2-redirect",
+            "methods": [
+              "GET",
+              "HEAD"
+            ],
+            "name": "swagger_ui_redirect"
+          },
+          {
+            "path": "/redoc",
+            "methods": [
+              "GET",
+              "HEAD"
+            ],
+            "name": "redoc_html"
+          },
+          {
+            "path": "/",
+            "methods": [
+              "GET"
+            ],
+            "name": "root"
+          },
+          {
+            "path": "/health",
+            "methods": [
+              "GET"
+            ],
+            "name": "health_check"
+          },
+          {
+            "path": "/api/chat",
+            "methods": [
+              "POST"
+            ],
+            "name": "chat_completion"
+          },
+          {
+            "path": "/vapi/webhook",
+            "methods": [
+              "POST"
+            ],
+            "name": "vapi_webhook_handler"
+          },
+          {
+            "path": "/admin/action",
+            "methods": [
+              "POST"
+            ],
+            "name": "admin_action_handler"
+          },
+          {
+            "path": "/api/models",
+            "methods": [
+              "GET"
+            ],
+            "name": "list_models"
+          },
+          {
+            "path": "/api/status",
+            "methods": [
+              "GET"
+            ],
+            "name": "get_status"
+          }
+        ],
+        "handler_initialized": true
+      }
+    },
+    "dependencies": {
+      "status": "\u274c Missing dependencies",
+      "details": {
+        "total_packages": 8,
+        "import_status": {
+          "fastapi": "\u2705 Installed",
+          "uvicorn": "\u2705 Installed",
+          "pydantic": "\u2705 Installed",
+          "requests": "\u2705 Installed",
+          "httpx": "\u2705 Installed",
+          "python-dotenv": "\u2705 Installed",
+          "pytest": "\u274c Missing",
+          "pytest-asyncio": "\u274c Missing"
+        }
+      }
+    },
+    "runpod_connectivity": {
+      "status": "\u2705 RunPod reachable",
+      "details": {
+        "endpoint_id": "vk7efas3wu5vd7",
+        "base_url": "https://api.runpod.ai/v2/vk7efas3wu5vd7",
+        "connectivity_test": "passed"
+      }
+    }
+  },
+  "timestamp": "2025-08-18T12:19:58.474349"
+}

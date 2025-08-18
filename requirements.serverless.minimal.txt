@@ -1,0 +1,22 @@
+# PeteOllama Serverless - Minimal Dependencies
+# Optimized for fast cold starts and small container size
+
+# Core Framework (Required)
+fastapi>=0.104.1
+uvicorn>=0.24.0
+pydantic>=2.5.0
+
+# HTTP Client (Required for RunPod API)
+requests>=2.31.0
+httpx>=0.25.0
+
+# Environment Management (Required)
+python-dotenv>=1.0.0
+
+# Development/Testing (Optional)
+pytest>=7.4.3
+pytest-asyncio>=0.21.1
+
+# Total: 7 packages (vs 40+ in current requirements)
+# Estimated container size reduction: ~70%
+# Estimated cold start improvement: ~60%

@@ -7,7 +7,7 @@ echo "=============================================="
 # Configuration
 IMAGE_NAME="peteollama-serverless"
 TAG="v1.0.0"
-REGISTRY="your-registry"  # Change this to your Docker registry
+REGISTRY="mark0025"  # Your Docker Hub username
 
 # Build the image
 echo "🔨 Building Docker image..."

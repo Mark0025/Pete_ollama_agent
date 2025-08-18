@@ -1,0 +1,37 @@
+[project]
+name = "peteollama-serverless"
+version = "2.0.0"
+description = "PeteOllama Serverless - Routes all requests through RunPod"
+authors = [
+    {name = "Pete", email = "pete@peteproperties.com"}
+]
+requires-python = ">=3.11"
+dependencies = [
+    # Core Framework (Required)
+    "fastapi>=0.104.1",
+    "uvicorn>=0.24.0", 
+    "pydantic>=2.5.0",
+    
+    # HTTP Client (Required for RunPod API)
+    "requests>=2.31.0",
+    "httpx>=0.25.0",
+    
+    # Environment Management (Required)
+    "python-dotenv>=1.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4.3",
+    "pytest-asyncio>=0.21.1",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.uv]
+dev-dependencies = [
+    "pytest>=7.4.3",
+    "pytest-asyncio>=0.21.1",
+]

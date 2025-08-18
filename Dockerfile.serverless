@@ -1,28 +1,16 @@
 # PeteOllama V1 - RunPod Serverless Optimized
-# Optimized for cold starts and single endpoint deployment
+# Uses RunPod's pre-built Ollama container for fast deployment
 
-FROM python:3.11-slim
-
-# Install system dependencies (minimal for serverless)
-RUN apt-get update && apt-get install -y \
-    curl \
-    git \
-    build-essential \
-    # Database drivers
-    libpq-dev \
-    unixodbc-dev \
-    unixodbc \
-    # Cleanup
-    && rm -rf /var/lib/apt/lists/*
+FROM pooyaharatian/runpod-ollama:0.0.8
 
 # Set working directory
 WORKDIR /app
 
-# Copy requirements for dependency installation
-COPY requirements.txt ./
+# Copy our custom requirements (only what's not already included)
+COPY requirements.serverless.txt ./
 
-# Install Python dependencies
-RUN pip install --no-cache-dir -r requirements.txt
+# Install additional Python dependencies we need
+RUN pip install --no-cache-dir -r requirements.serverless.txt
 
 # Copy application source code
 COPY src/ ./src/
@@ -35,7 +23,7 @@ RUN mkdir -p /app/data /app/logs /app/models /app/public
 # Copy public assets
 COPY src/public/ ./public/
 
-# Set Python path
+# Set Python path and environment
 ENV PYTHONPATH=/app
 ENV PYTHONUNBUFFERED=1
 

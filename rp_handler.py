@@ -9,6 +9,19 @@ import os
 import sys
 import json
 from pathlib import Path
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
+
+# Get RunPod configuration from environment
+RUNPOD_API_KEY = os.getenv('RUNPOD_API_KEY')
+RUNPOD_SERVERLESS_ENDPOINT = os.getenv('RUNPOD_SERVERLESS_ENDPOINT')
+
+if not RUNPOD_API_KEY:
+    print("⚠️ Warning: RUNPOD_API_KEY not found in environment variables")
+if not RUNPOD_SERVERLESS_ENDPOINT:
+    print("⚠️ Warning: RUNPOD_SERVERLESS_ENDPOINT not found in environment variables")
 
 # Add src to path
 sys.path.insert(0, str(Path(__file__).parent / "src"))
@@ -146,11 +159,18 @@ def health_check():
     try:
         return {
             "status": "healthy",
+            "endpoint_id": RUNPOD_SERVERLESS_ENDPOINT,
             "models_available": webhook_server.model_manager.is_available(),
             "database_connected": db_manager.is_connected()
         }
     except Exception as e:
         return {"status": "unhealthy", "error": str(e)}
+
+def get_endpoint_url():
+    """Get the full RunPod serverless endpoint URL"""
+    if RUNPOD_SERVERLESS_ENDPOINT:
+        return f"https://{RUNPOD_SERVERLESS_ENDPOINT}.runpod.net"
+    return None
 
 # Start the Serverless function when the script is run
 if __name__ == '__main__':
@@ -170,6 +190,13 @@ if __name__ == '__main__':
         else:
             logger.warning("⚠️ Models not available")
             
+        # Log endpoint information
+        endpoint_url = get_endpoint_url()
+        if endpoint_url:
+            logger.info(f"🎯 Serverless handler ready at: {endpoint_url}")
+        else:
+            logger.warning("⚠️ Endpoint URL not available")
+        
         logger.info("🎯 Serverless handler ready for requests")
         
     except Exception as e:
@@ -178,5 +205,6 @@ if __name__ == '__main__':
     # Start RunPod serverless
     runpod.serverless.start({
         "handler": handler,
-        "health_check": health_check
+        "health_check": health_check,
+        "api_key": RUNPOD_API_KEY
     })

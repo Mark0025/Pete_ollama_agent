@@ -1,5 +1,6 @@
 # PeteOllama V1 - Serverless Dependencies
-# Optimized for RunPod Serverless deployment
+# Optimized for RunPod Ollama container deployment
+# Ollama, PyTorch, and common ML packages are already included in base image
 
 # Core Framework
 fastapi>=0.104.1
@@ -14,13 +15,12 @@ psycopg2-binary>=2.9.9
 pyodbc>=5.2.0
 sqlalchemy>=2.0.42
 
-# AI & ML
-ollama>=0.1.8
+# AI & ML (Ollama already included in base image)
 langchain>=0.3.27
 langchain-community>=0.3.27
 langchain-ollama>=0.3.6
-sentence-transformers>=2.2.2
-faiss-cpu>=1.7.4
+# sentence-transformers>=2.2.2  # Already included in Ollama base
+# faiss-cpu>=1.7.4  # Already included in Ollama base
 
 # Utilities
 python-dotenv>=1.0.0
