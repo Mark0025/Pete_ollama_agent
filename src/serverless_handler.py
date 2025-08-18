@@ -43,9 +43,16 @@ class ServerlessHandler:
         return self
     
     async def __aexit__(self, exc_type, exc_val, exc_tb):
-        """Async context manager exit"""
+        """Async context manager exit with proper cleanup"""
         if self.session:
-            await self.session.close()
+            try:
+                await self.session.close()
+                # Give time for underlying connections to close
+                await asyncio.sleep(0.1)
+            except Exception as e:
+                logger.warning(f"⚠️ Session cleanup warning: {e}")
+            finally:
+                self.session = None
     
     async def warmup_endpoint(self) -> bool:
         """Warm up the serverless endpoint to reduce cold start latency"""

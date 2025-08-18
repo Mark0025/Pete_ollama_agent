@@ -11,6 +11,20 @@ import sqlite3
 from dataclasses import dataclass
 import re
 
+# Fix multiprocessing issues before importing ML libraries
+try:
+    import multiprocessing as mp
+    mp.set_start_method('fork', force=True)
+except (RuntimeError, OSError):
+    pass  # Ignore if already set or not available
+
+# Set torch multiprocessing sharing strategy to avoid semaphore leaks
+try:
+    import torch
+    torch.multiprocessing.set_sharing_strategy('file_system')
+except ImportError:
+    pass  # torch not available
+
 # Try to import LangChain components (graceful fallback if not available)
 try:
     # LangChain v0.3 structure (2025) - using new huggingface package
@@ -45,7 +59,21 @@ class SimilarityResult:
 class ConversationSimilarityAnalyzer:
     """Analyzes conversation similarity using embeddings and semantic search."""
     
-    def __init__(self, indexed_conversations_path: str = "/app/langchain_indexed_conversations.json"):
+    def __init__(self, indexed_conversations_path: str = None):
+        if indexed_conversations_path is None:
+            # Try multiple possible paths
+            possible_paths = [
+                "langchain_indexed_conversations.json",
+                "../langchain_indexed_conversations.json", 
+                "/app/langchain_indexed_conversations.json"
+            ]
+            indexed_conversations_path = None
+            for path in possible_paths:
+                if os.path.exists(path):
+                    indexed_conversations_path = path
+                    break
+            if indexed_conversations_path is None:
+                indexed_conversations_path = possible_paths[0]  # Use first as fallback
         self.indexed_conversations_path = indexed_conversations_path
         self.conversation_samples: List[ConversationSample] = []
         self.embeddings = None

@@ -187,10 +187,9 @@ class PeteOllamaHandler:
         print(f"📝 Message: {message}")
         print(f"🤖 Model: {model}")
         
-        # Prepare input for RunPod serverless endpoint
+        # Prepare input for RunPod serverless endpoint (backward compatible)
         input_data = {
-            "type": "chat",
-            "message": message,
+            "prompt": message,
             "model": model,
             **kwargs
         }
@@ -300,14 +299,23 @@ class PeteOllamaHandler:
         
         # Handle different response formats
         if isinstance(output, dict):
-            response_text = output.get('response', output.get('message', ''))
+            # Try multiple possible response fields
+            response_text = (
+                output.get('response') or 
+                output.get('message') or 
+                output.get('text', [''])[0] if output.get('text') and isinstance(output.get('text'), list) else 
+                output.get('text', '') or 
+                ''
+            )
             model = output.get('model', 'unknown')
             
             return {
                 "status": "success",
                 "response": response_text,
                 "model": model,
-                "execution_time": job_result.get('executionTime', 0) / 1000
+                "execution_time": job_result.get('executionTime', 0) / 1000,
+                "input_tokens": output.get('input_tokens', 0),
+                "output_tokens": output.get('output_tokens', 0)
             }
         elif isinstance(output, str):
             return {

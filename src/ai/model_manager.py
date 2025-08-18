@@ -10,6 +10,11 @@ import json
 import os
 from typing import Dict, List, Optional, Any, Iterable
 from pathlib import Path
+import sys
+
+# Import our working RunPod handler
+sys.path.insert(0, str(Path(__file__).parent.parent.parent))
+from runpod_handler import pete_handler
 
 class ModelManager:
     """Manages AI model interactions and training"""
@@ -119,87 +124,54 @@ class ModelManager:
             return False
     
     def generate_response(self, prompt: str, context: str = None, model_name: str | None = None) -> str:
-        """Generate AI response to a prompt"""
+        """Generate AI response to a prompt using RunPod serverless"""
         try:
             # Prepare the full prompt with context
             full_prompt = self._prepare_prompt(prompt, context)
             
-            # Determine which model to use
-            if model_name:
-                model_to_use = model_name
-            else:
-                model_to_use = self.custom_model_name if self.is_model_available(self.custom_model_name) else self.model_name
+            # Determine which model to use - default to llama3:latest for RunPod
+            model_to_use = model_name or "llama3:latest"
             
-            if not self.is_model_available(model_to_use):
-                return "❌ AI model not available. Please download the model first."
+            print(f"🚀 ModelManager routing to RunPod: {model_to_use}")
             
-            # Make request to Ollama
-            response = requests.post(
-                f"{self.base_url}/api/generate",
-                json={
-                    "model": model_to_use,
-                    "prompt": full_prompt,
-                    "stream": False,
-                    "options": {
-                        "temperature": self.temperature,
-                        "num_predict": self.max_tokens
-                    }
-                },
-                timeout=30
-            )
+            # Use our working RunPod handler
+            result = pete_handler.chat_completion(full_prompt, model=model_to_use)
             
-            if response.status_code == 200:
-                result = response.json()
+            if result.get('status') == 'success':
                 return result.get('response', 'No response generated.')
             else:
-                return f"❌ Error generating response: {response.status_code}"
+                return f"❌ RunPod Error: {result.get('error', 'Unknown error')}"
         
         except Exception as e:
             return f"❌ Error: {str(e)}"
 
     def generate_stream(self, prompt: str, context: str = None, model_name: str | None = None) -> Iterable[str]:
-        """Stream tokens back from Ollama as they are generated."""
-        # Prepare prompt
-        full_prompt = self._prepare_prompt(prompt, context)
-        # Choose model
-        if model_name:
-            model_to_use = model_name
-        else:
-            model_to_use = self.custom_model_name if self.is_model_available(self.custom_model_name) else self.model_name
-
-        if not self.is_model_available(model_to_use):
-            yield "❌ AI model not available. Please download the model first."
-            return
-
+        """Stream AI response using RunPod serverless (simulated streaming)"""
         try:
-            with requests.post(
-                f"{self.base_url}/api/generate",
-                json={
-                    "model": model_to_use,
-                    "prompt": full_prompt,
-                    "stream": True,
-                    "options": {
-                        "temperature": self.temperature,
-                        "num_predict": self.max_tokens
-                    }
-                },
-                stream=True,
-                timeout=3600  # allow long streams
-            ) as resp:
-                for line in resp.iter_lines(decode_unicode=True):
-                    if not line:
-                        continue
-                    try:
-                        data = json.loads(line)
-                        # Ollama streams incremental messages in 'response' or in data['message']['content']
-                        token = data.get('response') or (data.get('message', {}) or {}).get('content', '')
-                        if token:
-                            yield token
-                        if data.get('done'):
-                            break
-                    except json.JSONDecodeError:
-                        # If chunk is plain text, just yield it
-                        yield line
+            # Prepare prompt
+            full_prompt = self._prepare_prompt(prompt, context)
+            model_to_use = model_name or "llama3:latest"
+            
+            print(f"🚀 ModelManager streaming via RunPod: {model_to_use}")
+            
+            # Get response from RunPod (non-streaming)
+            result = pete_handler.chat_completion(full_prompt, model=model_to_use)
+            
+            if result.get('status') == 'success':
+                response_text = result.get('response', 'No response generated.')
+                
+                # Simulate streaming by yielding words with small delays
+                import time
+                words = response_text.split()
+                for i, word in enumerate(words):
+                    if i == 0:
+                        yield word
+                    else:
+                        yield " " + word
+                    time.sleep(0.05)  # Small delay to simulate streaming
+            else:
+                yield f"❌ RunPod Error: {result.get('error', 'Unknown error')}"
+                
         except Exception as e:
             yield f"❌ Error: {str(e)}"
             return
@@ -207,7 +179,7 @@ class ModelManager:
     def _prepare_prompt(self, user_prompt: str, context: str = None) -> str:
         """Prepare the full prompt with property management context"""
         
-        system_prompt = """You are PeteOllama, an AI property manager trained on real phone conversations. 
+        system_prompt = """You are Jamie, an AI property manager trained on real phone conversations. 
 You help with tenant communications, property management tasks, and real estate questions.
 
 Key guidelines:
@@ -216,13 +188,14 @@ Key guidelines:
 - Provide practical, actionable advice
 - If you need specific property details, ask clarifying questions
 - Keep responses concise but thorough
+- You work with Christina and handle property management for various locations
 
 """
         
         if context:
             system_prompt += f"\nAdditional context: {context}\n"
         
-        return f"{system_prompt}\nTenant/Caller: {user_prompt}\n\nPeteOllama:"
+        return f"{system_prompt}\nTenant/Caller: {user_prompt}\n\nJamie:"
     
     def create_custom_model(self, training_data: List[Dict[str, str]]) -> bool:
         """Create custom property management model"""

@@ -17,6 +17,7 @@ class OllamaModelPreloader:
         self.model_load_times: Dict[str, float] = {}
         self.preload_lock = threading.Lock()
         self.executor = ThreadPoolExecutor(max_workers=2)
+        self._shutdown = False
         
     def is_model_loaded(self, model_name: str) -> bool:
         """Check if a model is currently loaded in memory."""
@@ -199,6 +200,37 @@ class OllamaModelPreloader:
         thread = threading.Thread(target=warm_model, daemon=True)
         thread.start()
         logger.info(f"🔥 Started keep-warm thread for {model_name}")
+    
+    def shutdown(self):
+        """Shutdown the preloader and clean up resources."""
+        logger.info("🧹 Shutting down model preloader...")
+        self._shutdown = True
+        
+        # Shutdown the executor
+        try:
+            self.executor.shutdown(wait=True, timeout=30)
+            logger.info("✅ ThreadPoolExecutor shutdown complete")
+        except Exception as e:
+            logger.warning(f"⚠️ ThreadPoolExecutor shutdown warning: {e}")
+        
+        # Unload all models
+        if self.loaded_models:
+            logger.info(f"🗑️ Unloading {len(self.loaded_models)} models...")
+            for model in list(self.loaded_models):
+                try:
+                    self.unload_model(model)
+                except Exception as e:
+                    logger.warning(f"⚠️ Error unloading {model}: {e}")
+        
+        logger.info("✅ Model preloader shutdown complete")
+    
+    def __del__(self):
+        """Destructor to ensure cleanup."""
+        if not self._shutdown:
+            try:
+                self.shutdown()
+            except Exception:
+                pass  # Ignore errors in destructor
 
 # Global preloader instance
 model_preloader = OllamaModelPreloader()

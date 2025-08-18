@@ -37,13 +37,38 @@ async def warmup_serverless_endpoint():
         return False
 
 def run_warmup():
-    """Run the warmup synchronously"""
+    """Run the warmup synchronously with proper resource cleanup"""
     try:
-        loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
-        result = loop.run_until_complete(warmup_serverless_endpoint())
-        loop.close()
-        return result
+        # Get or create event loop
+        try:
+            loop = asyncio.get_event_loop()
+            if loop.is_closed():
+                loop = asyncio.new_event_loop()
+                asyncio.set_event_loop(loop)
+        except RuntimeError:
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+        
+        # Run warmup and ensure proper cleanup
+        try:
+            result = loop.run_until_complete(warmup_serverless_endpoint())
+            return result
+        finally:
+            # Clean up pending tasks
+            pending = asyncio.all_tasks(loop)
+            for task in pending:
+                task.cancel()
+            
+            # Wait for task cancellation
+            if pending:
+                loop.run_until_complete(asyncio.gather(*pending, return_exceptions=True))
+            
+            # Only close if we created a new loop
+            if not loop.is_running():
+                try:
+                    loop.close()
+                except Exception as cleanup_error:
+                    logger.warning(f"⚠️ Loop cleanup warning: {cleanup_error}")
     except Exception as e:
         logger.error(f"❌ Warmup execution failed: {str(e)}")
         return False
