@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: jamie-ai-property-manager
+    env: docker
+    region: oregon
+    plan: starter
+    dockerfilePath: ./Dockerfile
+    envVars:
+      - key: PORT
+        sync: false
+      - key: RUNPOD_API_KEY
+        sync: false
+      - key: RUNPOD_SERVERLESS_ENDPOINT
+        sync: false
+    healthCheckPath: /health
