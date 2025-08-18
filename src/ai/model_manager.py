@@ -87,12 +87,24 @@ class ModelManager:
         return None
     
     def is_available(self) -> bool:
-        """Check if Ollama service is available"""
+        """Check if Ollama service is available or if we're in serverless mode"""
         try:
+            # First check if RunPod proxy is available
+            try:
+                # If pete_handler is imported, we have RunPod serverless capability
+                if 'pete_handler' in globals() or 'pete_handler' in sys.modules:
+                    print("🚀 Serverless mode detected via RunPod")
+                    return True
+            except Exception as proxy_error:
+                print(f"RunPod proxy check failed: {proxy_error}")
+                
+            # Fallback to checking Ollama service
             response = requests.get(f"{self.base_url}/api/tags", timeout=5)
             return response.status_code == 200
-        except Exception:
-            return False
+        except Exception as e:
+            print(f"Model availability check failed: {e}")
+            # Still return True if we have pete_handler available
+            return 'pete_handler' in globals() or 'pete_handler' in sys.modules
     
     def list_models(self) -> List[Dict[str, Any]]:
         """List available models"""

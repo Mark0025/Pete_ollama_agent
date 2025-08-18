@@ -103,10 +103,26 @@ class VAPIWebhookServer:
         @self.app.get("/health")
         async def health_check():
             """Health check endpoint"""
+            
+            # Check for RunPod handler availability for serverless mode
+            runpod_available = False
+            try:
+                # Check if the module is imported
+                import sys
+                if 'runpod_handler' in sys.modules or hasattr(self.model_manager, 'pete_handler'):
+                    runpod_available = True
+                    logger.info("Health check: RunPod serverless mode detected")
+            except Exception as e:
+                logger.error(f"RunPod check error: {e}")
+            
+            # Regular model check plus RunPod availability
+            models_available = self.model_manager.is_available() or runpod_available
+            
             return {
                 "status": "healthy",
-                "model_available": self.model_manager.is_available(),
-                "database_connected": self.db_manager.is_connected()
+                "model_available": models_available,
+                "database_connected": self.db_manager.is_connected(),
+                "serverless_mode": runpod_available
             }
 
         @self.app.get("/models")
