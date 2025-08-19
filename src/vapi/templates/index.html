@@ -1,0 +1,217 @@
+{% extends "base.html" %}
+
+{% block title %}Home - VAPI AI Assistant{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8">
+        <!-- Hero Section -->
+        <div class="card mb-4">
+            <div class="card-body text-center py-5">
+                <div class="mb-4">
+                    <i class="fas fa-robot fa-4x text-primary"></i>
+                </div>
+                <h1 class="card-title mb-3">VAPI AI Assistant</h1>
+                <p class="card-text lead mb-4">
+                    Advanced property management AI powered by cutting-edge language models.
+                    Get instant answers to your property management questions through voice or chat.
+                </p>
+                <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+                    <a href="/ui" class="btn btn-primary btn-lg">
+                        <i class="fas fa-comments me-2"></i>
+                        Start Chatting
+                    </a>
+                    <a href="/admin" class="btn btn-outline-secondary btn-lg">
+                        <i class="fas fa-cogs me-2"></i>
+                        Admin Panel
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Features -->
+        <div class="row g-4 mb-4">
+            <div class="col-md-6">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <i class="fas fa-comments fa-2x text-primary mb-3"></i>
+                        <h5 class="card-title">Interactive Chat</h5>
+                        <p class="card-text">
+                            Chat directly with our AI models through an intuitive web interface.
+                            Get instant responses to your questions.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <i class="fas fa-phone fa-2x text-success mb-3"></i>
+                        <h5 class="card-title">VAPI Integration</h5>
+                        <p class="card-text">
+                            Voice-powered AI interactions through VAPI webhooks.
+                            Handle phone calls with intelligent responses.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4 mb-4">
+            <div class="col-md-6">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <i class="fas fa-brain fa-2x text-warning mb-3"></i>
+                        <h5 class="card-title">Multiple AI Models</h5>
+                        <p class="card-text">
+                            Switch between Ollama local models and OpenRouter cloud models.
+                            Choose the best model for your needs.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <i class="fas fa-chart-line fa-2x text-info mb-3"></i>
+                        <h5 class="card-title">Performance Monitoring</h5>
+                        <p class="card-text">
+                            Track model performance, response times, and system health.
+                            Optimize your AI setup with detailed analytics.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <!-- System Status -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <i class="fas fa-heartbeat me-2"></i>
+                System Status
+            </div>
+            <div class="card-body" id="system-status">
+                <div class="text-center">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p class="mt-2 mb-0">Checking status...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <i class="fas fa-bolt me-2"></i>
+                Quick Actions
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="/ui" class="btn btn-primary">
+                        <i class="fas fa-comments me-2"></i>
+                        Open Chat Interface
+                    </a>
+                    <a href="/personas" class="btn btn-outline-primary">
+                        <i class="fas fa-users me-2"></i>
+                        View Available Models
+                    </a>
+                    <a href="/admin/health" class="btn btn-outline-secondary">
+                        <i class="fas fa-stethoscope me-2"></i>
+                        Health Check
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Activity -->
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-history me-2"></i>
+                Recent Activity
+            </div>
+            <div class="card-body">
+                <div id="recent-activity">
+                    <p class="text-muted">No recent activity</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Load system status
+    async function loadSystemStatus() {
+        try {
+            const response = await fetch('/status');
+            const status = await response.json();
+            
+            const statusContainer = document.getElementById('system-status');
+            
+            if (status.status === 'online' || status.model_available) {
+                statusContainer.innerHTML = `
+                    <div class="row g-3">
+                        <div class="col-6">
+                            <div class="text-center">
+                                <i class="fas fa-circle status-online fa-2x"></i>
+                                <p class="mb-0 mt-2"><small>System</small></p>
+                                <strong>Online</strong>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="text-center">
+                                <i class="fas fa-brain ${status.model_available ? 'status-online' : 'status-offline'} fa-2x"></i>
+                                <p class="mb-0 mt-2"><small>AI Model</small></p>
+                                <strong>${status.model_available ? 'Ready' : 'Offline'}</strong>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <hr>
+                            <p class="mb-0">
+                                <small class="text-muted">
+                                    Current Model: <strong>${status.current_model || 'Unknown'}</strong>
+                                </small>
+                            </p>
+                            ${status.current_provider ? `
+                            <p class="mb-0">
+                                <small class="text-muted">
+                                    Provider: <strong>${status.current_provider}</strong>
+                                </small>
+                            </p>
+                            ` : ''}
+                        </div>
+                    </div>
+                `;
+            } else {
+                statusContainer.innerHTML = `
+                    <div class="text-center text-danger">
+                        <i class="fas fa-exclamation-circle fa-2x"></i>
+                        <p class="mt-2 mb-0"><strong>System Offline</strong></p>
+                        <small class="text-muted">Unable to connect to AI models</small>
+                    </div>
+                `;
+            }
+        } catch (error) {
+            console.error('Error loading system status:', error);
+            const statusContainer = document.getElementById('system-status');
+            statusContainer.innerHTML = `
+                <div class="text-center text-danger">
+                    <i class="fas fa-times-circle fa-2x"></i>
+                    <p class="mt-2 mb-0"><strong>Connection Error</strong></p>
+                    <small class="text-muted">Unable to check system status</small>
+                </div>
+            `;
+        }
+    }
+    
+    // Load status on page load
+    document.addEventListener('DOMContentLoaded', loadSystemStatus);
+    
+    // Refresh status every 30 seconds
+    setInterval(loadSystemStatus, 30000);
+</script>
+{% endblock %}

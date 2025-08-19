@@ -25,6 +25,7 @@ src/frontend/
 ## 🚀 Quick Start
 
 ### 1. Test Basic Frontend Structure
+
 ```bash
 cd src/frontend
 python3 -m http.server 8003 --directory .
@@ -32,6 +33,7 @@ python3 -m http.server 8003 --directory .
 ```
 
 ### 2. Test Main UI
+
 ```bash
 cd src/frontend/html
 python3 -m http.server 8004 --directory .
@@ -39,6 +41,7 @@ python3 -m http.server 8004 --directory .
 ```
 
 ### 3. Test Admin UI
+
 ```bash
 cd src/frontend/html
 python3 -m http.server 8005 --directory .
@@ -46,6 +49,7 @@ python3 -m http.server 8005 --directory .
 ```
 
 ### 4. Test Frontend Server (Recommended)
+
 ```bash
 cd src/frontend
 python3 frontend_server.py
@@ -66,13 +70,14 @@ python3 frontend_server.py
 ### Adding New Components
 
 1. **HTML**: Add to `html/` directory
-2. **CSS**: Add to `css/` directory  
+2. **CSS**: Add to `css/` directory
 3. **JavaScript**: Add to `js/` directory
 4. **Update**: Add route to `frontend_server.py`
 
 ### Testing
 
 Each component can be tested independently:
+
 - HTML files can be opened directly in browser
 - CSS and JS files are served by the frontend server
 - Use browser dev tools to debug
@@ -80,6 +85,7 @@ Each component can be tested independently:
 ## 📋 Current Status
 
 ✅ **Completed**:
+
 - Basic frontend structure
 - Main UI (chat interface)
 - Admin UI (dashboard)
@@ -87,10 +93,12 @@ Each component can be tested independently:
 - CSS and JavaScript separation
 
 🔄 **In Progress**:
+
 - Additional UI components
 - Integration with backend
 
 📝 **Todo**:
+
 - Settings UI
 - Stats UI
 - Benchmark UI
@@ -100,6 +108,7 @@ Each component can be tested independently:
 ## 🔗 Integration
 
 The frontend is designed to work with the existing PeteOllama backend APIs:
+
 - `/personas` - Model listing
 - `/admin/*` - Admin endpoints
 - `/test/*` - Testing endpoints

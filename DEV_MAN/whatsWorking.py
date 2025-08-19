@@ -10,6 +10,10 @@ import requests
 from datetime import datetime
 from pathlib import Path
 from typing import Dict, Any, List
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 class ServerlessStatus:
     """Track what's working in the serverless architecture"""

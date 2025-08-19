@@ -2,7 +2,7 @@
 # Render deployment start script
 echo "🚀 Starting Jamie AI Property Manager..."
 echo "📍 Working directory: $(pwd)"
-echo "🐍 Python version: $(python --version)"
+echo "🐍 Python version: $(uv run python --version)"
 echo "🔧 Environment variables:"
 echo "  PORT: $PORT"
 echo "  RUNPOD_API_KEY: ${RUNPOD_API_KEY:+Set} ${RUNPOD_API_KEY:-Not set}"
@@ -12,4 +12,4 @@ echo "  RUNPOD_SERVERLESS_ENDPOINT: ${RUNPOD_SERVERLESS_ENDPOINT:+Set} ${RUNPOD_
 export PYTHONPATH=/opt/render/project/src:$PYTHONPATH
 
 # Start the application
-exec python src/main.py
+exec uv run src/main.py

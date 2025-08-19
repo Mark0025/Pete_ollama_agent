@@ -17,7 +17,8 @@ from datetime import datetime
 from typing import Dict, Any, List, Optional, Annotated
 from pathlib import Path
 import sys
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
+from typing import Optional, List, Dict, Any, Union
 
 # Add src to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
@@ -48,6 +49,23 @@ class VAPIChatResponse(BaseModel):
     model: str
     choices: List[Dict[str, Any]]
     usage: Dict[str, int]
+
+# Pydantic models for error handling
+class ProviderError(BaseModel):
+    error_type: str = Field(..., description="Type of error (api_key_missing, network_error, etc.)")
+    provider: str = Field(..., description="Provider name (ollama, openrouter, runpod)")
+    message: str = Field(..., description="Human readable error message")
+    details: Optional[str] = Field(None, description="Additional error details")
+    timestamp: str = Field(..., description="ISO timestamp when error occurred")
+
+class ModelAvailabilityError(BaseModel):
+    error_type: str = "model_not_available"
+    provider: str = Field(..., description="Provider name")
+    requested_models: List[str] = Field(..., description="Models that were requested but not available")
+    available_models: List[str] = Field(default_factory=list, description="Models that are available")
+    message: str = Field(..., description="Error message")
+    suggested_action: str = Field(..., description="Suggested action to resolve the issue")
+    timestamp: str = Field(..., description="ISO timestamp when error occurred")
 
 class VAPIWebhookServer:
     """VAPI webhook server for voice interactions"""
@@ -300,58 +318,553 @@ class VAPIWebhookServer:
         # ---- Persona list endpoint ----
         @self.app.get("/personas")
         async def personas():
-            """Return list of personas filtered by model settings."""
-            # Refresh models from ollama list first
-            model_settings.refresh_from_ollama()
-            
-            # Get only models that are enabled for UI display
-            ui_models = model_settings.get_ui_models()
-            
-            if not ui_models:
-                logger.warning("No models enabled for UI display")
-                return []
-            
-            persona_list = []
-            jamie_models = []
-            generic_models = []
-            
-            for model_config in ui_models:
-                model_data = {
-                    "name": model_config.name,
-                    "display_name": model_config.display_name,
-                    "description": model_config.description,
-                    "auto_preload": model_config.auto_preload,
-                    "type": getattr(model_config, 'type', 'unknown'),
-                    "base_model": getattr(model_config, 'base_model', 'unknown')
-                }
+            """Return list of personas filtered by model settings and current provider."""
+            try:
+                # Get current provider to determine which models to show
+                try:
+                    provider_settings = model_settings.get_provider_settings()
+                    current_provider = provider_settings.get('default_provider', 'ollama')
+                except Exception as e:
+                    logger.warning(f"Failed to get provider settings: {e}, defaulting to ollama")
+                    current_provider = 'ollama'
                 
-                if model_config.is_jamie_model:
-                    jamie_models.append(model_data)
-                else:
-                    generic_models.append(model_data)
-            
-            # Create Jamie persona if we have Jamie models
-            if jamie_models:
-                persona_list.append({
-                    "name": "Jamie (Property Manager)",
-                    "icon": "/public/Jamie.png",
-                    "type": "primary",
-                    "models": jamie_models,
-                    "description": "Professional property manager AI trained on real conversations"
-                })
-            
-            # Add generic models
-            for model in generic_models:
-                persona_list.append({
-                    "name": model["display_name"],
+                logger.info(f"📋 Serving models for provider: {current_provider}")
+                
+                if current_provider == 'openrouter':
+                    # Return OpenRouter models
+                    return await self._get_openrouter_personas()
+                elif current_provider == 'ollama':
+                    # Return Ollama models (existing logic)
+                    return await self._get_ollama_personas()
+                else:  # runpod
+                    # Return RunPod models (same as Ollama for now)
+                    return await self._get_ollama_personas()
+                
+            except Exception as e:
+                logger.error(f"Error getting personas: {e}")
+                # Fallback response
+                return [{
+                    "name": "Default Model",
                     "icon": "/public/pete.png",
-                    "type": "generic",
-                    "models": [model],
-                    "description": model["description"]
+                    "type": "primary",
+                    "models": [{
+                        "name": "llama3:latest",
+                        "display_name": "Llama 3 Latest",
+                        "description": "General purpose language model",
+                        "auto_preload": False,
+                        "type": "base"
+                    }],
+                    "description": "Fallback model"
+                }]
+    
+    async def _get_ollama_personas(self):
+        """Get Ollama model personas"""
+        # Refresh models from ollama list first
+        model_settings.refresh_from_ollama()
+        
+        # Get only models that are enabled for UI display
+        ui_models = model_settings.get_ui_models()
+        
+        if not ui_models:
+            logger.warning("No models enabled for UI display")
+            return []
+        
+        persona_list = []
+        jamie_models = []
+        generic_models = []
+        
+        for model_config in ui_models:
+            model_data = {
+                "name": model_config.name,
+                "display_name": model_config.display_name,
+                "description": model_config.description,
+                "auto_preload": model_config.auto_preload,
+                "type": getattr(model_config, 'type', 'unknown'),
+                "base_model": getattr(model_config, 'base_model', 'unknown')
+            }
+            
+            if model_config.is_jamie_model:
+                jamie_models.append(model_data)
+            else:
+                generic_models.append(model_data)
+        
+        # Create Jamie persona if we have Jamie models
+        if jamie_models:
+            persona_list.append({
+                "name": "Jamie (Property Manager)",
+                "icon": "/public/Jamie.png",
+                "type": "primary",
+                "models": jamie_models,
+                "description": "Professional property manager AI trained on real conversations"
+            })
+        
+        # Add generic models
+        for model in generic_models:
+            persona_list.append({
+                "name": model["display_name"],
+                "icon": "/public/pete.png",
+                "type": "generic",
+                "models": [model],
+                "description": model["description"]
+            })
+        
+        logger.info(f"Serving {len(ui_models)} Ollama models to UI: {[m.name for m in ui_models]}")
+        return persona_list
+    
+    async def _get_openrouter_personas(self):
+        """Get OpenRouter model personas - dynamically fetched from OpenRouter API"""
+        try:
+            # Try to fetch models dynamically from OpenRouter API
+            openrouter_models = await self._fetch_openrouter_models()
+            
+            # If dynamic fetch failed, raise a validation error
+            if not openrouter_models:
+                logger.error("OpenRouter API unavailable or API key missing")
+                from datetime import datetime
+                error = ModelAvailabilityError(
+                    provider="openrouter",
+                    requested_models=["all_openrouter_models"],
+                    available_models=[],
+                    message="OpenRouter models are not currently available. Please check API key configuration or try a different provider.",
+                    suggested_action="Switch to Local Ollama or RunPod provider, or verify OpenRouter API key is configured correctly.",
+                    timestamp=datetime.now().isoformat()
+                )
+                raise HTTPException(status_code=503, detail=error.dict())
+            
+            # Create persona list for OpenRouter
+            persona_list = []
+            
+            # Group models by type
+            free_models = [m for m in openrouter_models if m["type"] == "base"]
+            premium_models = [m for m in openrouter_models if m["type"] == "premium"]
+            
+            # Add free models persona
+            if free_models:
+                persona_list.append({
+                    "name": "OpenRouter Free Models",
+                    "icon": "/public/pete.png",
+                    "type": "primary",
+                    "models": free_models,
+                    "description": "Free OpenRouter models for testing and development"
                 })
             
-            logger.info(f"Serving {len(ui_models)} models to UI: {[m.name for m in ui_models]}")
+            # Add premium models persona
+            if premium_models:
+                persona_list.append({
+                    "name": "OpenRouter Premium Models",
+                    "icon": "/public/pete.png", 
+                    "type": "premium",
+                    "models": premium_models,
+                    "description": "High-quality OpenRouter models for production use"
+                })
+            
+            logger.info(f"Serving {len(openrouter_models)} OpenRouter models to UI")
             return persona_list
+            
+        except HTTPException:
+            # Re-raise HTTP exceptions (model availability errors)
+            raise
+        except Exception as e:
+            logger.error(f"Unexpected error getting OpenRouter personas: {e}")
+            # For unexpected errors, also raise a structured error
+            from datetime import datetime
+            error = ProviderError(
+                error_type="unexpected_error",
+                provider="openrouter",
+                message=f"An unexpected error occurred while fetching OpenRouter models: {str(e)}",
+                details=f"Exception type: {type(e).__name__}",
+                timestamp=datetime.now().isoformat()
+            )
+            raise HTTPException(status_code=500, detail=error.dict())
+    
+    async def _fetch_openrouter_models(self):
+        """Fetch available models from OpenRouter API"""
+        try:
+            import requests
+            
+            # Get API key from environment
+            api_key = os.getenv("OPENROUTER_API_KEY")
+            if not api_key:
+                logger.error("OPENROUTER_API_KEY not configured")
+                from datetime import datetime
+                error = ProviderError(
+                    error_type="api_key_missing",
+                    provider="openrouter",
+                    message="OpenRouter API key is not configured. Please set OPENROUTER_API_KEY environment variable.",
+                    details="API key must be obtained from https://openrouter.ai and set as an environment variable.",
+                    timestamp=datetime.now().isoformat()
+                )
+                raise HTTPException(status_code=503, detail=error.dict())
+            
+            # Set up headers for OpenRouter API
+            headers = {
+                "Authorization": f"Bearer {api_key}",
+                "Content-Type": "application/json",
+                "HTTP-Referer": "https://peteollama.com",  # Optional but recommended
+                "X-Title": "PeteOllama Property Manager"  # Optional but recommended
+            }
+            
+            logger.info("Fetching models from OpenRouter API...")
+            
+            # Fetch models from OpenRouter API
+            response = requests.get(
+                "https://openrouter.ai/api/v1/models",
+                headers=headers,
+                timeout=10  # 10 second timeout
+            )
+            
+            if response.status_code != 200:
+                logger.error(f"OpenRouter API returned status {response.status_code}: {response.text}")
+                from datetime import datetime
+                if response.status_code == 401:
+                    error = ProviderError(
+                        error_type="api_key_invalid",
+                        provider="openrouter",
+                        message="OpenRouter API key is invalid or expired. Please verify your API key.",
+                        details=f"API returned status code 401: {response.text}",
+                        timestamp=datetime.now().isoformat()
+                    )
+                elif response.status_code == 403:
+                    error = ProviderError(
+                        error_type="api_access_denied",
+                        provider="openrouter",
+                        message="Access denied to OpenRouter API. Check your API key permissions.",
+                        details=f"API returned status code 403: {response.text}",
+                        timestamp=datetime.now().isoformat()
+                    )
+                else:
+                    error = ProviderError(
+                        error_type="api_error",
+                        provider="openrouter",
+                        message=f"OpenRouter API error (status {response.status_code}). Service may be temporarily unavailable.",
+                        details=response.text,
+                        timestamp=datetime.now().isoformat()
+                    )
+                raise HTTPException(status_code=503, detail=error.dict())
+            
+            api_data = response.json()
+            raw_models = api_data.get("data", [])
+            
+            if not raw_models:
+                logger.error("OpenRouter API returned no models")
+                from datetime import datetime
+                error = ModelAvailabilityError(
+                    provider="openrouter",
+                    requested_models=["all_openrouter_models"],
+                    available_models=[],
+                    message="OpenRouter API returned no available models. This may be a temporary service issue.",
+                    suggested_action="Try again in a few minutes, or switch to Local Ollama provider.",
+                    timestamp=datetime.now().isoformat()
+                )
+                raise HTTPException(status_code=503, detail=error.dict())
+            
+            logger.info(f"Successfully fetched {len(raw_models)} models from OpenRouter API")
+            
+            # Process and filter models suitable for property management
+            return self._process_openrouter_api_models(raw_models)
+            
+        except requests.RequestException as e:
+            logger.error(f"Network error fetching OpenRouter models: {e}")
+            from datetime import datetime
+            error = ProviderError(
+                error_type="network_error",
+                provider="openrouter",
+                message="Network error connecting to OpenRouter API. Please check your internet connection.",
+                details=f"Request exception: {str(e)}",
+                timestamp=datetime.now().isoformat()
+            )
+            raise HTTPException(status_code=503, detail=error.dict())
+        except HTTPException:
+            # Re-raise HTTP exceptions (structured errors)
+            raise
+        except Exception as e:
+            logger.error(f"Unexpected error fetching OpenRouter models: {e}")
+            from datetime import datetime
+            error = ProviderError(
+                error_type="unexpected_error",
+                provider="openrouter",
+                message=f"An unexpected error occurred while fetching OpenRouter models: {str(e)}",
+                details=f"Exception type: {type(e).__name__}",
+                timestamp=datetime.now().isoformat()
+            )
+            raise HTTPException(status_code=500, detail=error.dict())
+    
+    def _process_openrouter_api_models(self, raw_models):
+        """Process raw OpenRouter API models into our format"""
+        try:
+            processed_models = []
+            
+            # Define preferred models for property management (in order of preference)
+            preferred_models = [
+                # Free models
+                "meta-llama/llama-3.1-8b-instruct:free",
+                "microsoft/wizardlm-2-8x22b:nitro",
+                "google/gemma-2-9b-it:free",
+                
+                # Premium models that work well for property management
+                "meta-llama/llama-3.1-70b-instruct:nitro",
+                "meta-llama/llama-3.1-405b-instruct:nitro",
+                "anthropic/claude-3-haiku",
+                "anthropic/claude-3-sonnet",
+                "openai/gpt-3.5-turbo",
+                "openai/gpt-4o-mini",
+                "openai/gpt-4o",
+                "google/gemini-pro-1.5",
+                "mistralai/mistral-7b-instruct:free",
+                "mistralai/mixtral-8x7b-instruct:nitro",
+            ]
+            
+            # Create lookup for preferred models
+            preferred_set = set(preferred_models)
+            
+            # First, add preferred models in order
+            for preferred_model in preferred_models:
+                for raw_model in raw_models:
+                    model_id = raw_model.get("id", "")
+                    if model_id == preferred_model:
+                        processed_model = self._convert_api_model_to_our_format(raw_model)
+                        if processed_model:
+                            processed_models.append(processed_model)
+                        break
+            
+            # Then add any other suitable models not in preferred list
+            for raw_model in raw_models:
+                model_id = raw_model.get("id", "")
+                
+                # Skip if already added as preferred
+                if model_id in preferred_set:
+                    continue
+                
+                # Only include models that seem suitable for property management
+                if self._is_suitable_for_property_management(raw_model):
+                    processed_model = self._convert_api_model_to_our_format(raw_model)
+                    if processed_model:
+                        processed_models.append(processed_model)
+            
+            # Limit to reasonable number of models to avoid overwhelming UI
+            max_models = 25
+            if len(processed_models) > max_models:
+                logger.info(f"Limiting OpenRouter models to {max_models} (found {len(processed_models)})")
+                processed_models = processed_models[:max_models]
+            
+            return processed_models
+            
+        except Exception as e:
+            logger.error(f"Error processing OpenRouter API models: {e}")
+            from datetime import datetime
+            error = ProviderError(
+                error_type="processing_error",
+                provider="openrouter",
+                message=f"Error processing OpenRouter model data: {str(e)}",
+                details="The API returned data but it could not be processed into the expected format.",
+                timestamp=datetime.now().isoformat()
+            )
+            raise HTTPException(status_code=500, detail=error.dict())
+    
+    def _convert_api_model_to_our_format(self, raw_model):
+        """Convert OpenRouter API model to our internal format"""
+        try:
+            model_id = raw_model.get("id", "")
+            model_name = raw_model.get("name", model_id)
+            
+            # Determine if free or premium
+            pricing = raw_model.get("pricing", {})
+            prompt_cost = float(pricing.get("prompt", "0"))
+            completion_cost = float(pricing.get("completion", "0"))
+            is_free = prompt_cost == 0 and completion_cost == 0
+            
+            # Create display name
+            display_name = self._create_display_name(model_name, model_id, is_free)
+            
+            # Create description
+            description = self._create_model_description(raw_model, is_free)
+            
+            # Determine base model type
+            base_model = self._determine_base_model(model_id)
+            
+            return {
+                "name": model_id,
+                "display_name": display_name,
+                "description": description,
+                "auto_preload": False,
+                "type": "base" if is_free else "premium",
+                "base_model": base_model,
+                "context_length": raw_model.get("context_length", 4096),
+                "is_free": is_free,
+                "pricing": {
+                    "prompt": prompt_cost,
+                    "completion": completion_cost
+                }
+            }
+            
+        except Exception as e:
+            logger.error(f"Error converting model {raw_model.get('id', 'unknown')}: {e}")
+            return None
+    
+    def _is_suitable_for_property_management(self, raw_model):
+        """Determine if a model is suitable for property management use"""
+        try:
+            model_id = raw_model.get("id", "").lower()
+            model_name = raw_model.get("name", "").lower()
+            description = raw_model.get("description", "").lower()
+            
+            # Skip models that are explicitly not suitable
+            exclude_patterns = [
+                "vision", "image", "coding", "code", "math", "reasoning", 
+                "function", "tool", "nsfw", "uncensored", "roleplay",
+                "experimental", "beta", "alpha", "deprecated"
+            ]
+            
+            combined_text = f"{model_id} {model_name} {description}"
+            
+            for pattern in exclude_patterns:
+                if pattern in combined_text:
+                    return False
+            
+            # Prefer general-purpose conversation models
+            include_patterns = [
+                "instruct", "chat", "turbo", "haiku", "sonnet", "pro",
+                "llama", "claude", "gpt", "gemini", "mistral", "wizard"
+            ]
+            
+            for pattern in include_patterns:
+                if pattern in combined_text:
+                    return True
+            
+            # Default to suitable if no specific exclusions found
+            return True
+            
+        except Exception:
+            return False
+    
+    def _create_display_name(self, model_name, model_id, is_free):
+        """Create a user-friendly display name for the model"""
+        try:
+            # Try to create a nice display name from model name or ID
+            name = model_name if model_name != model_id else model_id
+            
+            # Clean up common patterns
+            name = name.replace("-instruct", "")
+            name = name.replace("-chat", "")
+            name = name.replace("meta-llama/", "")
+            name = name.replace("anthropic/", "")
+            name = name.replace("openai/", "")
+            name = name.replace("google/", "")
+            name = name.replace("mistralai/", "")
+            name = name.replace("microsoft/", "")
+            
+            # Capitalize and format nicely
+            name = name.replace("-", " ").replace("_", " ")
+            name = " ".join(word.capitalize() for word in name.split())
+            
+            # Add free/premium indicator
+            if is_free:
+                name += " (Free)"
+            else:
+                name += " (Premium)"
+            
+            return name
+            
+        except Exception:
+            return f"{model_id} ({'Free' if is_free else 'Premium'})"
+    
+    def _create_model_description(self, raw_model, is_free):
+        """Create a description for the model"""
+        try:
+            original_desc = raw_model.get("description", "")
+            
+            # If there's a good original description, use it
+            if original_desc and len(original_desc) > 20:
+                desc = original_desc[:100]  # Truncate if too long
+                if len(original_desc) > 100:
+                    desc += "..."
+            else:
+                # Create a generic description based on model type
+                model_id = raw_model.get("id", "")
+                
+                if "llama" in model_id.lower():
+                    desc = "Open-source language model optimized for instruction following"
+                elif "claude" in model_id.lower():
+                    desc = "Anthropic's AI assistant known for helpful and harmless responses"
+                elif "gpt" in model_id.lower():
+                    desc = "OpenAI's language model for conversational AI"
+                elif "gemini" in model_id.lower():
+                    desc = "Google's advanced language model"
+                elif "mistral" in model_id.lower():
+                    desc = "Efficient language model with strong performance"
+                else:
+                    desc = "Advanced language model for property management tasks"
+            
+            # Add context about cost
+            if is_free:
+                desc += " - Free to use"
+            else:
+                desc += " - Premium model with high quality responses"
+            
+            return desc
+            
+        except Exception:
+            return f"OpenRouter model ({'free' if is_free else 'premium'}) for property management"
+    
+    def _determine_base_model(self, model_id):
+        """Determine the base model family"""
+        model_lower = model_id.lower()
+        
+        if "llama" in model_lower:
+            return "llama"
+        elif "claude" in model_lower:
+            return "claude"
+        elif "gpt" in model_lower:
+            return "gpt"
+        elif "gemini" in model_lower:
+            return "gemini"
+        elif "mistral" in model_lower:
+            return "mistral"
+        elif "wizard" in model_lower:
+            return "wizard"
+        else:
+            return "unknown"
+    
+    def _get_fallback_openrouter_models(self):
+        """Get hardcoded fallback models if API fetch fails"""
+        return [
+            {
+                "name": "meta-llama/llama-3.1-8b-instruct:free",
+                "display_name": "Llama 3.1 8B (Free)",
+                "description": "Fast, reliable model for property management tasks - Free to use",
+                "auto_preload": False,
+                "type": "base",
+                "base_model": "llama",
+                "is_free": True
+            },
+            {
+                "name": "meta-llama/llama-3.1-70b-instruct:nitro",
+                "display_name": "Llama 3.1 70B (Premium)",
+                "description": "High-quality responses for complex property issues - Premium model with high quality responses",
+                "auto_preload": False,
+                "type": "premium",
+                "base_model": "llama",
+                "is_free": False
+            },
+            {
+                "name": "anthropic/claude-3-haiku",
+                "display_name": "Claude 3 Haiku (Premium)",
+                "description": "Fast and efficient for quick property responses - Premium model with high quality responses",
+                "auto_preload": False,
+                "type": "premium",
+                "base_model": "claude",
+                "is_free": False
+            },
+            {
+                "name": "openai/gpt-3.5-turbo",
+                "display_name": "GPT-3.5 Turbo (Premium)",
+                "description": "Reliable OpenAI model for property management - Premium model with high quality responses",
+                "auto_preload": False,
+                "type": "premium",
+                "base_model": "gpt",
+                "is_free": False
+            }
+        ]
 
         # ---- Train property-manager model ----
         @self.app.post("/train/pm")
@@ -720,7 +1233,14 @@ class VAPIWebhookServer:
             </div>
             <div class="model-selector">
                 <label for="model">Model:</label>
-        <select id="model"></select>
+                <select id="model"></select>
+                <span style="margin-left:15px;margin-right:8px;font-weight:bold;color:#333;">Provider:</span>
+                <select id="providerSelect" style="padding:6px 10px;border:2px solid #007acc;border-radius:6px;font-size:14px;" onchange="switchProvider()">
+                    <option value="ollama">🏠 Ollama</option>
+                    <option value="runpod">☁️ RunPod</option>
+                    <option value="openrouter">🌐 OpenRouter</option>
+                </select>
+                <span id="providerStatus" style="margin-left:8px;font-size:12px;padding:2px 6px;border-radius:3px;background:#f8f9fa;color:#666;">Checking...</span>
             </div>
         </div>
         
@@ -743,7 +1263,8 @@ class VAPIWebhookServer:
     const modelSelect = document.getElementById('model');
 
     // Populate Jamie models in header dropdown
-    fetch('/personas').then(r=>r.json()).then(list=>{
+    fetch('/personas').then(r=>r.json())
+    .then(list=>{
         let jamieModels = [];
         let otherModels = [];
         
@@ -786,6 +1307,15 @@ class VAPIWebhookServer:
             });
             modelSelect.appendChild(otherGroup);
         }
+    })
+    .catch(error => {
+        console.error('Error loading personas:', error);
+        log.innerHTML += `<div style="color:#dc3545;font-weight:bold;margin:10px 0;padding:10px;background:#f8d7da;border-radius:4px;">
+            ❌ Error loading models: ${error.message}
+        </div>`;
+        
+        // Add fallback option
+        modelSelect.innerHTML = '<option value="llama3:latest">Fallback Model (llama3:latest)</option>';
     });
 
     // Environment detection (same as admin)
@@ -813,7 +1343,158 @@ class VAPIWebhookServer:
             document.getElementById('envStatus').innerHTML='❌ Environment Detection Failed';
         }
     }
-    loadEnvironmentStatus();
+    // Page initialization with sequential async operations to prevent race conditions
+    async function initializePage() {
+        try {
+            // Load environment status first
+            await loadEnvironmentStatus();
+            
+            // Then load provider settings
+            await loadCurrentProvider();
+            
+            // Enable provider switching after everything is loaded
+            const providerSelect = document.getElementById('providerSelect');
+            providerSelect.disabled = false;
+            
+        } catch (error) {
+            console.error('Error initializing page:', error);
+            // Enable dropdown even on error so user can still interact
+            document.getElementById('providerSelect').disabled = false;
+        }
+    }
+    
+    // Provider switching with debouncing and UI locking
+    let switchTimeout = null;
+    let isSwitching = false;
+    
+    async function switchProvider() {
+        // Clear any pending switch
+        if (switchTimeout) {
+            clearTimeout(switchTimeout);
+        }
+        
+        // Debounce rapid changes
+        switchTimeout = setTimeout(async () => {
+            await performProviderSwitch();
+        }, 300); // 300ms debounce
+    }
+    
+    async function performProviderSwitch() {
+        // Prevent concurrent switches
+        if (isSwitching) {
+            return;
+        }
+        
+        const selectedProvider = document.getElementById('providerSelect').value;
+        const statusSpan = document.getElementById('providerStatus');
+        const providerSelect = document.getElementById('providerSelect');
+        
+        // Lock UI during operation
+        isSwitching = true;
+        providerSelect.disabled = true;
+        statusSpan.textContent = 'Switching...';
+        statusSpan.style.color = '#666';
+        
+        try {
+            const response = await fetch('/admin/provider-settings/update', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    default_provider: selectedProvider,
+                    fallback_enabled: false  // Simplified for main UI
+                })
+            });
+            
+            const result = await response.json();
+            
+            if (result.success) {
+                statusSpan.textContent = `✅ ${selectedProvider.toUpperCase()}`;
+                statusSpan.style.color = '#28a745';
+                
+                // Show success message in chat log
+                log.innerHTML += `<div style="color:#28a745;font-weight:bold;">✅ Switched to ${selectedProvider.toUpperCase()} provider</div>`;
+            } else {
+                statusSpan.textContent = `❌ Failed`;
+                statusSpan.style.color = '#dc3545';
+                
+                // Show error in chat log with more details
+                const errorMsg = result.error || 'Unknown error occurred';
+                log.innerHTML += `<div style="color:#dc3545;font-weight:bold;">❌ Failed to switch provider: ${errorMsg}</div>`;
+                
+                // Reset dropdown to previous value on failure
+                const currentSettings = await getCurrentProviderSettings();
+                if (currentSettings) {
+                    providerSelect.value = currentSettings.default_provider;
+                }
+            }
+        } catch (error) {
+            statusSpan.textContent = `❌ Error`;
+            statusSpan.style.color = '#dc3545';
+            
+            // Show detailed error in chat log
+            log.innerHTML += `<div style="color:#dc3545;font-weight:bold;">❌ Error switching provider: ${error.message}</div>`;
+            
+            // Reset dropdown on network error
+            const currentSettings = await getCurrentProviderSettings();
+            if (currentSettings) {
+                providerSelect.value = currentSettings.default_provider;
+            }
+        } finally {
+            // Always unlock UI
+            isSwitching = false;
+            providerSelect.disabled = false;
+            log.scrollTop = log.scrollHeight;
+        }
+    }
+    
+    // Helper function to get current provider settings
+    async function getCurrentProviderSettings() {
+        try {
+            const response = await fetch('/admin/provider-settings');
+            return await response.json();
+        } catch (error) {
+            console.error('Error fetching current provider settings:', error);
+            return null;
+        }
+    }
+    
+    // Load current provider on page load with better error handling
+    async function loadCurrentProvider() {
+        try {
+            const response = await fetch('/admin/provider-settings');
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+            
+            const settings = await response.json();
+            
+            if (settings.success !== false) {
+                const providerSelect = document.getElementById('providerSelect');
+                const statusSpan = document.getElementById('providerStatus');
+                
+                providerSelect.value = settings.default_provider;
+                statusSpan.textContent = `✅ ${settings.default_provider.toUpperCase()}`;
+                statusSpan.style.color = '#28a745';
+            } else {
+                throw new Error(settings.error || 'Failed to load provider settings');
+            }
+        } catch (error) {
+            console.error('Error loading current provider:', error);
+            const statusSpan = document.getElementById('providerStatus');
+            statusSpan.textContent = 'Failed to load';
+            statusSpan.style.color = '#dc3545';
+            
+            // Show error in chat log
+            log.innerHTML += `<div style="color:#dc3545;font-weight:bold;">⚠️ Could not load current provider settings: ${error.message}</div>`;
+        }
+    }
+    
+    // Initialize page with sequential operations
+    // Disable provider dropdown initially to prevent race conditions
+    document.getElementById('providerSelect').disabled = true;
+    initializePage();
 
     document.getElementById('send').onclick = async () => {
         const text = document.getElementById('msg').value;
@@ -2169,6 +2850,101 @@ input[type="number"], input[type="text"], select{padding:8px;margin:5px;border:1
 </div>
 
 <div class="section">
+<h3>🔀 Provider Settings</h3>
+<p>Choose your default AI provider for all chat requests. Changes take effect immediately.</p>
+
+<!-- Current Provider Status -->
+<div style="margin-bottom: 20px; padding: 15px; background: #e8f5e8; border-radius: 6px; border-left: 4px solid #28a745;">
+    <h4 style="margin: 0 0 10px 0;">📊 Current Configuration</h4>
+    <div id="currentProviderStatus">
+        <div>🎯 <strong>Active Provider:</strong> <span id="currentProvider">Loading...</span></div>
+        <div>🔄 <strong>Fallback Provider:</strong> <span id="fallbackProvider">Loading...</span></div>
+        <div>🔀 <strong>Fallback Enabled:</strong> <span id="fallbackEnabled">Loading...</span></div>
+    </div>
+</div>
+
+<!-- Provider Selection -->
+<div style="margin-bottom: 20px;">
+    <h4>🎯 Select Default Provider:</h4>
+    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; margin: 15px 0;">
+        
+        <!-- Local Ollama -->
+        <label style="display: flex; align-items: center; padding: 15px; border: 2px solid #ddd; border-radius: 8px; cursor: pointer; transition: all 0.3s;" 
+               onmouseover="this.style.borderColor='#007acc'" 
+               onmouseout="this.style.borderColor='#ddd'">
+            <input type="radio" name="defaultProvider" value="ollama" style="margin-right: 10px;">
+            <div>
+                <div style="font-weight: bold; color: #007acc;">🏠 Local Ollama</div>
+                <div style="font-size: 12px; color: #666;">Fastest, Private, No API costs</div>
+                <div id="ollamaStatus" style="font-size: 11px; margin-top: 5px;">Checking...</div>
+            </div>
+        </label>
+
+        <!-- RunPod Serverless -->
+        <label style="display: flex; align-items: center; padding: 15px; border: 2px solid #ddd; border-radius: 8px; cursor: pointer; transition: all 0.3s;"
+               onmouseover="this.style.borderColor='#007acc'" 
+               onmouseout="this.style.borderColor='#ddd'">
+            <input type="radio" name="defaultProvider" value="runpod" style="margin-right: 10px;">
+            <div>
+                <div style="font-weight: bold; color: #007acc;">☁️ RunPod Serverless</div>
+                <div style="font-size: 12px; color: #666;">Production, Scalable</div>
+                <div id="runpodStatus" style="font-size: 11px; margin-top: 5px;">Checking...</div>
+            </div>
+        </label>
+
+        <!-- OpenRouter -->
+        <label style="display: flex; align-items: center; padding: 15px; border: 2px solid #ddd; border-radius: 8px; cursor: pointer; transition: all 0.3s;"
+               onmouseover="this.style.borderColor='#007acc'" 
+               onmouseout="this.style.borderColor='#ddd'">
+            <input type="radio" name="defaultProvider" value="openrouter" style="margin-right: 10px;">
+            <div>
+                <div style="font-weight: bold; color: #007acc;">🌐 OpenRouter</div>
+                <div style="font-size: 12px; color: #666;">300+ Models, Testing</div>
+                <div id="openrouterStatus" style="font-size: 11px; margin-top: 5px;">Checking...</div>
+            </div>
+        </label>
+    </div>
+</div>
+
+<!-- Fallback Settings -->
+<div style="margin-bottom: 20px;">
+    <h4>🔄 Fallback Configuration:</h4>
+    <label style="display: flex; align-items: center; margin: 10px 0;">
+        <input type="checkbox" id="enableFallback" style="margin-right: 10px;">
+        <span>Enable automatic fallback to secondary provider on failure</span>
+    </label>
+    
+    <label style="margin-left: 25px;">
+        Fallback Provider: 
+        <select id="fallbackProviderSelect" style="padding: 5px; margin-left: 10px;">
+            <option value="ollama">🏠 Local Ollama</option>
+            <option value="runpod">☁️ RunPod Serverless</option>
+            <option value="openrouter">🌐 OpenRouter</option>
+        </select>
+    </label>
+</div>
+
+<!-- Action Buttons -->
+<div style="margin-top: 20px;">
+    <button id="saveProviderSettings" onclick="saveProviderSettings()" 
+            style="padding: 12px 24px; background: #007acc; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; margin-right: 10px;">
+        💾 Save Provider Settings
+    </button>
+    <button onclick="testCurrentProvider()" 
+            style="padding: 12px 24px; background: #28a745; color: white; border: none; border-radius: 6px; cursor: pointer; margin-right: 10px;">
+        🧪 Test Current Provider
+    </button>
+    <button onclick="loadProviderSettings()" 
+            style="padding: 12px 24px; background: #6c757d; color: white; border: none; border-radius: 6px; cursor: pointer;">
+        🔄 Reload Settings
+    </button>
+</div>
+
+<!-- Status Messages -->
+<div id="providerStatusMessage" style="margin-top: 15px; padding: 10px; border-radius: 5px; display: none;"></div>
+</div>
+
+<div class="section">
 <h3>🔧 Model Configuration</h3>
 <p>Adjust model timeout and performance settings</p>
 <label>Model Timeout (seconds):
@@ -2846,6 +3622,200 @@ async function deleteModel(modelName) {
 
 // Auto-load model settings on page load
 setTimeout(() => document.getElementById('loadModelSettings').click(), 500);
+
+// ========== Provider Settings JavaScript Functions ==========
+
+// Load current provider settings on page load
+async function loadProviderSettings() {
+    try {
+        const response = await fetch('/admin/provider-settings');
+        const settings = await response.json();
+        
+        // Update current status display
+        document.getElementById('currentProvider').textContent = settings.default_provider.toUpperCase();
+        document.getElementById('fallbackProvider').textContent = settings.fallback_provider.toUpperCase();
+        document.getElementById('fallbackEnabled').textContent = settings.fallback_enabled ? 'Yes' : 'No';
+        
+        // Set radio button selection
+        const defaultRadio = document.querySelector(`input[name="defaultProvider"][value="${settings.default_provider}"]`);
+        if (defaultRadio) {
+            defaultRadio.checked = true;
+        }
+        
+        // Set fallback settings
+        document.getElementById('enableFallback').checked = settings.fallback_enabled;
+        document.getElementById('fallbackProviderSelect').value = settings.fallback_provider;
+        
+    // Check provider availability
+    await checkProviderAvailability();
+    
+    // Set current provider in UI
+    const currentProviderSelect = document.getElementById('providerSelect');
+    if (currentProviderSelect) {
+        currentProviderSelect.value = settings.default_provider;
+    }
+        
+    } catch (error) {
+        console.error('Error loading provider settings:', error);
+        showStatusMessage('Error loading provider settings: ' + error.message, 'error');
+    }
+}
+
+async function checkProviderAvailability(settings) {
+    try {
+        const response = await fetch('/admin/provider-status');
+        const status = await response.json();
+        
+        // Update status indicators
+        updateProviderStatus('ollama', status.ollama || { available: false, message: 'Unknown' });
+        updateProviderStatus('runpod', status.runpod || { available: false, message: 'Unknown' });
+        updateProviderStatus('openrouter', status.openrouter || { available: false, message: 'Unknown' });
+        
+    } catch (error) {
+        console.error('Error checking provider availability:', error);
+        // Set all to unknown status
+        updateProviderStatus('ollama', { available: false, message: 'Status check failed' });
+        updateProviderStatus('runpod', { available: false, message: 'Status check failed' });
+        updateProviderStatus('openrouter', { available: false, message: 'Status check failed' });
+    }
+}
+
+function updateProviderStatus(provider, status) {
+    const statusElement = document.getElementById(provider + 'Status');
+    if (statusElement) {
+        if (status.available) {
+            statusElement.textContent = '✅ Available';
+            statusElement.style.color = '#28a745';
+        } else {
+            statusElement.textContent = '❌ ' + status.message;
+            statusElement.style.color = '#dc3545';
+        }
+    }
+}
+
+async function saveProviderSettings() {
+    try {
+        const button = document.getElementById('saveProviderSettings');
+        button.disabled = true;
+        button.textContent = '⏳ Saving...';
+        
+        // Get selected values
+        const defaultProvider = document.querySelector('input[name="defaultProvider"]:checked')?.value;
+        const fallbackEnabled = document.getElementById('enableFallback').checked;
+        const fallbackProvider = document.getElementById('fallbackProviderSelect').value;
+        
+        if (!defaultProvider) {
+            throw new Error('Please select a default provider');
+        }
+        
+        const requestData = {
+            default_provider: defaultProvider,
+            fallback_enabled: fallbackEnabled,
+            fallback_provider: fallbackProvider
+        };
+        
+        const response = await fetch('/admin/provider-settings/update', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(requestData)
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            showStatusMessage(result.message, 'success');
+            
+            // Update current status display
+            document.getElementById('currentProvider').textContent = defaultProvider.toUpperCase();
+            document.getElementById('fallbackProvider').textContent = fallbackProvider.toUpperCase();
+            document.getElementById('fallbackEnabled').textContent = fallbackEnabled ? 'Yes' : 'No';
+            
+        } else {
+            throw new Error(result.error || 'Unknown error occurred');
+        }
+        
+    } catch (error) {
+        console.error('Error saving provider settings:', error);
+        showStatusMessage('Error saving provider settings: ' + error.message, 'error');
+    } finally {
+        const button = document.getElementById('saveProviderSettings');
+        button.disabled = false;
+        button.textContent = '💾 Save Provider Settings';
+    }
+}
+
+async function testCurrentProvider() {
+    try {
+        const defaultProvider = document.querySelector('input[name="defaultProvider"]:checked')?.value;
+        if (!defaultProvider) {
+            showStatusMessage('Please select a provider to test', 'error');
+            return;
+        }
+        
+        showStatusMessage(`Testing ${defaultProvider} provider...`, 'info');
+        
+        const response = await fetch('/admin/provider-test', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ provider: defaultProvider })
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            showStatusMessage(`✅ ${defaultProvider} test successful: ${result.message}`, 'success');
+        } else {
+            showStatusMessage(`❌ ${defaultProvider} test failed: ${result.error}`, 'error');
+        }
+        
+    } catch (error) {
+        console.error('Error testing provider:', error);
+        showStatusMessage('Error testing provider: ' + error.message, 'error');
+    }
+}
+
+function showStatusMessage(message, type) {
+    const statusDiv = document.getElementById('providerStatusMessage');
+    statusDiv.style.display = 'block';
+    statusDiv.textContent = message;
+    
+    // Set colors based on type
+    switch (type) {
+        case 'success':
+            statusDiv.style.backgroundColor = '#d4edda';
+            statusDiv.style.color = '#155724';
+            statusDiv.style.borderLeft = '4px solid #28a745';
+            break;
+        case 'error':
+            statusDiv.style.backgroundColor = '#f8d7da';
+            statusDiv.style.color = '#721c24';
+            statusDiv.style.borderLeft = '4px solid #dc3545';
+            break;
+        case 'info':
+            statusDiv.style.backgroundColor = '#d1ecf1';
+            statusDiv.style.color = '#0c5460';
+            statusDiv.style.borderLeft = '4px solid #17a2b8';
+            break;
+        default:
+            statusDiv.style.backgroundColor = '#f8f9fa';
+            statusDiv.style.color = '#6c757d';
+            statusDiv.style.borderLeft = '4px solid #6c757d';
+    }
+    
+    // Auto-hide after 5 seconds for success messages
+    if (type === 'success') {
+        setTimeout(() => {
+            statusDiv.style.display = 'none';
+        }, 5000);
+    }
+}
+
+// Load provider settings on page load (after model settings)
+setTimeout(() => loadProviderSettings(), 1000);
 </script>
 </body></html>'''
 
@@ -3511,6 +4481,230 @@ function loadHistoricalData() {
                 logger.error(f"Error deleting model {model_name}: {e}")
                 return {"error": str(e)}
 
+        # ---------- Provider Settings API Endpoints ----------
+        @self.app.get("/admin/provider-settings")
+        async def get_provider_settings():
+            """Get current provider settings"""
+            try:
+                # Import model settings to get provider configuration
+                from config.model_settings import model_settings
+                
+                # Load current provider settings from config
+                settings = model_settings.get_provider_settings()
+                
+                return {
+                    "success": True,
+                    "default_provider": settings.get("default_provider", "ollama"),
+                    "fallback_provider": settings.get("fallback_provider", "runpod"),
+                    "fallback_enabled": settings.get("fallback_enabled", False)
+                }
+            except Exception as e:
+                logger.error(f"Error getting provider settings: {e}")
+                return {
+                    "success": False,
+                    "error": str(e),
+                    "default_provider": "ollama",
+                    "fallback_provider": "runpod", 
+                    "fallback_enabled": False
+                }
+        
+        @self.app.post("/admin/provider-settings/update")
+        async def update_provider_settings(request: dict):
+            """Update provider settings"""
+            try:
+                default_provider = request.get("default_provider")
+                fallback_provider = request.get("fallback_provider")
+                fallback_enabled = request.get("fallback_enabled", False)
+                
+                if not default_provider:
+                    return {"success": False, "error": "Default provider is required"}
+                
+                # Validate provider names
+                valid_providers = ["ollama", "runpod", "openrouter"]
+                if default_provider not in valid_providers:
+                    return {"success": False, "error": f"Invalid default provider. Must be one of: {', '.join(valid_providers)}"}
+                
+                if fallback_provider and fallback_provider not in valid_providers:
+                    return {"success": False, "error": f"Invalid fallback provider. Must be one of: {', '.join(valid_providers)}"}
+                
+                # Update the provider settings in config
+                from config.model_settings import model_settings
+                
+                success = model_settings.update_provider_settings({
+                    "default_provider": default_provider,
+                    "fallback_provider": fallback_provider or "runpod",
+                    "fallback_enabled": fallback_enabled
+                })
+                
+                if success:
+                    logger.info(f"Updated provider settings: default={default_provider}, fallback={fallback_provider}, enabled={fallback_enabled}")
+                    return {
+                        "success": True,
+                        "message": f"Provider settings updated successfully. Default provider is now {default_provider.upper()}",
+                        "settings": {
+                            "default_provider": default_provider,
+                            "fallback_provider": fallback_provider or "runpod",
+                            "fallback_enabled": fallback_enabled
+                        }
+                    }
+                else:
+                    return {"success": False, "error": "Failed to update provider settings"}
+                
+            except Exception as e:
+                logger.error(f"Error updating provider settings: {e}")
+                return {"success": False, "error": str(e)}
+        
+        @self.app.get("/admin/provider-status")
+        async def get_provider_status():
+            """Check availability of all providers"""
+            try:
+                import subprocess
+                import os
+                import requests
+                import time
+                
+                status = {}
+                
+                # Check Ollama (local)
+                try:
+                    result = subprocess.run(["ollama", "list"], capture_output=True, text=True, timeout=10)
+                    if result.returncode == 0:
+                        status["ollama"] = {"available": True, "message": "Running locally"}
+                    else:
+                        status["ollama"] = {"available": False, "message": "Not installed or not running"}
+                except (subprocess.TimeoutExpired, FileNotFoundError):
+                    status["ollama"] = {"available": False, "message": "Not installed or not running"}
+                
+                # Check RunPod (check for environment variables)
+                runpod_api_key = os.getenv("RUNPOD_API_KEY")
+                runpod_endpoint = os.getenv("RUNPOD_ENDPOINT_URL")
+                if runpod_api_key and runpod_endpoint:
+                    try:
+                        # Try a simple ping to the endpoint
+                        response = requests.get(f"{runpod_endpoint}/health", timeout=5)
+                        if response.status_code == 200:
+                            status["runpod"] = {"available": True, "message": "Endpoint reachable"}
+                        else:
+                            status["runpod"] = {"available": False, "message": "Endpoint not responding"}
+                    except requests.RequestException:
+                        status["runpod"] = {"available": True, "message": "API key configured (endpoint not tested)"}
+                else:
+                    status["runpod"] = {"available": False, "message": "API key or endpoint not configured"}
+                
+                # Check OpenRouter
+                openrouter_api_key = os.getenv("OPENROUTER_API_KEY")
+                if openrouter_api_key:
+                    try:
+                        headers = {"Authorization": f"Bearer {openrouter_api_key}"}
+                        response = requests.get("https://openrouter.ai/api/v1/models", headers=headers, timeout=5)
+                        if response.status_code == 200:
+                            models = response.json().get("data", [])
+                            status["openrouter"] = {"available": True, "message": f"{len(models)} models available"}
+                        else:
+                            status["openrouter"] = {"available": False, "message": "API key invalid"}
+                    except requests.RequestException:
+                        status["openrouter"] = {"available": False, "message": "Connection failed"}
+                else:
+                    status["openrouter"] = {"available": False, "message": "API key not configured"}
+                
+                return status
+                
+            except Exception as e:
+                logger.error(f"Error checking provider status: {e}")
+                return {
+                    "ollama": {"available": False, "message": "Status check failed"},
+                    "runpod": {"available": False, "message": "Status check failed"},
+                    "openrouter": {"available": False, "message": "Status check failed"}
+                }
+        
+        @self.app.post("/admin/provider-test")
+        async def test_provider(request: dict):
+            """Test a specific provider with a simple request"""
+            try:
+                provider = request.get("provider")
+                if not provider:
+                    return {"success": False, "error": "Provider name required"}
+                
+                test_message = "Hello, this is a test message to verify the provider is working."
+                
+                if provider == "ollama":
+                    # Test Ollama with a simple model query
+                    import subprocess
+                    result = subprocess.run(["ollama", "run", "llama3:latest", test_message], 
+                                          capture_output=True, text=True, timeout=30)
+                    if result.returncode == 0 and result.stdout.strip():
+                        return {
+                            "success": True, 
+                            "message": "Ollama responded successfully",
+                            "response_preview": result.stdout.strip()[:100] + "..."
+                        }
+                    else:
+                        return {"success": False, "error": f"Ollama error: {result.stderr or 'No response'}"}
+                
+                elif provider == "runpod":
+                    # Test RunPod endpoint
+                    import requests
+                    import os
+                    
+                    api_key = os.getenv("RUNPOD_API_KEY")
+                    endpoint = os.getenv("RUNPOD_ENDPOINT_URL")
+                    
+                    if not api_key or not endpoint:
+                        return {"success": False, "error": "RunPod API key or endpoint not configured"}
+                    
+                    headers = {"Authorization": f"Bearer {api_key}"}
+                    payload = {"input": {"message": test_message}}
+                    
+                    response = requests.post(f"{endpoint}/run", json=payload, headers=headers, timeout=30)
+                    if response.status_code == 200:
+                        return {
+                            "success": True,
+                            "message": "RunPod endpoint responded successfully",
+                            "response_preview": str(response.json())[:100] + "..."
+                        }
+                    else:
+                        return {"success": False, "error": f"RunPod error: {response.status_code} - {response.text}"}
+                
+                elif provider == "openrouter":
+                    # Test OpenRouter API
+                    import requests
+                    import os
+                    
+                    api_key = os.getenv("OPENROUTER_API_KEY")
+                    if not api_key:
+                        return {"success": False, "error": "OpenRouter API key not configured"}
+                    
+                    headers = {
+                        "Authorization": f"Bearer {api_key}",
+                        "Content-Type": "application/json"
+                    }
+                    
+                    payload = {
+                        "model": "meta-llama/llama-3.1-8b-instruct:free",
+                        "messages": [{"role": "user", "content": test_message}],
+                        "max_tokens": 100
+                    }
+                    
+                    response = requests.post("https://openrouter.ai/api/v1/chat/completions", 
+                                           json=payload, headers=headers, timeout=30)
+                    if response.status_code == 200:
+                        data = response.json()
+                        content = data.get("choices", [{}])[0].get("message", {}).get("content", "")
+                        return {
+                            "success": True,
+                            "message": "OpenRouter API responded successfully",
+                            "response_preview": content[:100] + "..."
+                        }
+                    else:
+                        return {"success": False, "error": f"OpenRouter error: {response.status_code} - {response.text}"}
+                
+                else:
+                    return {"success": False, "error": f"Unknown provider: {provider}"}
+                
+            except Exception as e:
+                logger.error(f"Error testing provider {request.get('provider', 'unknown')}: {e}")
+                return {"success": False, "error": str(e)}
+        
         @self.app.get("/admin/stats", response_class=HTMLResponse)
         async def admin_stats():
             """Admin stats page with model performance analytics"""

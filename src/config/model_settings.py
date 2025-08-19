@@ -296,6 +296,78 @@ class ModelSettingsManager:
     def refresh_from_ollama(self) -> bool:
         """Refresh model list from ollama list command"""
         return self.sync_with_discovered_models()
+    
+    def get_provider_settings(self) -> Dict:
+        """Get current provider configuration settings."""
+        try:
+            # Load provider settings from the same config file
+            if self.settings_file.exists():
+                with open(self.settings_file, 'r') as f:
+                    data = json.load(f)
+                    provider_settings = data.get('provider_settings', {})
+                    
+                    # Return with defaults if missing
+                    return {
+                        "default_provider": provider_settings.get("default_provider", "ollama"),
+                        "fallback_provider": provider_settings.get("fallback_provider", "runpod"),
+                        "fallback_enabled": provider_settings.get("fallback_enabled", False)
+                    }
+            
+            # Return defaults if file doesn't exist
+            return {
+                "default_provider": "ollama",
+                "fallback_provider": "runpod", 
+                "fallback_enabled": False
+            }
+            
+        except Exception as e:
+            logger.error(f"Error loading provider settings: {e}")
+            # Return safe defaults on error
+            return {
+                "default_provider": "ollama",
+                "fallback_provider": "runpod",
+                "fallback_enabled": False
+            }
+    
+    def update_provider_settings(self, settings: Dict) -> bool:
+        """Update provider configuration settings."""
+        try:
+            # Load existing config or create new one
+            config_data = {}
+            if self.settings_file.exists():
+                with open(self.settings_file, 'r') as f:
+                    config_data = json.load(f)
+            
+            # Update provider settings section
+            if 'provider_settings' not in config_data:
+                config_data['provider_settings'] = {}
+            
+            # Update with new settings
+            config_data['provider_settings'].update(settings)
+            config_data['provider_settings']['last_updated'] = datetime.now().isoformat()
+            
+            # Validate provider names
+            valid_providers = ["ollama", "runpod", "openrouter"]
+            default_provider = config_data['provider_settings'].get('default_provider')
+            if default_provider and default_provider not in valid_providers:
+                logger.error(f"Invalid default provider: {default_provider}")
+                return False
+            
+            fallback_provider = config_data['provider_settings'].get('fallback_provider')
+            if fallback_provider and fallback_provider not in valid_providers:
+                logger.error(f"Invalid fallback provider: {fallback_provider}")
+                return False
+            
+            # Save updated config
+            with open(self.settings_file, 'w') as f:
+                json.dump(config_data, f, indent=2)
+            
+            logger.info(f"Updated provider settings: {settings}")
+            return True
+            
+        except Exception as e:
+            logger.error(f"Error updating provider settings: {e}")
+            return False
 
 # Global settings manager instance
 model_settings = ModelSettingsManager()

@@ -20,6 +20,13 @@ except ImportError:
     sys.path.insert(0, str(Path(__file__).parent.parent.parent))
     from runpod_handler import pete_handler
 
+# Import OpenRouter handler for provider switching
+try:
+    from openrouter_handler import OpenRouterHandler
+except ImportError:
+    sys.path.insert(0, str(Path(__file__).parent.parent.parent))
+    from openrouter_handler import OpenRouterHandler
+
 # Import conversation similarity system for intelligent instant responses
 try:
     from analytics.conversation_similarity import ConversationSimilarityAnalyzer
@@ -62,6 +69,10 @@ class ModelManager:
         # Set similarity threshold for instant responses (0.75 = 75% similarity)
         self.similarity_threshold = float(os.getenv('SIMILARITY_THRESHOLD', '0.75'))
         self.similarity_analyzer = None  # Lazy load to avoid startup delays
+        
+        # Initialize provider handlers
+        self.openrouter_handler = None  # Lazy load
+        self._current_provider = None  # Cache for current provider
     
     def _get_similarity_analyzer(self):
         """Lazy load the conversation similarity analyzer"""
@@ -74,6 +85,112 @@ class ModelManager:
                 print(f"⚠️ Failed to load similarity analyzer: {e}")
                 self.similarity_analyzer = None
         return self.similarity_analyzer
+    
+    def _get_openrouter_handler(self):
+        """Lazy load the OpenRouter handler"""
+        if self.openrouter_handler is None:
+            try:
+                print("🌐 Loading OpenRouter handler...")
+                self.openrouter_handler = OpenRouterHandler()
+                print("✅ OpenRouter handler loaded")
+            except Exception as e:
+                print(f"⚠️ Failed to load OpenRouter handler: {e}")
+                self.openrouter_handler = None
+        return self.openrouter_handler
+    
+    def _get_current_provider(self) -> str:
+        """Get current provider from settings"""
+        try:
+            # Import model settings to get current provider
+            from config.model_settings import model_settings
+            settings = model_settings.get_provider_settings()
+            provider = settings.get('default_provider', 'ollama')
+            print(f"🔧 Current provider: {provider}")
+            return provider
+        except Exception as e:
+            print(f"⚠️ Error getting current provider: {e}, defaulting to ollama")
+            return 'ollama'
+    
+    def _route_to_provider(self, prompt: str, model_name: str = None, **kwargs) -> Dict[str, Any]:
+        """Route request to appropriate provider based on settings"""
+        provider = self._get_current_provider()
+        
+        if provider == 'openrouter':
+            print(f"🌐 Routing to OpenRouter")
+            handler = self._get_openrouter_handler()
+            if handler and handler.available:
+                # Map Ollama model names to OpenRouter models
+                openrouter_model = self._map_to_openrouter_model(model_name)
+                return handler.chat_completion(prompt, model=openrouter_model, **kwargs)
+            else:
+                print(f"⚠️ OpenRouter not available, falling back to RunPod")
+                return pete_handler.chat_completion(prompt, model=model_name, **kwargs)
+        
+        elif provider == 'ollama':
+            print(f"🏠 Routing to Ollama")
+            # Try local Ollama first
+            try:
+                result = self._ollama_completion(prompt, model_name, **kwargs)
+                if result.get('status') == 'success':
+                    return result
+            except Exception as e:
+                print(f"⚠️ Ollama failed: {e}, falling back to RunPod")
+            
+            # Fallback to RunPod if Ollama fails
+            return pete_handler.chat_completion(prompt, model=model_name, **kwargs)
+        
+        else:  # runpod or default
+            print(f"☁️ Routing to RunPod")
+            return pete_handler.chat_completion(prompt, model=model_name, **kwargs)
+    
+    def _map_to_openrouter_model(self, ollama_model: str) -> str:
+        """Map Ollama model names to OpenRouter model names"""
+        if not ollama_model:
+            return "meta-llama/llama-3.1-8b-instruct:free"
+        
+        # Simple mapping - can be expanded
+        model_mapping = {
+            "llama3:latest": "meta-llama/llama-3.1-8b-instruct:free",
+            "llama3:8b": "meta-llama/llama-3.1-8b-instruct:free",
+            "mistral:latest": "mistralai/mistral-7b-instruct:free",
+            "mixtral:latest": "mistralai/mixtral-8x7b-instruct:free",
+        }
+        
+        # Default to a good free model if no mapping found
+        return model_mapping.get(ollama_model, "meta-llama/llama-3.1-8b-instruct:free")
+    
+    def _ollama_completion(self, prompt: str, model_name: str = None, **kwargs) -> Dict[str, Any]:
+        """Direct Ollama API completion"""
+        try:
+            model_to_use = model_name or self.model_name
+            
+            response = requests.post(
+                f"{self.base_url}/api/generate",
+                json={
+                    "model": model_to_use,
+                    "prompt": prompt,
+                    "stream": False,
+                    "options": {
+                        "temperature": kwargs.get('temperature', self.temperature),
+                        "num_predict": kwargs.get('max_tokens', self.max_tokens)
+                    }
+                },
+                timeout=60
+            )
+            
+            if response.status_code == 200:
+                data = response.json()
+                return {
+                    "status": "success",
+                    "response": data.get('response', ''),
+                    "model": model_to_use,
+                    "provider": "ollama"
+                }
+            else:
+                return {"status": "error", "error": f"HTTP {response.status_code}"}
+                
+        except Exception as e:
+            return {"status": "error", "error": str(e)}
     
     def _load_default_model(self) -> Optional[str]:
         """Load the default model from settings file"""
@@ -245,25 +362,29 @@ class ModelManager:
             return f"❌ Error: {str(e)}"
 
     def generate_stream(self, prompt: str, context: str = None, model_name: str | None = None) -> Iterable[str]:
-        """Stream AI response using RunPod serverless with improved simulated streaming"""
+        """Stream AI response using provider-based routing with simulated streaming"""
         try:
             # Prepare prompt
             full_prompt = self._prepare_prompt(prompt, context)
             model_to_use = model_name or "llama3:latest"
             
-            print(f"🚀 ModelManager streaming via RunPod: {model_to_use}")
+            provider = self._get_current_provider()
+            print(f"🚀 ModelManager streaming via {provider.upper()}: {model_to_use}")
             
             # Send immediate feedback to user
             yield "[Thinking...]"
             
-            # Get response from RunPod (non-streaming - this is the limitation)
-            result = pete_handler.chat_completion(full_prompt, model=model_to_use)
+            # Route to appropriate provider
+            result = self._route_to_provider(full_prompt, model_to_use, max_tokens=2048, temperature=0.7)
             
             # Clear the "thinking" message
             yield "\b" * 13 + " " * 13 + "\b" * 13  # Clear "[Thinking...]"
             
             if result.get('status') == 'success':
                 response_text = result.get('response', 'No response generated.')
+                actual_provider = result.get('provider', provider)
+                
+                print(f"✅ {actual_provider.upper()} response: {response_text[:100]}...")
                 
                 # Enhanced streaming simulation with natural pacing
                 import time
@@ -294,7 +415,7 @@ class ModelManager:
                         if i < len(sentences) - 1:
                             time.sleep(0.1)
             else:
-                yield f"❌ RunPod Error: {result.get('error', 'Unknown error')}"
+                yield f"❌ {provider.upper()} Error: {result.get('error', 'Unknown error')}"
                 
         except Exception as e:
             yield f"❌ Error: {str(e)}"
@@ -313,13 +434,16 @@ Key guidelines:
 - If you need specific property details, ask clarifying questions
 - Keep responses concise but thorough
 - You work with Christina and handle property management for various locations
+- Always respond directly as Jamie without adding extra conversation elements
+- End your response naturally without continuing the conversation
 
 """
         
         if context:
             system_prompt += f"\nAdditional context: {context}\n"
         
-        return f"{system_prompt}\nTenant/Caller: {user_prompt}\n\nJamie:"
+        # Use a cleaner prompt format that doesn't encourage conversation continuation
+        return f"{system_prompt}\nMessage from tenant: {user_prompt}\n\nPlease respond as Jamie:"
     
     def create_custom_model(self, training_data: List[Dict[str, str]]) -> bool:
         """Create custom property management model"""

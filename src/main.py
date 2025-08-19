@@ -19,7 +19,7 @@ import subprocess
 sys.path.insert(0, str(Path(__file__).parent))
 
 from utils.logger import logger
-from vapi.webhook_server import VAPIWebhookServer
+from vapi.modular_server import ModularVAPIServer
 from startup_warmup import run_warmup
 
 
@@ -94,9 +94,9 @@ def main() -> None:
     logger.info("🔗 Starting VAPI webhook server with serverless backend")
     
     try:
-        # Start the main webhook server (now serverless-first)
-        server = VAPIWebhookServer(port=port)
-        uvicorn.run(server.app, host="0.0.0.0", port=port, log_level="info")
+        # Start the modular webhook server (now serverless-first)
+        server = ModularVAPIServer()
+        server.run(host="0.0.0.0", port=port, debug=False)
     except KeyboardInterrupt:
         logger.info("🛑 Received keyboard interrupt, shutting down...")
     except Exception as e:

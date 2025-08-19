@@ -1,0 +1,275 @@
+<!-- ADD THIS SECTION TO YOUR EXISTING /admin/settings PAGE -->
+<!-- Insert this after the existing "Model Management" section -->
+
+<div class="section">
+<h3>🔀 Provider Settings</h3>
+<p>Choose your default AI provider for all chat requests. Changes take effect immediately.</p>
+
+<!-- Current Provider Status -->
+<div style="margin-bottom: 20px; padding: 15px; background: #e8f5e8; border-radius: 6px; border-left: 4px solid #28a745;">
+    <h4 style="margin: 0 0 10px 0;">📊 Current Configuration</h4>
+    <div id="currentProviderStatus">
+        <div>🎯 <strong>Active Provider:</strong> <span id="currentProvider">Loading...</span></div>
+        <div>🔄 <strong>Fallback Provider:</strong> <span id="fallbackProvider">Loading...</span></div>
+        <div>🔀 <strong>Fallback Enabled:</strong> <span id="fallbackEnabled">Loading...</span></div>
+    </div>
+</div>
+
+<!-- Provider Selection -->
+<div style="margin-bottom: 20px;">
+    <h4>🎯 Select Default Provider:</h4>
+    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; margin: 15px 0;">
+        
+        <!-- Local Ollama -->
+        <label style="display: flex; align-items: center; padding: 15px; border: 2px solid #ddd; border-radius: 8px; cursor: pointer; transition: all 0.3s;" 
+               onmouseover="this.style.borderColor='#007acc'" 
+               onmouseout="this.style.borderColor='#ddd'">
+            <input type="radio" name="defaultProvider" value="ollama" style="margin-right: 10px;">
+            <div>
+                <div style="font-weight: bold; color: #007acc;">🏠 Local Ollama</div>
+                <div style="font-size: 12px; color: #666;">Fastest, Private, No API costs</div>
+                <div id="ollamaStatus" style="font-size: 11px; margin-top: 5px;">Checking...</div>
+            </div>
+        </label>
+
+        <!-- RunPod Serverless -->
+        <label style="display: flex; align-items: center; padding: 15px; border: 2px solid #ddd; border-radius: 8px; cursor: pointer; transition: all 0.3s;"
+               onmouseover="this.style.borderColor='#007acc'" 
+               onmouseout="this.style.borderColor='#ddd'">
+            <input type="radio" name="defaultProvider" value="runpod" style="margin-right: 10px;">
+            <div>
+                <div style="font-weight: bold; color: #007acc;">☁️ RunPod Serverless</div>
+                <div style="font-size: 12px; color: #666;">Production, Scalable</div>
+                <div id="runpodStatus" style="font-size: 11px; margin-top: 5px;">Checking...</div>
+            </div>
+        </label>
+
+        <!-- OpenRouter -->
+        <label style="display: flex; align-items: center; padding: 15px; border: 2px solid #ddd; border-radius: 8px; cursor: pointer; transition: all 0.3s;"
+               onmouseover="this.style.borderColor='#007acc'" 
+               onmouseout="this.style.borderColor='#ddd'">
+            <input type="radio" name="defaultProvider" value="openrouter" style="margin-right: 10px;">
+            <div>
+                <div style="font-weight: bold; color: #007acc;">🌐 OpenRouter</div>
+                <div style="font-size: 12px; color: #666;">300+ Models, Testing</div>
+                <div id="openrouterStatus" style="font-size: 11px; margin-top: 5px;">Checking...</div>
+            </div>
+        </label>
+    </div>
+</div>
+
+<!-- Fallback Settings -->
+<div style="margin-bottom: 20px;">
+    <h4>🔄 Fallback Configuration:</h4>
+    <label style="display: flex; align-items: center; margin: 10px 0;">
+        <input type="checkbox" id="enableFallback" style="margin-right: 10px;">
+        <span>Enable automatic fallback to secondary provider on failure</span>
+    </label>
+    
+    <label style="margin-left: 25px;">
+        Fallback Provider: 
+        <select id="fallbackProviderSelect" style="padding: 5px; margin-left: 10px;">
+            <option value="ollama">🏠 Local Ollama</option>
+            <option value="runpod">☁️ RunPod Serverless</option>
+            <option value="openrouter">🌐 OpenRouter</option>
+        </select>
+    </label>
+</div>
+
+<!-- Action Buttons -->
+<div style="margin-top: 20px;">
+    <button id="saveProviderSettings" onclick="saveProviderSettings()" 
+            style="padding: 12px 24px; background: #007acc; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; margin-right: 10px;">
+        💾 Save Provider Settings
+    </button>
+    <button onclick="testCurrentProvider()" 
+            style="padding: 12px 24px; background: #28a745; color: white; border: none; border-radius: 6px; cursor: pointer; margin-right: 10px;">
+        🧪 Test Current Provider
+    </button>
+    <button onclick="loadProviderSettings()" 
+            style="padding: 12px 24px; background: #6c757d; color: white; border: none; border-radius: 6px; cursor: pointer;">
+        🔄 Reload Settings
+    </button>
+</div>
+
+<!-- Status Messages -->
+<div id="providerStatusMessage" style="margin-top: 15px; padding: 10px; border-radius: 5px; display: none;"></div>
+</div>
+
+<script>
+// PROVIDER MANAGEMENT FUNCTIONS
+// Add these to your existing admin settings JavaScript
+
+async function loadProviderSettings() {
+    try {
+        // Load from your model settings
+        const response = await fetch('/admin/model-settings');
+        const result = await response.json();
+        
+        if (result.success && result.provider_settings) {
+            const settings = result.provider_settings;
+            
+            // Update current status display
+            document.getElementById('currentProvider').textContent = settings.default_provider?.toUpperCase() || 'Not Set';
+            document.getElementById('fallbackProvider').textContent = settings.fallback_provider?.toUpperCase() || 'Not Set';
+            document.getElementById('fallbackEnabled').textContent = settings.enable_fallback ? '✅ YES' : '❌ NO';
+            
+            // Set radio button selection
+            const defaultRadio = document.querySelector(`input[name="defaultProvider"][value="${settings.default_provider}"]`);
+            if (defaultRadio) defaultRadio.checked = true;
+            
+            // Set fallback settings
+            document.getElementById('enableFallback').checked = settings.enable_fallback || false;
+            document.getElementById('fallbackProviderSelect').value = settings.fallback_provider || 'openrouter';
+            
+            // Check provider status
+            await checkProviderStatus();
+        }
+    } catch (e) {
+        console.error('Error loading provider settings:', e);
+        showStatusMessage('❌ Error loading provider settings', 'error');
+    }
+}
+
+async function saveProviderSettings() {
+    const button = document.getElementById('saveProviderSettings');
+    button.disabled = true;
+    button.textContent = '💾 Saving...';
+    
+    try {
+        const selectedProvider = document.querySelector('input[name="defaultProvider"]:checked')?.value;
+        const enableFallback = document.getElementById('enableFallback').checked;
+        const fallbackProvider = document.getElementById('fallbackProviderSelect').value;
+        
+        if (!selectedProvider) {
+            throw new Error('Please select a default provider');
+        }
+        
+        const settings = {
+            default_provider: selectedProvider,
+            fallback_provider: fallbackProvider,
+            enable_fallback: enableFallback
+        };
+        
+        // Save to backend (you'll need to create this endpoint)
+        const response = await fetch('/admin/provider-settings/update', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(settings)
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            showStatusMessage(`✅ Provider settings saved! Default: ${selectedProvider.toUpperCase()}`, 'success');
+            loadProviderSettings(); // Refresh display
+        } else {
+            throw new Error(result.error || 'Failed to save settings');
+        }
+        
+    } catch (e) {
+        console.error('Error saving provider settings:', e);
+        showStatusMessage('❌ Error saving settings: ' + e.message, 'error');
+    } finally {
+        button.disabled = false;
+        button.textContent = '💾 Save Provider Settings';
+    }
+}
+
+async function testCurrentProvider() {
+    const selectedProvider = document.querySelector('input[name="defaultProvider"]:checked')?.value;
+    
+    if (!selectedProvider) {
+        showStatusMessage('❌ Please select a provider first', 'error');
+        return;
+    }
+    
+    showStatusMessage('🧪 Testing ' + selectedProvider.toUpperCase() + '...', 'info');
+    
+    try {
+        // Test the provider with a simple request
+        const response = await fetch('/v1/chat/completions', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                model: 'peteollama:jamie-fixed',
+                provider: selectedProvider,
+                messages: [{role: 'user', content: 'Test message'}],
+                max_tokens: 10
+            })
+        });
+        
+        if (response.ok) {
+            showStatusMessage('✅ ' + selectedProvider.toUpperCase() + ' is working correctly!', 'success');
+        } else {
+            throw new Error('Provider test failed');
+        }
+    } catch (e) {
+        showStatusMessage('❌ ' + selectedProvider.toUpperCase() + ' test failed: ' + e.message, 'error');
+    }
+}
+
+async function checkProviderStatus() {
+    // Check each provider's availability
+    const providers = ['ollama', 'runpod', 'openrouter'];
+    
+    for (const provider of providers) {
+        const statusElement = document.getElementById(provider + 'Status');
+        statusElement.textContent = 'Checking...';
+        
+        try {
+            // You can implement specific checks for each provider
+            // For now, just check environment variables
+            const response = await fetch('/admin/environment');
+            const env = await response.json();
+            
+            let status = '';
+            switch (provider) {
+                case 'ollama':
+                    status = env.ollama_available ? '✅ Available' : '❌ Not Running';
+                    break;
+                case 'runpod':
+                    status = (env.RUNPOD_API_KEY && env.RUNPOD_SERVERLESS_ENDPOINT) ? '✅ Configured' : '⚠️ API keys needed';
+                    break;
+                case 'openrouter':
+                    status = env.OPENROUTER_API_KEY ? '✅ Configured' : '⚠️ API key needed';
+                    break;
+            }
+            statusElement.textContent = status;
+        } catch (e) {
+            statusElement.textContent = '❓ Unknown';
+        }
+    }
+}
+
+function showStatusMessage(message, type) {
+    const messageDiv = document.getElementById('providerStatusMessage');
+    messageDiv.style.display = 'block';
+    messageDiv.textContent = message;
+    
+    // Style based on type
+    const colors = {
+        success: { bg: '#d4edda', border: '#c3e6cb', text: '#155724' },
+        error: { bg: '#f8d7da', border: '#f5c6cb', text: '#721c24' },
+        info: { bg: '#cce5ff', border: '#b3d9ff', text: '#0066cc' }
+    };
+    
+    const color = colors[type] || colors.info;
+    messageDiv.style.backgroundColor = color.bg;
+    messageDiv.style.borderColor = color.border;
+    messageDiv.style.color = color.text;
+    messageDiv.style.border = '1px solid ' + color.border;
+    
+    // Auto-hide after 5 seconds for success messages
+    if (type === 'success') {
+        setTimeout(() => {
+            messageDiv.style.display = 'none';
+        }, 5000);
+    }
+}
+
+// Auto-load provider settings when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    loadProviderSettings();
+});
+</script>

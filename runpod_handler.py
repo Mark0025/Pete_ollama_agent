@@ -191,6 +191,9 @@ class PeteOllamaHandler:
         input_data = {
             "prompt": message,
             "model": model,
+            "max_tokens": kwargs.get("max_tokens", 2048),  # Ensure adequate response length
+            "temperature": kwargs.get("temperature", 0.7),
+            "stop": kwargs.get("stop", ["\nMessage from tenant:", "\nPlease respond as Jamie:", "USER:", "TENANT:", "\n\n---"]),  # Stop sequences
             **kwargs
         }
         
