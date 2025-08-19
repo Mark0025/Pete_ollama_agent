@@ -179,25 +179,7 @@ class AdminRouter:
                 logger.error(f"Error getting configuration: {str(e)}")
                 raise HTTPException(status_code=500, detail=str(e))
         
-        @self.router.post("/config/provider")
-        async def update_provider_settings(request: Request):
-            """Update provider settings"""
-            try:
-                body = await request.json()
-                
-                # Update provider settings
-                model_settings.update_provider_settings(body)
-                
-                logger.info(f"Provider settings updated: {body}")
-                return {
-                    "success": True,
-                    "message": "Provider settings updated successfully",
-                    "settings": body
-                }
-            
-            except Exception as e:
-                logger.error(f"Error updating provider settings: {str(e)}")
-                raise HTTPException(status_code=500, detail=str(e))
+
         
         @self.router.get("/logs")
         async def get_recent_logs():
@@ -342,6 +324,78 @@ class AdminRouter:
                 logger.error(f"Model test error: {str(e)}")
                 raise HTTPException(status_code=500, detail=str(e))
         
+        @self.router.get("/environment")
+        async def get_environment():
+            """Get environment information"""
+            try:
+                import os
+                return {
+                    "environment": "production" if os.getenv("PRODUCTION") else "development",
+                    "provider": "runpod" if os.getenv("RUNPOD_API_KEY") else "ollama",
+                    "model_manager_available": bool(self.model_manager),
+                    "runpod_configured": bool(self.runpod_api_key)
+                }
+            except Exception as e:
+                logger.error(f"Error getting environment: {str(e)}")
+                return {"environment": "unknown", "error": str(e)}
+        
+        @self.router.get("/provider-settings")
+        async def get_provider_settings():
+            """Get current provider settings"""
+            try:
+                provider_settings = model_settings.get_provider_settings()
+                return {
+                    "success": True,
+                    **provider_settings
+                }
+            except Exception as e:
+                logger.error(f"Error getting provider settings: {str(e)}")
+                return {
+                    "success": False,
+                    "error": str(e),
+                    "default_provider": "ollama"
+                }
+        
+
+        
+        @self.router.get("/training-samples")
+        async def get_training_samples():
+            """Get training samples"""
+            try:
+                # This would normally fetch from database
+                # For now, return mock data
+                return {
+                    "samples": [
+                        {"id": 1, "user_message": "My AC is broken", "ai_response": "I'll schedule a maintenance request for your AC unit."},
+                        {"id": 2, "user_message": "When is rent due?", "ai_response": "Rent is due on the 1st of each month."}
+                    ],
+                    "total": 2,
+                    "message": "Training samples loaded successfully"
+                }
+            except Exception as e:
+                logger.error(f"Error getting training samples: {str(e)}")
+                return {"samples": [], "total": 0, "error": str(e)}
+        
+        @self.router.get("/model-status")
+        async def get_model_status():
+            """Get model status information"""
+            try:
+                model_available = self.model_manager.is_model_available(self.model_manager.model_name)
+                return {
+                    "current_model": self.model_manager.model_name,
+                    "model_available": model_available,
+                    "status": "loaded" if model_available else "not_loaded",
+                    "custom_model": getattr(self.model_manager, 'custom_model_name', None)
+                }
+            except Exception as e:
+                logger.error(f"Error getting model status: {str(e)}")
+                return {
+                    "current_model": "unknown",
+                    "model_available": False,
+                    "status": "error",
+                    "error": str(e)
+                }
+        
         @self.router.delete("/logs/clear")
         async def clear_logs():
             """Clear all log files"""
@@ -441,20 +495,21 @@ class AdminRouter:
                 default_provider = data.get('default_provider', 'ollama')
                 fallback_enabled = data.get('fallback_enabled', False)
                 
-                # Update settings
-                current_settings = model_settings.get_provider_settings()
-                current_settings['default_provider'] = default_provider
-                current_settings['fallback_enabled'] = fallback_enabled
+                # Create new settings
+                new_settings = {
+                    'default_provider': default_provider,
+                    'fallback_enabled': fallback_enabled
+                }
                 
                 # Save settings
-                model_settings.save_provider_settings(current_settings)
+                model_settings.update_provider_settings(new_settings)
                 
                 logger.info(f"Updated provider settings: {default_provider}, fallback: {fallback_enabled}")
                 
                 return {
                     "success": True,
                     "message": f"Provider updated to {default_provider}",
-                    "settings": current_settings
+                    "settings": new_settings
                 }
             except Exception as e:
                 logger.error(f"Error updating provider settings: {e}")
