@@ -332,21 +332,23 @@ class ModelManager:
                 return cached_response
             
             cache_time = (time.time() - cache_start) * 1000
-            print(f"🔍 All caches miss ({cache_time:.1f}ms), routing to RunPod...")
+            print(f"🔍 All caches miss ({cache_time:.1f}ms), routing to provider...")
             
-            # STEP 3: Fallback to RunPod serverless
+            # STEP 3: Route to appropriate provider based on settings
             full_prompt = self._prepare_prompt(prompt, context)
             model_to_use = model_name or "llama3:latest"
             
-            print(f"🚀 ModelManager routing to RunPod: {model_to_use}")
+            provider = self._get_current_provider()
+            print(f"🚀 ModelManager routing to {provider.upper()}: {model_to_use}")
             
-            runpod_start = time.time()
-            result = pete_handler.chat_completion(full_prompt, model=model_to_use)
-            runpod_time = (time.time() - runpod_start) * 1000
+            provider_start = time.time()
+            result = self._route_to_provider(full_prompt, model_to_use, max_tokens=2048, temperature=0.7)
+            provider_time = (time.time() - provider_start) * 1000
             
             if result.get('status') == 'success':
                 response = result.get('response', 'No response generated.')
-                print(f"✅ RunPod response ({runpod_time:.0f}ms): {response[:50]}...")
+                actual_provider = result.get('provider', provider)
+                print(f"✅ {actual_provider.upper()} response ({provider_time:.0f}ms): {response[:50]}...")
                 
                 # STEP 4: Add successful response to cache for future instant replies
                 try:
@@ -356,7 +358,8 @@ class ModelManager:
                 
                 return response
             else:
-                return f"❌ RunPod Error: {result.get('error', 'Unknown error')}"
+                error_msg = result.get('error', 'Unknown error')
+                return f"❌ {provider.upper()} Error: {error_msg}"
         
         except Exception as e:
             return f"❌ Error: {str(e)}"
