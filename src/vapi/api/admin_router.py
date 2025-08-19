@@ -10,6 +10,7 @@ from fastapi import APIRouter, HTTPException, Depends, Request
 from fastapi.responses import JSONResponse, HTMLResponse
 from typing import Dict, Any, List
 from pathlib import Path
+from utils.datetime_utils import now_cst, format_datetime_api, format_datetime_display
 import time
 import sys
 import os
@@ -166,7 +167,15 @@ class AdminRouter:
                 
                 return {
                     "provider_settings": provider_settings,
-                    "ui_models": [model.dict() for model in ui_models],
+                    "ui_models": [{
+                        "name": model.name,
+                        "display_name": model.display_name,
+                        "type": model.type,
+                        "is_jamie_model": model.is_jamie_model,
+                        "show_in_ui": model.show_in_ui,
+                        "auto_preload": model.auto_preload,
+                        "status": model.status
+                    } for model in ui_models],
                     "model_manager": {
                         "current_model": self.model_manager.model_name,
                         "custom_model": getattr(self.model_manager, 'custom_model_name', None),
@@ -667,6 +676,149 @@ class AdminRouter:
                 return StreamingResponse(generate_training_log(), media_type="text/plain")
             except Exception as e:
                 logger.error(f"Error in training stream: {e}")
+                raise HTTPException(status_code=500, detail=str(e))
+
+        # ===== CONFIGURATION MANAGEMENT ENDPOINTS =====
+        
+        @self.router.get("/environment-variables")
+        async def get_environment_variables():
+            """Get current environment variables (filtered for security)"""
+            try:
+                # Define which environment variables to expose (avoid sensitive data)
+                safe_vars = [
+                    "OPENROUTER_API_KEY", "RUNPOD_API_KEY", "RUNPOD_SERVERLESS_ENDPOINT",
+                    "PORT", "ENVIRONMENT", "DEBUG", "LOG_LEVEL", "DATABASE_URL",
+                    "REDIS_URL", "API_VERSION", "APP_NAME"
+                ]
+                
+                env_vars = {}
+                for var in safe_vars:
+                    value = os.getenv(var)
+                    if value:
+                        # Mask sensitive API keys for security
+                        if "API_KEY" in var and len(value) > 10:
+                            env_vars[var] = f"{value[:8]}...{value[-4:]}"
+                        else:
+                            env_vars[var] = value
+                
+                return {
+                    "success": True,
+                    "environment_variables": env_vars,
+                    "total_vars": len(env_vars),
+                    "note": "API keys are masked for security"
+                }
+            
+            except Exception as e:
+                logger.error(f"Error getting environment variables: {e}")
+                raise HTTPException(status_code=500, detail=str(e))
+
+        @self.router.get("/configuration")
+        async def get_configuration():
+            """Get current configuration settings"""
+            try:
+                # Get model settings configuration
+                config_data = {
+                    "models": {
+                        "total": len(model_settings.models),
+                        "jamie_models": len([m for m in model_settings.models.values() if m.is_jamie_model]),
+                        "ui_models": len([m for m in model_settings.models.values() if m.show_in_ui]),
+                        "auto_preload": len([m for m in model_settings.models.values() if m.auto_preload])
+                    },
+                    "providers": {
+                        "current": model_settings.get_provider_settings().get('default_provider', 'unknown'),
+                        "fallback_enabled": model_settings.get_provider_settings().get('fallback_enabled', False),
+                        "fallback_provider": model_settings.get_provider_settings().get('fallback_provider', None)
+                    },
+                    "system": {
+                        "config_file": str(model_settings.settings_file),
+                        "last_updated": "unknown",  # Not available in stats
+                        "total_models": model_settings.get_stats().get('total_models', 0)
+                    }
+                }
+                
+                return {
+                    "success": True,
+                    "configuration": config_data
+                }
+            
+            except Exception as e:
+                logger.error(f"Error getting configuration: {e}")
+                raise HTTPException(status_code=500, detail=str(e))
+
+        @self.router.post("/configuration/update")
+        async def update_configuration(request: Request):
+            """Update configuration settings"""
+            try:
+                body = await request.json()
+                
+                # Validate required fields
+                if 'section' not in body or 'key' not in body or 'value' not in body:
+                    raise HTTPException(status_code=400, detail="Missing required fields: section, key, value")
+                
+                section = body['section']
+                key = body['key']
+                value = body['value']
+                
+                # Handle different configuration sections
+                if section == 'provider':
+                    # Update provider settings
+                    current_settings = model_settings.get_provider_settings()
+                    current_settings[key] = value
+                    model_settings.update_provider_settings(current_settings)
+                    
+                    logger.info(f"Updated provider setting: {key} = {value}")
+                    
+                elif section == 'model':
+                    # Update model-specific settings
+                    model_name = body.get('model_name')
+                    if not model_name:
+                        raise HTTPException(status_code=400, detail="model_name required for model section")
+                    
+                    model_settings.update_model_config(model_name, key, value)
+                    logger.info(f"Updated model setting: {model_name}.{key} = {value}")
+                    
+                else:
+                    raise HTTPException(status_code=400, detail=f"Unknown configuration section: {section}")
+                
+                return {
+                    "success": True,
+                    "message": f"Configuration updated: {section}.{key} = {value}",
+                    "updated_value": value
+                }
+            
+            except Exception as e:
+                logger.error(f"Error updating configuration: {e}")
+                raise HTTPException(status_code=500, detail=str(e))
+
+        @self.router.get("/configuration/export")
+        async def export_configuration():
+            """Export current configuration as JSON"""
+            try:
+                # Get full configuration data
+                config_data = {
+                    "models": {name: {
+                        "name": model.name,
+                        "display_name": model.display_name,
+                        "type": model.type,
+                        "is_jamie_model": model.is_jamie_model,
+                        "show_in_ui": model.show_in_ui,
+                        "auto_preload": model.auto_preload,
+                        "status": model.status
+                    } for name, model in model_settings.models.items()},
+                    "provider_settings": model_settings.get_provider_settings(),
+                    "stats": model_settings.get_stats(),
+                    "exported_at": format_datetime_api(now_cst())
+                }
+                
+                return {
+                    "success": True,
+                    "configuration": config_data,
+                    "exported_at": config_data["exported_at"],
+                    "note": "Full configuration exported successfully"
+                }
+            
+            except Exception as e:
+                logger.error(f"Error exporting configuration: {e}")
                 raise HTTPException(status_code=500, detail=str(e))
     
     async def _get_system_status(self) -> Dict[str, Any]:
