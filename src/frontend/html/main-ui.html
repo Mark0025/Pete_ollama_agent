@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Jamie AI Property Manager</title>
+    <link rel="icon" type="image/png" href="/favicon.ico">
+    <link rel="stylesheet" href="../css/main-ui.css">
+</head>
+<body>
+    <!-- Pete Logo Header -->
+    <div style="text-align:center;padding:15px;background:white;border-bottom:2px solid #007acc;">
+        <img src="/public/pete.png" alt="PeteOllama Logo" style="height:60px;"/>
+        <h2 style="margin:5px 0 0 0;color:#007acc;">PeteOllama</h2>
+    </div>
+    
+    <div class="header">
+        <div class="header-content">
+            <div class="jamie-section">
+                <img id="jamieAvatar" src="/public/Jamie.png" alt="Jamie" class="jamie-avatar"/>
+                <div class="jamie-info">
+                    <h1>Jamie AI</h1>
+                    <p>Property Management Assistant</p>
+                </div>
+            </div>
+            <div class="model-selector">
+                <label for="model">Model:</label>
+                <select id="model"></select>
+                <span style="margin-left:15px;margin-right:8px;font-weight:bold;color:#333;">Provider:</span>
+                <select id="providerSelect" style="padding:6px 10px;border:2px solid #007acc;border-radius:6px;font-size:14px;" onchange="switchProvider()">
+                    <option value="ollama">🏠 Ollama</option>
+                    <option value="runpod">☁️ RunPod</option>
+                    <option value="openrouter">🌐 OpenRouter</option>
+                </select>
+                <span id="providerStatus" style="margin-left:8px;font-size:12px;padding:2px 6px;border-radius:3px;background:#f8f9fa;color:#666;">Checking...</span>
+            </div>
+        </div>
+        
+        <!-- Environment Indicator -->
+        <div id="environmentIndicator" style="text-align:center;padding:8px;margin:10px auto;max-width:600px;border-radius:6px;font-weight:bold;font-size:14px;">
+            <span id="envStatus">🔄 Detecting Environment...</span>
+            <span id="envDetails" style="font-size:11px;margin-left:10px;font-weight:normal;"></span>
+        </div>
+    </div>
+    
+    <div class="chat-container">
+        <div id="log"></div>
+        <div class="input-section">
+            <input id="msg" placeholder="Ask Jamie about property management..."/>
+            <button id="send">Send</button>
+        </div>
+    </div>
+    
+    <script src="../js/main-ui.js"></script>
+</body>
+</html>
