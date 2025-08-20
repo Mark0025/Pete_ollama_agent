@@ -1,0 +1,3217 @@
+{
+  "timestamp": "2025-08-19_20-31-50",
+  "version": 1,
+  "config": {
+    "title": "\ud83c\udfaf Codebase Architecture",
+    "direction": "TB",
+    "groups": {
+      "Frontend": {
+        "label": "\ud83c\udfa8 Frontend",
+        "path_patterns": [
+          "frontend/"
+        ],
+        "color": "#4ecdc4"
+      },
+      "Backend": {
+        "label": "\ud83d\udd27 Backend",
+        "path_patterns": [
+          "backend/"
+        ],
+        "color": "#ff6b6b"
+      },
+      "CLI": {
+        "label": "\ud83d\udeaa Entry Points",
+        "path_patterns": [
+          "cli.py"
+        ],
+        "color": "#45b7d1"
+      }
+    }
+  },
+  "mermaid_diagram": "graph TB\n    subgraph \"\ud83c\udfaf Codebase Architecture\"\n        subgraph \"\ud83d\udcc1 Other (128 files)\"\n            node_0[\"whatsWorking.py<br/>\ud83d\udcc4 Utility<br/>\ud83d\udcca 271 LOC\"]\n            node_1[\"analyze_openrouter_detailed.py<br/>\ud83d\udcc4 Utility<br/>\ud83d\udcca 177 LOC\"]\n            node_2[\"analyze_openrouter_integration.py<br/>\ud83d\udcc4 Utility<br/>\ud83d\udcca 164 LOC\"]\n            node_3[\"analyze_openrouter_models.py<br/>\ud83d\udcc4 Utility<br/>\ud83d\udcca 109 LOC\"]\n            node_4[\"analyze_questions.py<br/>\ud83d\udcc4 Utility<br/>\ud83d\udcca 236 LOC\"]\n            node_5[\"index.py<br/>\ud83d\udcc4 Utility<br/>\ud83d\udcca 32 LOC\"]\n            node_6[\"api_server.py<br/>\ud83d\udcc4 Backend<br/>\ud83d\udcca 190 LOC\"]\n            node_7[\"check_runpod_account.py<br/>\ud83d\udcc4 Utility<br/>\ud83d\udcca 102 LOC\"]\n            node_8[\"check_runpod_endpoint.py<br/>\ud83d\udcc4 Utility<br/>\ud83d\udcca 105 LOC\"]\n            node_9[\"comprehensive_system_test.py<br/>\ud83e\uddea Test<br/>\ud83d\udcca 306 LOC\"]\n            more_node_10[\"... and 118 more files\"]\n        end\n        subgraph \"\ud83d\udcc1 \ud83d\udeaa Entry Points (1 files)\"\n            node_11[\"cli.py<br/>\ud83d\udeaa CLI<br/>\ud83d\udcca 246 LOC\"]\n        end\n        subgraph \"\ud83d\udcc1 \ud83c\udfa8 Frontend (1 files)\"\n            node_12[\"frontend_server.py<br/>\ud83d\udcc4 Frontend<br/>\ud83d\udcca 81 LOC\"]\n        end\n    end\n\n    %% Key relationships\n    node_0 --> node_9\n    node_0 --> node_6\n    node_1 --> node_9\n    node_2 --> node_9\n    node_4 --> node_9\n    node_4 --> node_9\n    node_5 --> node_9\n    node_11 --> node_9\n    node_11 --> node_12\n    node_9 --> node_1\n    node_12 --> node_9\n\n    %% Styling\n    style node_11 fill:#45b7d1\n    style node_12 fill:#4ecdc4",
+  "categorized_files": {
+    "Other": [
+      {
+        "file": "/Users/markcarpenter/Desktop/pete/ollama_agent/DEV_MAN/whatsWorking.py",
+        "relative_path": "DEV_MAN/whatsWorking.py",
+        "imports": "{'pathlib', 'sys', 'dotenv', 'importlib', 'api_server', 'datetime', 'runpod_handler', 'typing', 'os', 'json', 'requests'}",
+        "local_imports": "{'api_server', 'runpod_handler'}",
+        "external_imports": "{'pathlib', 'sys', 'dotenv', 'importlib', 'datetime', 'typing', 'os', 'json', 'requests'}",
+        "functions": [
+          "create_status_wireframe",
+          "main",
+          "__init__",
+          "check_environment",
+          "check_files",
+          "check_api_structure",
+          "check_dependencies",
+          "test_runpod_connectivity",
+          "run_full_status_check"
+        ],
+        "classes": [
+          "ServerlessStatus"
+        ],
+        "decorators": [],
+        "lines_of_code": 271,
+        "role": "Utility",
+        "is_init": false,
+        "has_main": true,
+        "has_tests": true,
+        "complexity_score": 72
+      },
+      {
+        "file": "/Users/markcarpenter/Desktop/pete/ollama_agent/analyze_openrouter_detailed.py",
+        "relative_path": "analyze_openrouter_detailed.py",
+        "imports": "{'sys', 'pathlib', 'config', 'traceback', 'asyncio', 'vapi', 'os', 'json'}",
+        "local_imports": "{'config'}",
+        "external_imports": "{'sys', 'pathlib', 'traceback', 'asyncio', 'vapi', 'os', 'json'}",
+        "functions": [
+          "main"
+        ],
+        "classes": [],
+        "decorators": [],
+        "lines_of_code": 177,
+        "role": "Utility",
+        "is_init": false,
+        "has_main": true,
+        "has_tests": false,
+        "complexity_score": 2
+      },
+      {
+        "file": "/Users/markcarpenter/Desktop/pete/ollama_agent/analyze_openrouter_integration.py",
+        "relative_path": "analyze_openrouter_integration.py",
+        "imports": "{'sys', 'pathlib', 'config', 'traceback', 'vapi', 'os', 'json'}",
+        "local_imports": "{'config'}",
+        "external_imports": "{'sys', 'pathlib', 'traceback', 'vapi', 'os', 'json'}",
+        "functions": [
+          "analyze_openrouter_integration"
+        ],
+        "classes": [],
+        "decorators": [],
+        "lines_of_code": 164,
+        "role": "Utility",
+        "is_init": false,
+        "has_main": false,
+        "has_tests": false,
+        "complexity_score": 4
+      },
+      {
+        "file": "/Users/markcarpenter/Desktop/pete/ollama_agent/analyze_openrouter_models.py",
+        "relative_path": "analyze_openrouter_models.py",
+        "imports": "{'os', 'typing', 'json', 'requests'}",
+        "local_imports": "set()",
+        "external_imports": "{'os', 'typing', 'json', 'requests'}",
+        "functions": [
+          "analyze_openrouter_models"
+        ],
+        "classes": [],
+        "decorators": [],
+        "lines_of_code": 109,
+        "role": "Utility",
+        "is_init": false,
+        "has_main": false,
+        "has_tests": false,
+        "complexity_score": 7
+      },
+      {
+        "file": "/Users/markcarpenter/Desktop/pete/ollama_agent/analyze_questions.py",
+        "relative_path": "analyze_questions.py",
+        "imports": "{'sys', 'pathlib', 'collections', 're', 'typing', 'json'}",
+        "local_imports": "set()",
+        "external_imports": "{'sys', 'pathlib', 'collections', 're', 'typing', 'json'}",
+        "functions": [
+          "clean_question",
+          "extract_questions",
+          "normalize_question",
+          "categorize_question",
+          "analyze_conversations",
+          "generate_test_cases",
+          "main"
+        ],
+        "classes": [],
+        "decorators": [],
+        "lines_of_code": 236,
+        "role": "Utility",
+        "is_init": false,
+        "has_main": true,
+        "has_tests": true,
+        "complexity_score": 80
+      },
+      {
+        "file": "/Users/markcarpenter/Desktop/pete/ollama_agent/api/index.py",
+        "relative_path": "api/index.py",
+        "imports": "{'sys', 'pathlib', 'fastapi', 'vapi', 'os'}",
+        "local_imports": "set()",
+        "external_imports": "{'sys', 'pathlib', 'fastapi', 'vapi', 'os'}",
+        "functions": [],
+        "classes": [],
+        "decorators": [],
+        "lines_of_code": 32,
+        "role": "Utility",
+        "is_init": false,
+        "has_main": false,
+        "has_tests": false,
+        "complexity_score": 0
+      },
+      {
+        "file": "/Users/markcarpenter/Desktop/pete/ollama_agent/api_server.py",
+        "relative_path": "api_server.py",
+        "imports": "{'os', 'uvicorn', 'fastapi', 'runpod_handler', 'typing', 'pydantic'}",
+        "local_imports": "{'runpod_handler'}",
+        "external_imports": "{'pydantic', 'uvicorn', 'fastapi', 'typing', 'os'}",
+        "functions": [
+          "main"
+        ],
+        "classes": [
+          "ChatRequest",
+          "AdminRequest"
+        ],
+        "decorators": [],
+        "lines_of_code": 190,
+        "role": "Backend",
+        "is_init": false,
+        "has_main": true,
+        "has_tests": false,
+        "complexity_score": 17
+      },
+      {
+        "file": "/Users/markcarpenter/Desktop/pete/ollama_agent/check_runpod_account.py",
+        "relative_path": "check_runpod_account.py",
+        "imports": "{'os', 'json', 'requests'}",
+        "local_imports": "set()",
+        "external_imports": "{'os', 'json', 'requests'}",
+        "functions": [
+          "check_runpod_account",
+          "main"
+        ],
+        "classes": [],
+        "decorators": [],
+        "lines_of_code": 102,
+        "role": "Utility",
+        "is_init": false,
+        "has_main": true,
+        "has_tests": false,
+        "complexity_score": 21
+      },
+      {
+        "file": "/Users/markcarpenter/Desktop/pete/ollama_agent/check_runpod_endpoint.py",
+        "relative_path": "check_runpod_endpoint.py",
+        "imports": "{'os', 'datetime', 'json', 'requests'}",
+        "local_imports": "set()",
+        "external_imports": "{'os', 'datetime', 'json', 'requests'}",
+        "functions": [
+          "check_runpod_endpoint",
+          "main"
+        ],
+        "classes": [],
+        "decorators": [],
+        "lines_of_code": 105,
+        "role": "Utility",
+        "is_init": false,
+        "has_main": true,
+        "has_tests": false,
+        "complexity_score": 17
+      },
+      {
+        "file": "/Users/markcarpenter/Desktop/pete/ollama_agent/comprehensive_system_test.py",
+        "relative_path": "comprehensive_system_test.py",
+        "imports": "{'utils', 'sys', 'pathlib', 'config', 'threading', 'concurrent', 'time', 'ai', 'os', 'json'}",
+        "local_imports": "{'utils', 'config'}",
+        "external_imports": "{'sys', 'pathlib', 'threading', 'concurrent', 'time', 'ai', 'os', 'json'}",
+        "functions": [
+          "test_configuration_loading",
+          "test_provider_switching",
+          "test_caching_behavior",
+          "test_model_configuration",
+          "test_race_conditions",
+          "test_actual_functionality",
+          "test_error_handling",
+          "test_configuration_persistence",
+          "main",
+          "update_config_thread"
+        ],
+        "classes": [],
+        "decorators": [],
+        "lines_of_code": 306,
+        "role": "Test",
+        "is_init": false,
+        "has_main": true,
+        "has_tests": true,
+        "complexity_score": 51
+      },
+      {
+        "file": "/Users/markcarpenter/Desktop/pete/ollama_agent/create_test_suite.py",
+        "relative_path": "create_test_suite.py",
+        "imports": "{'sys', 'pathlib', 'collections', 'typing', 'analytics', 'json'}",
+        "local_imports": "set()",
+        "external_imports": "{'sys', 'pathlib', 'collections', 'typing', 'analytics', 'json'}",
+        "functions": [
+          "extract_questions_from_similarity_system",
+          "categorize_questions",
+          "create_test_cases",
+          "generate_question_variations",
+          "create_performance_test_suite",
+          "main"
+        ],
+        "classes": [],
+        "decorators": [],
+        "lines_of_code": 214,
+        "role": "Test",
+        "is_init": false,
+        "has_main": true,
+        "has_tests": true,
+        "complexity_score": 71
+      },
+      {
+        "file": "/Users/markcarpenter/Desktop/pete/ollama_agent/create_working_jamie_model.py",
+        "relative_path": "create_working_jamie_model.py",
+        "imports": "{'sys', 'pathlib', 'src', 'subprocess', 'os'}",
+        "local_imports": "set()",
+        "external_imports": "{'sys', 'pathlib', 'src', 'subprocess', 'os'}",
+        "functions": [
+          "create_simple_working_modelfile",
+          "test_model_responses"
+        ],
+        "classes": [],
+        "decorators": [],
+        "lines_of_code": 125,
+        "role": "Utility",
+        "is_init": false,
+        "has_main": false,
+        "has_tests": true,
+        "complexity_score": 21
+      },
+      {
+        "file": "/Users/markcarpenter/Desktop/pete/ollama_agent/debug_webhook_server.py",
+        "relative_path": "debug_webhook_server.py",
+        "imports": "{'sys', 'pathlib', 'uvicorn', 'traceback', 'vapi', 'os'}",
+        "local_imports": "set()",
+        "external_imports": "{'sys', 'pathlib', 'uvicorn', 'traceback', 'vapi', 'os'}",
+        "functions": [
+          "debug_route_registration",
+          "main"
+        ],
+        "classes": [],
+        "decorators": [],
+        "lines_of_code": 61,
+        "role": "Utility",
+        "is_init": false,
+        "has_main": true,
+        "has_tests": false,
+        "complexity_score": 8
+      },
+      {
+        "file": "/Users/markcarpenter/Desktop/pete/ollama_agent/dev_server.py",
+        "relative_path": "dev_server.py",
+        "imports": "{'sys', 'pathlib', 'subprocess', 'watchdog', 'signal', 'threading', 'time', 'os'}",
+        "local_imports": "set()",
+        "external_imports": "{'sys', 'pathlib', 'subprocess', 'watchdog', 'signal', 'threading', 'time', 'os'}",
+        "functions": [
+          "main",
+          "__init__",
+          "on_modified",
+          "restart_server",
+          "start_server",
+          "monitor_output",
+          "stop_server"
+        ],
+        "classes": [
+          "ServerRestartHandler"
+        ],
+        "decorators": [],
+        "lines_of_code": 113,
+        "role": "Utility",
+        "is_init": false,
+        "has_main": true,
+        "has_tests": false,
+        "complexity_score": 43
+      },
+      {
+        "file": "/Users/markcarpenter/Desktop/pete/ollama_agent/diagnose_endpoint.py",
+        "relative_path": "diagnose_endpoint.py",
+        "imports": "{'sys', 'pathlib', 'os', 'asyncio', 'loguru', 'serverless_handler'}",
+        "local_imports": "{'serverless_handler'}",
+        "external_imports": "{'sys', 'pathlib', 'asyncio', 'loguru', 'os'}",
+        "functions": [
+          "main"
+        ],
+        "classes": [],
+        "decorators": [],
+        "lines_of_code": 86,
+        "role": "Utility",
+        "is_init": false,
+        "has_main": true,
+        "has_tests": false,
+        "complexity_score": 2
+      },
+      {
+        "file": "/Users/markcarpenter/Desktop/pete/ollama_agent/enhanced_model_trainer.py",
+        "relative_path": "enhanced_model_trainer.py",
+        "imports": "{'sys', 'pathlib', 'sqlite3', 'subprocess', 'datetime', 're', 'typing', 'database', 'os', 'json'}",
+        "local_imports": "set()",
+        "external_imports": "{'sys', 'pathlib', 'sqlite3', 'subprocess', 'datetime', 're', 'typing', 'database', 'os', 'json'}",
+        "functions": [
+          "main",
+          "__init__",
+          "extract_conversations",
+          "_clean_transcription",
+          "_categorize_conversation",
+          "categorize_conversations",
+          "generate_message_pairs",
+          "_create_message_pair",
+          "_extract_real_conversation_pair",
+          "_extract_user_inquiry",
+          "_generate_assistant_response",
+          "_extract_context",
+          "_extract_details",
+          "create_modelfile",
+          "_get_available_models",
+          "_get_example_title",
+          "_escape_quotes",
+          "save_and_create_model"
+        ],
+        "classes": [
+          "PropertyManagementModelfileGenerator"
+        ],
+        "decorators": [],
+        "lines_of_code": 379,
+        "role": "Utility",
+        "is_init": false,
+        "has_main": true,
+        "has_tests": false,
+        "complexity_score": 117
+      },
+      {
+        "file": "/Users/markcarpenter/Desktop/pete/ollama_agent/list_runpod_endpoints.py",
+        "relative_path": "list_runpod_endpoints.py",
+        "imports": "{'os', 'json', 'requests'}",
+        "local_imports": "set()",
+        "external_imports": "{'os', 'json', 'requests'}",
+        "functions": [
+          "list_runpod_endpoints",
+          "main"
+        ],
+        "classes": [],
+        "decorators": [],
+        "lines_of_code": 92,
+        "role": "Utility",
+        "is_init": false,
+        "has_main": true,
+        "has_tests": false,
+        "complexity_score": 17
+      },
+      {
+        "file": "/Users/markcarpenter/Desktop/pete/ollama_agent/model_router.py",
+        "relative_path": "model_router.py",
+        "imports": "{'pathlib', 'openrouter_handler', 'runpod_handler', 'typing', 'os', 'ollama', 'json', 'requests'}",
+        "local_imports": "{'openrouter_handler', 'runpod_handler'}",
+        "external_imports": "{'pathlib', 'typing', 'os', 'ollama', 'json', 'requests'}",
+        "functions": [
+          "main",
+          "__init__",
+          "_load_config",
+          "get_provider_for_model",
+          "route_chat_completion",
+          "route_vapi_webhook",
+          "_route_to_openrouter",
+          "_route_to_runpod",
+          "_route_to_ollama",
+          "_route_ollama_vapi",
+          "_get_default_model",
+          "_get_default_jamie_model",
+          "get_available_models",
+          "test_providers"
+        ],
+        "classes": [
+          "ModelRouter"
+        ],
+        "decorators": [],
+        "lines_of_code": 318,
+        "role": "Utility",
+        "is_init": false,
+        "has_main": true,
+        "has_tests": true,
+        "complexity_score": 101
+      },
+      {
+        "file": "/Users/markcarpenter/Desktop/pete/ollama_agent/openrouter_handler.py",
+        "relative_path": "openrouter_handler.py",
+        "imports": "{'dotenv', 'typing', 'os', 'json', 'requests'}",
+        "local_imports": "set()",
+        "external_imports": "{'dotenv', 'typing', 'os', 'json', 'requests'}",
+        "functions": [
+          "main",
+          "__init__",
+          "get_models",
+          "chat_completion",
+          "vapi_webhook_response",
+          "__init__",
+          "chat_completion",
+          "vapi_webhook",
+          "get_available_models"
+        ],
+        "classes": [
+          "OpenRouterClient",
+          "OpenRouterHandler"
+        ],
+        "decorators": [],
+        "lines_of_code": 265,
+        "role": "Utility",
+        "is_init": false,
+        "has_main": true,
+        "has_tests": false,
+        "complexity_score": 76
+      },
+      {
+        "file": "/Users/markcarpenter/Desktop/pete/ollama_agent/openrouter_models.py",
+        "relative_path": "openrouter_models.py",
+        "imports": "{'dotenv', 'typing', 'os', 'json', 'requests'}",
+        "local_imports": "set()",
+        "external_imports": "{'dotenv', 'typing', 'os', 'json', 'requests'}",
+        "functions": [
+          "main",
+          "__init__",
+          "get_all_models",
+          "get_free_models",
+          "get_cheap_models",
+          "search_models",
+          "get_recommended_models",
+          "test_model_availability",
+          "create_model_routing_config",
+          "get_model_details",
+          "print_model_summary"
+        ],
+        "classes": [
+          "OpenRouterModelManager"
+        ],
+        "decorators": [],
+        "lines_of_code": 271,
+        "role": "Utility",
+        "is_init": false,
+        "has_main": true,
+        "has_tests": true,
+        "complexity_score": 81
+      },
+      {
+        "file": "/Users/markcarpenter/Desktop/pete/ollama_agent/provider_control_demo.py",
+        "relative_path": "provider_control_demo.py",
+        "imports": "{'pathlib', 'os', 'json', 'requests'}",
+        "local_imports": "set()",
+        "external_imports": "{'pathlib', 'os', 'json', 'requests'}",
+        "functions": [
+          "load_current_config",
+          "show_current_status",
+          "show_switch_options",
+          "demonstrate_switching",
+          "check_environment_vars",
+          "main"
+        ],
+        "classes": [],
+        "decorators": [],
+        "lines_of_code": 135,
+        "role": "Utility",
+        "is_init": false,
+        "has_main": true,
+        "has_tests": false,
+        "complexity_score": 76
+      },
+      {
+        "file": "/Users/markcarpenter/Desktop/pete/ollama_agent/rp_handler.py",
+        "relative_path": "rp_handler.py",
+        "imports": "{'utils', 'sys', 'pathlib', 'config', 'dotenv', 'runpod', 'vapi', 'ollama_proxy_streaming', 'database', 'os', 'json'}",
+        "local_imports": "{'utils', 'config', 'ollama_proxy_streaming'}",
+        "external_imports": "{'sys', 'pathlib', 'dotenv', 'runpod', 'vapi', 'database', 'os', 'json'}",
+        "functions": [
+          "handler",
+          "handle_webhook_request",
+          "handle_chat_request",
+          "handle_admin_request",
+          "health_check",
+          "get_endpoint_url"
+        ],
+        "classes": [],
+        "decorators": [],
+        "lines_of_code": 151,
+        "role": "Utility",
+        "is_init": false,
+        "has_main": false,
+        "has_tests": false,
+        "complexity_score": 13
+      },
+      {
+        "file": "/Users/markcarpenter/Desktop/pete/ollama_agent/rp_handler_local_test.py",
+        "relative_path": "rp_handler_local_test.py",
+        "imports": "{'sys', 'pathlib', 'dotenv', 'os', 'json'}",
+        "local_imports": "set()",
+        "external_imports": "{'sys', 'pathlib', 'dotenv', 'os', 'json'}",
+        "functions": [
+          "test_endpoint",
+          "get_endpoint_url"
+        ],
+        "classes": [],
+        "decorators": [],
+        "lines_of_code": 50,
+        "role": "Test",
+        "is_init": false,
+        "has_main": false,
+        "has_tests": true,
+        "complexity_score": 23
+      },
+      {
+        "file": "/Users/markcarpenter/Desktop/pete/ollama_agent/runpod_backward_compatible_handler.py",
+        "relative_path": "runpod_backward_compatible_handler.py",
+        "imports": "{'runpod', 'typing', 'os', 'json', 'requests'}",
+        "local_imports": "set()",
+        "external_imports": "{'runpod', 'typing', 'os', 'json', 'requests'}",
+        "functions": [
+          "handler",
+          "handle_structured_format",
+          "handle_prompt_format",
+          "process_with_ollama",
+          "template",
+          "health_check"
+        ],
+        "classes": [],
+        "decorators": [],
+        "lines_of_code": 145,
+        "role": "Utility",
+        "is_init": false,
+        "has_main": false,
+        "has_tests": false,
+        "complexity_score": 18
+      },
+      {
+        "file": "/Users/markcarpenter/Desktop/pete/ollama_agent/runpod_handler.py",
+        "relative_path": "runpod_handler.py",
+        "imports": "{'dotenv', 'time', 'typing', 'os', 'json', 'requests'}",
+        "local_imports": "set()",
+        "external_imports": "{'dotenv', 'time', 'typing', 'os', 'json', 'requests'}",
+        "functions": [
+          "main",
+          "__init__",
+          "submit_job",
+          "get_job_status",
+          "submit_sync_job",
+          "wait_for_completion",
+          "__init__",
+          "chat_completion",
+          "vapi_webhook",
+          "admin_action",
+          "_extract_chat_response",
+          "_extract_vapi_response",
+          "_extract_admin_response"
+        ],
+        "classes": [
+          "RunPodServerlessClient",
+          "PeteOllamaHandler"
+        ],
+        "decorators": [],
+        "lines_of_code": 299,
+        "role": "Utility",
+        "is_init": false,
+        "has_main": true,
+        "has_tests": false,
+        "complexity_score": 107
+      },
+      {
+        "file": "/Users/markcarpenter/Desktop/pete/ollama_agent/setup_openrouter.py",
+        "relative_path": "setup_openrouter.py",
+        "imports": "{'os', 'requests', 'dotenv'}",
+        "local_imports": "set()",
+        "external_imports": "{'os', 'requests', 'dotenv'}",
+        "functions": [
+          "setup_openrouter_api_key",
+          "test_api_key",
+          "show_recommended_models",
+          "test_model_request",
+          "check_current_setup",
+          "main"
+        ],
+        "classes": [],
+        "decorators": [],
+        "lines_of_code": 195,
+        "role": "Utility",
+        "is_init": false,
+        "has_main": true,
+        "has_tests": true,
+        "complexity_score": 52
+      },
+      {
+        "file": "/Users/markcarpenter/Desktop/pete/ollama_agent/smart_model_versioner.py",
+        "relative_path": "smart_model_versioner.py",
+        "imports": "{'sys', 'pathlib', 'enhanced_model_trainer', 'sqlite3', 'subprocess', 'datetime', 'typing', 'database', 'hashlib', 'os', 'json'}",
+        "local_imports": "{'enhanced_model_trainer'}",
+        "external_imports": "{'sys', 'pathlib', 'sqlite3', 'subprocess', 'datetime', 'typing', 'database', 'hashlib', 'os', 'json'}",
+        "functions": [
+          "main",
+          "__init__",
+          "_load_version_history",
+          "_save_version_history",
+          "_calculate_training_data_hash",
+          "_check_for_improvements",
+          "_has_performance_improvements",
+          "_get_last_model_date",
+          "_increment_version",
+          "_create_model_diff",
+          "should_create_new_model",
+          "create_new_model_version",
+          "get_current_model_info",
+          "list_all_models"
+        ],
+        "classes": [
+          "SmartModelVersioner"
+        ],
+        "decorators": [],
+        "lines_of_code": 278,
+        "role": "Utility",
+        "is_init": false,
+        "has_main": true,
+        "has_tests": false,
+        "complexity_score": 66
+      },
+      {
+        "file": "/Users/markcarpenter/Desktop/pete/ollama_agent/src/__init__.py",
+        "relative_path": "src/__init__.py",
+        "imports": "set()",
+        "local_imports": "set()",
+        "external_imports": "set()",
+        "functions": [],
+        "classes": [],
+        "decorators": [],
+        "lines_of_code": 0,
+        "role": "Utility",
+        "is_init": true,
+        "has_main": false,
+        "has_tests": false,
+        "complexity_score": 0
+      },
+      {
+        "file": "/Users/markcarpenter/Desktop/pete/ollama_agent/src/ai/__init__.py",
+        "relative_path": "src/ai/__init__.py",
+        "imports": "set()",
+        "local_imports": "set()",
+        "external_imports": "set()",
+        "functions": [],
+        "classes": [],
+        "decorators": [],
+        "lines_of_code": 0,
+        "role": "Utility",
+        "is_init": true,
+        "has_main": false,
+        "has_tests": false,
+        "complexity_score": 0
+      },
+      {
+        "file": "/Users/markcarpenter/Desktop/pete/ollama_agent/src/ai/model_manager.py",
+        "relative_path": "src/ai/model_manager.py",
+        "imports": "{'utils', 'pathlib', 'sys', 'config', 'ai', 'openrouter_handler', 'response_cache', 're', 'runpod_handler', 'typing', 'time', 'database', 'os', 'analytics', 'json', 'requests'}",
+        "local_imports": "{'utils', 'config', 'openrouter_handler', 'response_cache', 'runpod_handler'}",
+        "external_imports": "{'pathlib', 'sys', 'ai', 're', 'typing', 'time', 'database', 'os', 'analytics', 'json', 'requests'}",
+        "functions": [
+          "__init__",
+          "_get_similarity_analyzer",
+          "_get_openrouter_handler",
+          "_get_current_provider",
+          "_route_to_provider",
+          "_map_to_openrouter_model",
+          "_ollama_completion",
+          "_load_default_model",
+          "is_available",
+          "list_models",
+          "train_property_manager",
+          "is_model_available",
+          "pull_model",
+          "generate_response",
+          "generate_stream",
+          "_prepare_prompt",
+          "create_custom_model",
+          "_create_modelfile",
+          "get_model_info",
+          "test_model_response"
+        ],
+        "classes": [
+          "ModelManager"
+        ],
+        "decorators": [],
+        "lines_of_code": 477,
+        "role": "Utility",
+        "is_init": false,
+        "has_main": false,
+        "has_tests": true,
+        "complexity_score": 94
+      },
+      {
+        "file": "/Users/markcarpenter/Desktop/pete/ollama_agent/src/ai/model_preloader.py",
+        "relative_path": "src/ai/model_preloader.py",
+        "imports": "{'subprocess', 'threading', 'concurrent', 'time', 'typing', 'loguru', 'asyncio'}",
+        "local_imports": "set()",
+        "external_imports": "{'subprocess', 'threading', 'concurrent', 'time', 'typing', 'loguru', 'asyncio'}",
+        "functions": [
+          "__init__",
+          "is_model_loaded",
+          "preload_model",
+          "unload_model",
+          "preload_jamie_models",
+          "get_model_info",
+          "_get_base_model",
+          "get_all_models_status",
+          "keep_warm",
+          "shutdown",
+          "__del__",
+          "warm_model"
+        ],
+        "classes": [
+          "OllamaModelPreloader"
+        ],
+        "decorators": [],
+        "lines_of_code": 186,
+        "role": "Backend",
+        "is_init": false,
+        "has_main": false,
+        "has_tests": false,
+        "complexity_score": 53
+      },
+      {
+        "file": "/Users/markcarpenter/Desktop/pete/ollama_agent/src/ai/response_cache.py",
+        "relative_path": "src/ai/response_cache.py",
+        "imports": "{'pathlib', 're', 'time', 'typing', 'loguru', 'os', 'json'}",
+        "local_imports": "set()",
+        "external_imports": "{'pathlib', 're', 'time', 'typing', 'loguru', 'os', 'json'}",
+        "functions": [
+          "get_instant_response",
+          "__init__",
+          "load_cache",
+          "_extract_patterns",
+          "_classify_response_topic",
+          "_find_matching_context",
+          "_generate_cache_key",
+          "_is_quality_response",
+          "_calculate_confidence",
+          "_extract_keywords",
+          "_create_pattern",
+          "find_cached_response",
+          "add_response_to_cache",
+          "_create_fallback_cache",
+          "get_cache_stats"
+        ],
+        "classes": [
+          "ResponseCache"
+        ],
+        "decorators": [],
+        "lines_of_code": 332,
+        "role": "Utility",
+        "is_init": false,
+        "has_main": false,
+        "has_tests": false,
+        "complexity_score": 98
+      },
+      {
+        "file": "/Users/markcarpenter/Desktop/pete/ollama_agent/src/analytics/__init__.py",
+        "relative_path": "src/analytics/__init__.py",
+        "imports": "set()",
+        "local_imports": "set()",
+        "external_imports": "set()",
+        "functions": [],
+        "classes": [],
+        "decorators": [],
+        "lines_of_code": 0,
+        "role": "Utility",
+        "is_init": true,
+        "has_main": false,
+        "has_tests": false,
+        "complexity_score": 0
+      },
+      {
+        "file": "/Users/markcarpenter/Desktop/pete/ollama_agent/src/analytics/benchmark_analyzer.py",
+        "relative_path": "src/analytics/benchmark_analyzer.py",
+        "imports": "{'pathlib', 'benchmark_models', 'pandas', 'pendulum', 'typing', 'loguru', 'json'}",
+        "local_imports": "{'benchmark_models'}",
+        "external_imports": "{'pathlib', 'pandas', 'pendulum', 'typing', 'loguru', 'json'}",
+        "functions": [
+          "__init__",
+          "load_benchmark_data",
+          "load_all_benchmark_data",
+          "load_benchmark_data_for_range",
+          "_flatten_dataframe",
+          "generate_summary",
+          "compare_models",
+          "_generate_recommendation",
+          "get_time_series_data",
+          "export_analysis_report",
+          "_calculate_percentiles",
+          "_calculate_distribution",
+          "_calculate_hourly_volume"
+        ],
+        "classes": [
+          "BenchmarkAnalyzer"
+        ],
+        "decorators": [],
+        "lines_of_code": 298,
+        "role": "Backend",
+        "is_init": false,
+        "has_main": false,
+        "has_tests": false,
+        "complexity_score": 110
+      },
+      {
+        "file": "/Users/markcarpenter/Desktop/pete/ollama_agent/src/analytics/benchmark_models.py",
+        "relative_path": "src/analytics/benchmark_models.py",
+        "imports": "{'pendulum', 'pydantic', 'datetime', 'typing'}",
+        "local_imports": "set()",
+        "external_imports": "{'pendulum', 'pydantic', 'datetime', 'typing'}",
+        "functions": [
+          "pendulum_timestamp",
+          "response_rate_chars_per_second",
+          "is_fast_response",
+          "is_quality_response",
+          "fast_response_rate",
+          "quality_response_rate",
+          "performance_grade"
+        ],
+        "classes": [
+          "PerformanceMetrics",
+          "QualityMetrics",
+          "BenchmarkRecord",
+          "BenchmarkSummary",
+          "ModelComparison"
+        ],
+        "decorators": [
+          "property",
+          "property",
+          "property",
+          "property",
+          "property",
+          "property",
+          "property"
+        ],
+        "lines_of_code": 106,
+        "role": "Backend",
+        "is_init": false,
+        "has_main": false,
+        "has_tests": false,
+        "complexity_score": 75
+      },
+      {
+        "file": "/Users/markcarpenter/Desktop/pete/ollama_agent/src/analytics/conversation_similarity.py",
+        "relative_path": "src/analytics/conversation_similarity.py",
+        "imports": "{'langchain_huggingface', 'sys', 'dataclasses', 'pathlib', 'os', 'sqlite3', 'json', 'multiprocessing', 're', 'typing', 'loguru', 'langchain_text_splitters', 'langchain_core', 'torch', 'langchain_community'}",
+        "local_imports": "set()",
+        "external_imports": "{'langchain_huggingface', 'sys', 'dataclasses', 'pathlib', 'os', 'sqlite3', 'json', 'multiprocessing', 're', 'typing', 'loguru', 'langchain_text_splitters', 'langchain_core', 'torch', 'langchain_community'}",
+        "functions": [
+          "__init__",
+          "_load_indexed_conversations",
+          "_create_fallback_samples",
+          "_initialize_embeddings",
+          "calculate_similarity",
+          "_calculate_semantic_similarity",
+          "_calculate_keyword_similarity",
+          "categorize_conversation",
+          "find_similar_issue_responses",
+          "get_success_rate",
+          "analyze_conversation_batch"
+        ],
+        "classes": [
+          "ConversationSample",
+          "SimilarityResult",
+          "ConversationSimilarityAnalyzer"
+        ],
+        "decorators": [],
+        "lines_of_code": 393,
+        "role": "Utility",
+        "is_init": false,
+        "has_main": false,
+        "has_tests": false,
+        "complexity_score": 87
+      },
+      {
+        "file": "/Users/markcarpenter/Desktop/pete/ollama_agent/src/analytics/response_parser.py",
+        "relative_path": "src/analytics/response_parser.py",
+        "imports": "{'re', 'dataclasses', 'typing', 'loguru'}",
+        "local_imports": "set()",
+        "external_imports": "{'re', 'dataclasses', 'typing', 'loguru'}",
+        "functions": [
+          "__init__",
+          "parse_response",
+          "_clean_agent_response",
+          "_extract_thinking_process",
+          "_calculate_confidence",
+          "analyze_response_quality",
+          "_check_relevance",
+          "_check_professional_tone",
+          "_check_action_oriented"
+        ],
+        "classes": [
+          "ParsedResponse",
+          "ResponseParser"
+        ],
+        "decorators": [],
+        "lines_of_code": 133,
+        "role": "Utility",
+        "is_init": false,
+        "has_main": false,
+        "has_tests": false,
+        "complexity_score": 54
+      },
+      {
+        "file": "/Users/markcarpenter/Desktop/pete/ollama_agent/src/analytics/response_validator.py",
+        "relative_path": "src/analytics/response_validator.py",
+        "imports": "{'pathlib', 'collections', 'conversation_similarity', 'datetime', 'typing', 'loguru', 'pydantic', 'json'}",
+        "local_imports": "{'conversation_similarity'}",
+        "external_imports": "{'pathlib', 'collections', 'datetime', 'typing', 'loguru', 'pydantic', 'json'}",
+        "functions": [
+          "validate_length",
+          "no_conversation_simulation",
+          "no_system_bleed",
+          "__init__",
+          "analyze_response_pattern",
+          "validate_response",
+          "_calculate_jamie_score",
+          "_generate_improvement_suggestions",
+          "_validation_errors_to_suggestions",
+          "_generate_corrected_response",
+          "_log_validation_result",
+          "get_validation_stats"
+        ],
+        "classes": [
+          "JamieResponsePattern",
+          "ResponseValidationResult",
+          "ResponseValidator"
+        ],
+        "decorators": [],
+        "lines_of_code": 283,
+        "role": "Utility",
+        "is_init": false,
+        "has_main": false,
+        "has_tests": false,
+        "complexity_score": 97
+      },
+      {
+        "file": "/Users/markcarpenter/Desktop/pete/ollama_agent/src/analyze_ollama_agent.py",
+        "relative_path": "src/analyze_ollama_agent.py",
+        "imports": "{'sys', 'pathlib', 'config', 'ai', 'whatsWorking', 'os', 'requests'}",
+        "local_imports": "{'config', 'whatsWorking'}",
+        "external_imports": "{'sys', 'pathlib', 'ai', 'os', 'requests'}",
+        "functions": [
+          "__init__",
+          "check_system_config",
+          "check_provider_routing",
+          "check_caching_behavior",
+          "run_full_analysis"
+        ],
+        "classes": [
+          "OllamaAgentAnalyzer"
+        ],
+        "decorators": [],
+        "lines_of_code": 222,
+        "role": "Utility",
+        "is_init": false,
+        "has_main": false,
+        "has_tests": false,
+        "complexity_score": 40
+      },
+      {
+        "file": "/Users/markcarpenter/Desktop/pete/ollama_agent/src/comprehensive_system_test_suite.py",
+        "relative_path": "src/comprehensive_system_test_suite.py",
+        "imports": "{'utils', 'sys', 'dataclasses', 'pathlib', 'config', 'openrouter_handler', 'datetime', 'traceback', 'asyncio', 'vapi', 'runpod_handler', 'time', 'typing', 'ai', 'os', 'json', 'requests'}",
+        "local_imports": "{'utils', 'openrouter_handler', 'runpod_handler', 'config'}",
+        "external_imports": "{'sys', 'dataclasses', 'pathlib', 'datetime', 'traceback', 'asyncio', 'vapi', 'time', 'typing', 'ai', 'os', 'json', 'requests'}",
+        "functions": [
+          "main",
+          "__post_init__",
+          "success_rate",
+          "__init__",
+          "log_test_result",
+          "run_test",
+          "test_system_config_loading",
+          "test_model_settings_loading",
+          "test_environment_variables",
+          "test_configuration_conflicts",
+          "test_model_manager_initialization",
+          "test_model_manager_configuration_source",
+          "test_api_endpoints",
+          "test_chat_completions_endpoint",
+          "test_openrouter_handler",
+          "test_runpod_handler",
+          "test_pydantic_validation",
+          "test_beartype_validation",
+          "test_end_to_end_configuration_flow",
+          "run_all_tests",
+          "save_results",
+          "test_function"
+        ],
+        "classes": [
+          "TestResult",
+          "TestSuiteResult",
+          "ComprehensiveSystemTestSuite"
+        ],
+        "decorators": [
+          "property",
+          "beartype"
+        ],
+        "lines_of_code": 659,
+        "role": "Test",
+        "is_init": false,
+        "has_main": true,
+        "has_tests": true,
+        "complexity_score": 128
+      },
+      {
+        "file": "/Users/markcarpenter/Desktop/pete/ollama_agent/src/config/__init__.py",
+        "relative_path": "src/config/__init__.py",
+        "imports": "set()",
+        "local_imports": "set()",
+        "external_imports": "set()",
+        "functions": [],
+        "classes": [],
+        "decorators": [],
+        "lines_of_code": 1,
+        "role": "Utility",
+        "is_init": true,
+        "has_main": false,
+        "has_tests": false,
+        "complexity_score": 0
+      },
+      {
+        "file": "/Users/markcarpenter/Desktop/pete/ollama_agent/src/config/model_settings.py",
+        "relative_path": "src/config/model_settings.py",
+        "imports": "{'utils', 'pathlib', 'dataclasses', 'sys', 'datetime', 'typing', 'loguru', 'os', 'json'}",
+        "local_imports": "{'utils'}",
+        "external_imports": "{'pathlib', 'dataclasses', 'sys', 'datetime', 'typing', 'loguru', 'os', 'json'}",
+        "functions": [
+          "__post_init__",
+          "__init__",
+          "load_settings",
+          "save_settings",
+          "_init_default_models",
+          "get_model_config",
+          "update_model_config",
+          "get_ui_models",
+          "get_jamie_models",
+          "get_auto_preload_models",
+          "toggle_ui_visibility",
+          "toggle_auto_preload",
+          "get_all_models",
+          "get_stats",
+          "sync_with_discovered_models",
+          "refresh_from_ollama",
+          "get_provider_settings",
+          "update_provider_settings",
+          "list_models"
+        ],
+        "classes": [
+          "ModelConfig",
+          "ModelSettingsManager"
+        ],
+        "decorators": [
+          "error_boundary"
+        ],
+        "lines_of_code": 320,
+        "role": "Utility",
+        "is_init": false,
+        "has_main": false,
+        "has_tests": false,
+        "complexity_score": 90
+      },
+      {
+        "file": "/Users/markcarpenter/Desktop/pete/ollama_agent/src/config/system_config.py",
+        "relative_path": "src/config/system_config.py",
+        "imports": "{'utils', 'pathlib', 'dataclasses', 'typing', 'os', 'json'}",
+        "local_imports": "{'utils'}",
+        "external_imports": "{'pathlib', 'dataclasses', 'typing', 'os', 'json'}",
+        "functions": [
+          "__post_init__",
+          "__post_init__",
+          "__post_init__",
+          "__init__",
+          "_load_default_config",
+          "_setup_default_providers",
+          "_setup_default_models",
+          "_load_config",
+          "_merge_config",
+          "save_config",
+          "get_global_settings",
+          "get_caching_config",
+          "get_provider_config",
+          "get_model_config",
+          "update_provider_config",
+          "update_model_config",
+          "get_config_summary",
+          "safe_asdict"
+        ],
+        "classes": [
+          "CachingConfig",
+          "ProviderConfig",
+          "ModelConfig",
+          "SystemConfig",
+          "SystemConfigManager"
+        ],
+        "decorators": [
+          "beartype",
+          "beartype",
+          "beartype"
+        ],
+        "lines_of_code": 371,
+        "role": "Utility",
+        "is_init": false,
+        "has_main": false,
+        "has_tests": false,
+        "complexity_score": 113
+      },
+      {
+        "file": "/Users/markcarpenter/Desktop/pete/ollama_agent/src/database/__init__.py",
+        "relative_path": "src/database/__init__.py",
+        "imports": "set()",
+        "local_imports": "set()",
+        "external_imports": "set()",
+        "functions": [],
+        "classes": [],
+        "decorators": [],
+        "lines_of_code": 0,
+        "role": "Utility",
+        "is_init": true,
+        "has_main": false,
+        "has_tests": false,
+        "complexity_score": 0
+      },
+      {
+        "file": "/Users/markcarpenter/Desktop/pete/ollama_agent/src/database/pete_db_manager.py",
+        "relative_path": "src/database/pete_db_manager.py",
+        "imports": "{'pathlib', 'os', 'typing', 'sqlite3'}",
+        "local_imports": "set()",
+        "external_imports": "{'pathlib', 'os', 'typing', 'sqlite3'}",
+        "functions": [
+          "__init__",
+          "_find_pete_db",
+          "get_connection",
+          "is_connected",
+          "get_training_stats",
+          "get_sample_conversations",
+          "get_conversation_by_id",
+          "search_conversations",
+          "get_training_examples",
+          "close"
+        ],
+        "classes": [
+          "PeteDBManager"
+        ],
+        "decorators": [],
+        "lines_of_code": 189,
+        "role": "Utility",
+        "is_init": false,
+        "has_main": false,
+        "has_tests": false,
+        "complexity_score": 35
+      },
+      {
+        "file": "/Users/markcarpenter/Desktop/pete/ollama_agent/src/extract_jamie_data.py",
+        "relative_path": "src/extract_jamie_data.py",
+        "imports": "{'sys', 'os', 'virtual_jamie_extractor'}",
+        "local_imports": "{'virtual_jamie_extractor'}",
+        "external_imports": "{'sys', 'os'}",
+        "functions": [
+          "main"
+        ],
+        "classes": [],
+        "decorators": [],
+        "lines_of_code": 55,
+        "role": "Utility",
+        "is_init": false,
+        "has_main": true,
+        "has_tests": false,
+        "complexity_score": 8
+      },
+      {
+        "file": "/Users/markcarpenter/Desktop/pete/ollama_agent/src/full_whats_working_analysis.py",
+        "relative_path": "src/full_whats_working_analysis.py",
+        "imports": "{'sys', 'asyncio', 'whatsworking_platform', 'pathlib'}",
+        "local_imports": "set()",
+        "external_imports": "{'sys', 'asyncio', 'whatsworking_platform', 'pathlib'}",
+        "functions": [
+          "__init__"
+        ],
+        "classes": [
+          "OllamaAgentWhatsWorkingAnalyzer"
+        ],
+        "decorators": [],
+        "lines_of_code": 135,
+        "role": "Utility",
+        "is_init": false,
+        "has_main": false,
+        "has_tests": false,
+        "complexity_score": 10
+      },
+      {
+        "file": "/Users/markcarpenter/Desktop/pete/ollama_agent/src/generate_visual_documentation.py",
+        "relative_path": "src/generate_visual_documentation.py",
+        "imports": "{'sys', 'pathlib', 'config', 'full_whats_working_analysis', 'datetime', 'whatsworking_platform', 'ai', 'asyncio', 'json'}",
+        "local_imports": "{'config', 'full_whats_working_analysis'}",
+        "external_imports": "{'sys', 'pathlib', 'datetime', 'whatsworking_platform', 'ai', 'asyncio', 'json'}",
+        "functions": [
+          "__init__",
+          "generate_mermaid_architecture",
+          "generate_system_health_report",
+          "generate_codebase_analysis",
+          "generate_whats_working_report",
+          "create_documentation_index"
+        ],
+        "classes": [
+          "VisualDocumentationGenerator"
+        ],
+        "decorators": [],
+        "lines_of_code": 412,
+        "role": "Utility",
+        "is_init": false,
+        "has_main": false,
+        "has_tests": false,
+        "complexity_score": 39
+      },
+      {
+        "file": "/Users/markcarpenter/Desktop/pete/ollama_agent/src/langchain/__init__.py",
+        "relative_path": "src/langchain/__init__.py",
+        "imports": "set()",
+        "local_imports": "set()",
+        "external_imports": "set()",
+        "functions": [],
+        "classes": [],
+        "decorators": [],
+        "lines_of_code": 10,
+        "role": "Utility",
+        "is_init": true,
+        "has_main": false,
+        "has_tests": false,
+        "complexity_score": 0
+      },
+      {
+        "file": "/Users/markcarpenter/Desktop/pete/ollama_agent/src/langchain/basic_research_agent.py",
+        "relative_path": "src/langchain/basic_research_agent.py",
+        "imports": "{'pathlib', 'duckduckgo_search', 'logging', 'typing', 'os', 'json', 'requests'}",
+        "local_imports": "set()",
+        "external_imports": "{'pathlib', 'duckduckgo_search', 'logging', 'typing', 'os', 'json', 'requests'}",
+        "functions": [
+          "__init__",
+          "query_ollama",
+          "search_web",
+          "research_ollama_best_practices",
+          "analyze_existing_project_files",
+          "generate_optimized_modelfile",
+          "save_research_report"
+        ],
+        "classes": [
+          "BasicResearchAgent"
+        ],
+        "decorators": [],
+        "lines_of_code": 217,
+        "role": "Utility",
+        "is_init": false,
+        "has_main": false,
+        "has_tests": false,
+        "complexity_score": 41
+      },
+      {
+        "file": "/Users/markcarpenter/Desktop/pete/ollama_agent/src/langchain/conversation_indexer.py",
+        "relative_path": "src/langchain/conversation_indexer.py",
+        "imports": "{'utils', 'pathlib', 'sys', 'pandas', 'sqlite3', 'datetime', 're', 'typing', 'database', 'os', 'json'}",
+        "local_imports": "{'utils'}",
+        "external_imports": "{'pathlib', 'sys', 'pandas', 'sqlite3', 'datetime', 're', 'typing', 'database', 'os', 'json'}",
+        "functions": [
+          "__init__",
+          "load_conversations",
+          "_is_quality_phone_call",
+          "identify_speakers",
+          "extract_client_info",
+          "build_conversation_threads",
+          "analyze_conversation_patterns",
+          "create_full_conversation_examples",
+          "_parse_full_conversation_flow",
+          "_split_by_speakers",
+          "_extract_complete_conversation_exchange",
+          "_select_best_exchange_from_conversation",
+          "create_training_examples",
+          "export_indexed_data",
+          "run_full_indexing"
+        ],
+        "classes": [
+          "ConversationIndexer"
+        ],
+        "decorators": [],
+        "lines_of_code": 466,
+        "role": "Utility",
+        "is_init": false,
+        "has_main": false,
+        "has_tests": false,
+        "complexity_score": 130
+      },
+      {
+        "file": "/Users/markcarpenter/Desktop/pete/ollama_agent/src/langchain/jamie_trainer.py",
+        "relative_path": "src/langchain/jamie_trainer.py",
+        "imports": "{'utils', 'sys', 'pathlib', 'conversation_indexer', 'datetime', 'smart_modelfile_generator', 'os'}",
+        "local_imports": "{'utils', 'conversation_indexer', 'smart_modelfile_generator'}",
+        "external_imports": "{'sys', 'os', 'datetime', 'pathlib'}",
+        "functions": [
+          "main",
+          "__init__",
+          "run_complete_training",
+          "_log_analysis_summary",
+          "test_model",
+          "get_training_summary"
+        ],
+        "classes": [
+          "JamieTrainer"
+        ],
+        "decorators": [],
+        "lines_of_code": 133,
+        "role": "Utility",
+        "is_init": false,
+        "has_main": true,
+        "has_tests": true,
+        "complexity_score": 53
+      },
+      {
+        "file": "/Users/markcarpenter/Desktop/pete/ollama_agent/src/langchain/ollama_research_agent.py",
+        "relative_path": "src/langchain/ollama_research_agent.py",
+        "imports": "{'langchain', 'pathlib', 'langchain_ollama', 'json', 'logging', 'typing', 'os', 'langchain_community'}",
+        "local_imports": "set()",
+        "external_imports": "{'langchain', 'pathlib', 'langchain_ollama', 'json', 'logging', 'typing', 'os', 'langchain_community'}",
+        "functions": [
+          "main",
+          "__init__",
+          "research_ollama_best_practices",
+          "analyze_existing_project_files",
+          "synthesize_modelfile_guidelines",
+          "generate_optimized_modelfile",
+          "save_research_report"
+        ],
+        "classes": [
+          "OllamaResearchAgent"
+        ],
+        "decorators": [],
+        "lines_of_code": 263,
+        "role": "Utility",
+        "is_init": false,
+        "has_main": true,
+        "has_tests": false,
+        "complexity_score": 50
+      },
+      {
+        "file": "/Users/markcarpenter/Desktop/pete/ollama_agent/src/langchain/simplified_research_agent.py",
+        "relative_path": "src/langchain/simplified_research_agent.py",
+        "imports": "{'pathlib', 'langchain_ollama', 'json', 'logging', 'typing', 'os', 'langchain_community'}",
+        "local_imports": "set()",
+        "external_imports": "{'pathlib', 'langchain_ollama', 'json', 'logging', 'typing', 'os', 'langchain_community'}",
+        "functions": [
+          "__init__",
+          "research_ollama_best_practices",
+          "analyze_existing_project_files",
+          "generate_optimized_modelfile",
+          "save_research_report"
+        ],
+        "classes": [
+          "SimplifiedResearchAgent"
+        ],
+        "decorators": [],
+        "lines_of_code": 185,
+        "role": "Utility",
+        "is_init": false,
+        "has_main": false,
+        "has_tests": false,
+        "complexity_score": 37
+      },
+      {
+        "file": "/Users/markcarpenter/Desktop/pete/ollama_agent/src/langchain/smart_modelfile_generator.py",
+        "relative_path": "src/langchain/smart_modelfile_generator.py",
+        "imports": "{'utils', 'sys', 'pathlib', 'conversation_indexer', 'datetime', 'typing', 'os', 'json', 'requests'}",
+        "local_imports": "{'utils', 'conversation_indexer'}",
+        "external_imports": "{'sys', 'pathlib', 'datetime', 'typing', 'os', 'json', 'requests'}",
+        "functions": [
+          "main",
+          "__init__",
+          "load_indexed_data",
+          "generate_from_live_data",
+          "select_best_examples",
+          "create_system_prompt",
+          "format_message_pairs",
+          "_clean_for_modelfile",
+          "generate_smart_modelfile",
+          "save_and_create_model"
+        ],
+        "classes": [
+          "SmartModelfileGenerator"
+        ],
+        "decorators": [],
+        "lines_of_code": 282,
+        "role": "Utility",
+        "is_init": false,
+        "has_main": true,
+        "has_tests": false,
+        "complexity_score": 73
+      },
+      {
+        "file": "/Users/markcarpenter/Desktop/pete/ollama_agent/src/main.py",
+        "relative_path": "src/main.py",
+        "imports": "{'utils', 'sys', 'pathlib', 'os', 'uvicorn', 'subprocess', 'dotenv', 'signal', 'atexit', 'startup_warmup', 'threading', 'vapi', 'ai', 'asyncio'}",
+        "local_imports": "{'utils', 'startup_warmup'}",
+        "external_imports": "{'sys', 'pathlib', 'os', 'uvicorn', 'dotenv', 'subprocess', 'signal', 'atexit', 'threading', 'vapi', 'ai', 'asyncio'}",
+        "functions": [
+          "cleanup_resources",
+          "signal_handler",
+          "main",
+          "background_warmup"
+        ],
+        "classes": [],
+        "decorators": [],
+        "lines_of_code": 88,
+        "role": "CLI",
+        "is_init": false,
+        "has_main": true,
+        "has_tests": false,
+        "complexity_score": 20
+      },
+      {
+        "file": "/Users/markcarpenter/Desktop/pete/ollama_agent/src/main_app.py",
+        "relative_path": "src/main_app.py",
+        "imports": "{'vapi', 'uvicorn'}",
+        "local_imports": "set()",
+        "external_imports": "{'vapi', 'uvicorn'}",
+        "functions": [],
+        "classes": [],
+        "decorators": [],
+        "lines_of_code": 10,
+        "role": "Backend",
+        "is_init": false,
+        "has_main": false,
+        "has_tests": false,
+        "complexity_score": 0
+      },
+      {
+        "file": "/Users/markcarpenter/Desktop/pete/ollama_agent/src/ollama_proxy.py",
+        "relative_path": "src/ollama_proxy.py",
+        "imports": "{'pydantic', 'uvicorn', 'datetime', 'fastapi', 'httpx', 'typing', 'loguru', 'os', 'json'}",
+        "local_imports": "set()",
+        "external_imports": "{'pydantic', 'uvicorn', 'datetime', 'fastapi', 'httpx', 'typing', 'loguru', 'os', 'json'}",
+        "functions": [
+          "verify_api_key"
+        ],
+        "classes": [
+          "ChatMessage",
+          "ChatCompletionRequest",
+          "ChatCompletionResponse"
+        ],
+        "decorators": [],
+        "lines_of_code": 151,
+        "role": "Backend",
+        "is_init": false,
+        "has_main": false,
+        "has_tests": false,
+        "complexity_score": 18
+      },
+      {
+        "file": "/Users/markcarpenter/Desktop/pete/ollama_agent/src/ollama_proxy_streaming.py",
+        "relative_path": "src/ollama_proxy_streaming.py",
+        "imports": "{'pydantic', 'sys', 'pathlib', 'config', 'uvicorn', 'datetime', 'fastapi', 'asyncio', 'vapi', 'httpx', 'typing', 'loguru', 'os', 'uuid', 'json'}",
+        "local_imports": "{'config'}",
+        "external_imports": "{'pydantic', 'sys', 'pathlib', 'uvicorn', 'datetime', 'fastapi', 'asyncio', 'vapi', 'httpx', 'typing', 'loguru', 'os', 'uuid', 'json'}",
+        "functions": [
+          "process_response_for_vapi"
+        ],
+        "classes": [
+          "ChatMessage",
+          "ChatCompletionRequest",
+          "ChatCompletionResponse"
+        ],
+        "decorators": [],
+        "lines_of_code": 282,
+        "role": "Utility",
+        "is_init": false,
+        "has_main": false,
+        "has_tests": false,
+        "complexity_score": 23
+      },
+      {
+        "file": "/Users/markcarpenter/Desktop/pete/ollama_agent/src/openrouter_handler.py",
+        "relative_path": "src/openrouter_handler.py",
+        "imports": "{'utils', 'dotenv', 'typing', 'os', 'json', 'requests'}",
+        "local_imports": "{'utils'}",
+        "external_imports": "{'dotenv', 'typing', 'os', 'json', 'requests'}",
+        "functions": [
+          "main",
+          "__init__",
+          "get_models",
+          "chat_completion",
+          "vapi_webhook_response",
+          "__init__",
+          "chat_completion",
+          "vapi_webhook",
+          "get_available_models"
+        ],
+        "classes": [
+          "OpenRouterClient",
+          "OpenRouterHandler"
+        ],
+        "decorators": [],
+        "lines_of_code": 282,
+        "role": "Utility",
+        "is_init": false,
+        "has_main": true,
+        "has_tests": false,
+        "complexity_score": 79
+      },
+      {
+        "file": "/Users/markcarpenter/Desktop/pete/ollama_agent/src/serverless_handler.py",
+        "relative_path": "src/serverless_handler.py",
+        "imports": "{'ssl', 'os', 'dotenv', 'aiohttp', 'typing', 'loguru', 'socket', 'asyncio', 'json'}",
+        "local_imports": "set()",
+        "external_imports": "{'ssl', 'os', 'dotenv', 'aiohttp', 'typing', 'loguru', 'socket', 'asyncio', 'json'}",
+        "functions": [
+          "__init__"
+        ],
+        "classes": [
+          "ServerlessHandler"
+        ],
+        "decorators": [],
+        "lines_of_code": 355,
+        "role": "Utility",
+        "is_init": false,
+        "has_main": false,
+        "has_tests": false,
+        "complexity_score": 22
+      },
+      {
+        "file": "/Users/markcarpenter/Desktop/pete/ollama_agent/src/startup_warmup.py",
+        "relative_path": "src/startup_warmup.py",
+        "imports": "{'os', 'serverless_handler', 'asyncio', 'loguru'}",
+        "local_imports": "{'serverless_handler'}",
+        "external_imports": "{'os', 'asyncio', 'loguru'}",
+        "functions": [
+          "run_warmup"
+        ],
+        "classes": [],
+        "decorators": [],
+        "lines_of_code": 63,
+        "role": "Utility",
+        "is_init": false,
+        "has_main": false,
+        "has_tests": false,
+        "complexity_score": 2
+      },
+      {
+        "file": "/Users/markcarpenter/Desktop/pete/ollama_agent/src/test_ui_route.py",
+        "relative_path": "src/test_ui_route.py",
+        "imports": "{'fastapi', 'uvicorn'}",
+        "local_imports": "set()",
+        "external_imports": "{'fastapi', 'uvicorn'}",
+        "functions": [],
+        "classes": [],
+        "decorators": [],
+        "lines_of_code": 30,
+        "role": "Test",
+        "is_init": false,
+        "has_main": false,
+        "has_tests": false,
+        "complexity_score": 0
+      },
+      {
+        "file": "/Users/markcarpenter/Desktop/pete/ollama_agent/src/utils/__init__.py",
+        "relative_path": "src/utils/__init__.py",
+        "imports": "set()",
+        "local_imports": "set()",
+        "external_imports": "set()",
+        "functions": [],
+        "classes": [],
+        "decorators": [],
+        "lines_of_code": 0,
+        "role": "Utility",
+        "is_init": true,
+        "has_main": false,
+        "has_tests": false,
+        "complexity_score": 0
+      },
+      {
+        "file": "/Users/markcarpenter/Desktop/pete/ollama_agent/src/utils/app_utilities.py",
+        "relative_path": "src/utils/app_utilities.py",
+        "imports": "{'utils', 'sys', 'pathlib', 'functools', 'datetime', 'traceback', 'time', 'typing', 'os', 'json'}",
+        "local_imports": "{'utils'}",
+        "external_imports": "{'sys', 'pathlib', 'functools', 'datetime', 'traceback', 'time', 'typing', 'os', 'json'}",
+        "functions": [
+          "safe_type_check",
+          "safe_dict_access",
+          "validate_required_fields",
+          "validate_field_types",
+          "load_config_file",
+          "save_config_file",
+          "safe_execute",
+          "error_boundary",
+          "timing_decorator",
+          "get_env_var",
+          "safe_import",
+          "validate_inputs",
+          "validate_output",
+          "wrapper",
+          "wrapper",
+          "decorator",
+          "decorator",
+          "wrapper",
+          "wrapper"
+        ],
+        "classes": [
+          "AppUtilities"
+        ],
+        "decorators": [
+          "staticmethod",
+          "staticmethod",
+          "staticmethod",
+          "staticmethod",
+          "staticmethod",
+          "staticmethod",
+          "staticmethod",
+          "staticmethod",
+          "staticmethod",
+          "staticmethod",
+          "staticmethod",
+          "staticmethod",
+          "staticmethod"
+        ],
+        "lines_of_code": 323,
+        "role": "Utility",
+        "is_init": false,
+        "has_main": false,
+        "has_tests": false,
+        "complexity_score": 56
+      },
+      {
+        "file": "/Users/markcarpenter/Desktop/pete/ollama_agent/src/utils/datetime_utils.py",
+        "relative_path": "src/utils/datetime_utils.py",
+        "imports": "{'typing', 'datetime', 'pendulum'}",
+        "local_imports": "set()",
+        "external_imports": "{'typing', 'datetime', 'pendulum'}",
+        "functions": [
+          "now_cst",
+          "format_datetime_display",
+          "format_datetime_api",
+          "format_datetime_filename",
+          "get_time_ago_cst",
+          "get_cst_info",
+          "now",
+          "now_cst",
+          "format_datetime",
+          "format_for_display",
+          "format_for_api",
+          "format_for_filename",
+          "parse_datetime",
+          "get_time_ago",
+          "get_cst_timezone_info",
+          "convert_timezone"
+        ],
+        "classes": [
+          "DateTimeUtils"
+        ],
+        "decorators": [
+          "staticmethod",
+          "staticmethod",
+          "staticmethod",
+          "staticmethod",
+          "staticmethod",
+          "staticmethod",
+          "staticmethod",
+          "staticmethod",
+          "staticmethod",
+          "staticmethod"
+        ],
+        "lines_of_code": 207,
+        "role": "Utility",
+        "is_init": false,
+        "has_main": false,
+        "has_tests": false,
+        "complexity_score": 59
+      },
+      {
+        "file": "/Users/markcarpenter/Desktop/pete/ollama_agent/src/utils/enhanced_model_discovery.py",
+        "relative_path": "src/utils/enhanced_model_discovery.py",
+        "imports": "{'pathlib', 'subprocess', 'datetime', 're', 'typing', 'loguru', 'json'}",
+        "local_imports": "set()",
+        "external_imports": "{'pathlib', 'subprocess', 'datetime', 're', 'typing', 'loguru', 'json'}",
+        "functions": [
+          "__init__",
+          "discover_available_models",
+          "_analyze_model_name",
+          "_is_base_model",
+          "generate_model_configs",
+          "_generate_display_name",
+          "_generate_description",
+          "_should_show_in_ui",
+          "_should_auto_preload",
+          "get_recommended_default_model",
+          "_extract_version",
+          "sync_with_existing_config"
+        ],
+        "classes": [
+          "EnhancedModelDiscovery"
+        ],
+        "decorators": [],
+        "lines_of_code": 208,
+        "role": "Utility",
+        "is_init": false,
+        "has_main": false,
+        "has_tests": false,
+        "complexity_score": 59
+      },
+      {
+        "file": "/Users/markcarpenter/Desktop/pete/ollama_agent/src/utils/logger.py",
+        "relative_path": "src/utils/logger.py",
+        "imports": "{'sys', 'pathlib', 'pendulum', 'time', 'loguru', 'os'}",
+        "local_imports": "set()",
+        "external_imports": "{'sys', 'pathlib', 'pendulum', 'time', 'loguru', 'os'}",
+        "functions": [
+          "get_cst_time",
+          "setup_logger",
+          "get_logger"
+        ],
+        "classes": [],
+        "decorators": [],
+        "lines_of_code": 56,
+        "role": "Utility",
+        "is_init": false,
+        "has_main": false,
+        "has_tests": false,
+        "complexity_score": 8
+      },
+      {
+        "file": "/Users/markcarpenter/Desktop/pete/ollama_agent/src/utils/model_discovery.py",
+        "relative_path": "src/utils/model_discovery.py",
+        "imports": "{'pathlib', 'subprocess', 'typing', 'loguru', 'json'}",
+        "local_imports": "set()",
+        "external_imports": "{'pathlib', 'subprocess', 'typing', 'loguru', 'json'}",
+        "functions": [
+          "main",
+          "__init__",
+          "load_config",
+          "discover_available_models",
+          "sync_config_with_reality",
+          "create_model_from_config",
+          "get_model_info",
+          "get_ui_models",
+          "save_config"
+        ],
+        "classes": [
+          "ModelDiscovery"
+        ],
+        "decorators": [],
+        "lines_of_code": 128,
+        "role": "Utility",
+        "is_init": false,
+        "has_main": true,
+        "has_tests": false,
+        "complexity_score": 47
+      },
+      {
+        "file": "/Users/markcarpenter/Desktop/pete/ollama_agent/src/utils/type_validation.py",
+        "relative_path": "src/utils/type_validation.py",
+        "imports": "{'utils', 'beartype', 'functools', 'inspect', 'typing', 'json'}",
+        "local_imports": "{'utils'}",
+        "external_imports": "{'beartype', 'functools', 'inspect', 'typing', 'json'}",
+        "functions": [
+          "validate_and_log_types",
+          "validate_config_structure",
+          "validate_provider_config",
+          "validate_caching_config",
+          "safe_json_parse",
+          "validate_model_response",
+          "create_type_safe_wrapper",
+          "__init__",
+          "wrapper",
+          "decorator",
+          "beartype",
+          "wrapper"
+        ],
+        "classes": [
+          "TypeValidationError"
+        ],
+        "decorators": [
+          "validate_and_log_types",
+          "validate_and_log_types"
+        ],
+        "lines_of_code": 264,
+        "role": "Utility",
+        "is_init": false,
+        "has_main": false,
+        "has_tests": false,
+        "complexity_score": 56
+      },
+      {
+        "file": "/Users/markcarpenter/Desktop/pete/ollama_agent/src/vapi/__init__.py",
+        "relative_path": "src/vapi/__init__.py",
+        "imports": "set()",
+        "local_imports": "set()",
+        "external_imports": "set()",
+        "functions": [],
+        "classes": [],
+        "decorators": [],
+        "lines_of_code": 0,
+        "role": "Utility",
+        "is_init": true,
+        "has_main": false,
+        "has_tests": false,
+        "complexity_score": 0
+      },
+      {
+        "file": "/Users/markcarpenter/Desktop/pete/ollama_agent/src/vapi/api/__init__.py",
+        "relative_path": "src/vapi/api/__init__.py",
+        "imports": "set()",
+        "local_imports": "set()",
+        "external_imports": "set()",
+        "functions": [],
+        "classes": [],
+        "decorators": [],
+        "lines_of_code": 0,
+        "role": "Utility",
+        "is_init": true,
+        "has_main": false,
+        "has_tests": false,
+        "complexity_score": 0
+      },
+      {
+        "file": "/Users/markcarpenter/Desktop/pete/ollama_agent/src/vapi/api/admin_router.py",
+        "relative_path": "src/vapi/api/admin_router.py",
+        "imports": "{'utils', 'pathlib', 'sys', 'psutil', 'config', 'os', 'platform', 'fastapi', 'vapi', 'typing', 'time', 'socket', 'ai', 'asyncio', 'json'}",
+        "local_imports": "{'utils', 'config'}",
+        "external_imports": "{'pathlib', 'sys', 'psutil', 'os', 'platform', 'fastapi', 'vapi', 'time', 'typing', 'socket', 'ai', 'asyncio', 'json'}",
+        "functions": [
+          "create_admin_router",
+          "__init__",
+          "_setup_routes"
+        ],
+        "classes": [
+          "AdminRouter"
+        ],
+        "decorators": [],
+        "lines_of_code": 744,
+        "role": "Utility",
+        "is_init": false,
+        "has_main": false,
+        "has_tests": false,
+        "complexity_score": 40
+      },
+      {
+        "file": "/Users/markcarpenter/Desktop/pete/ollama_agent/src/vapi/api/system_config_router.py",
+        "relative_path": "src/vapi/api/system_config_router.py",
+        "imports": "{'utils', 'config', 'fastapi', 'typing', 'pydantic'}",
+        "local_imports": "{'utils', 'config'}",
+        "external_imports": "{'pydantic', 'typing', 'fastapi'}",
+        "functions": [
+          "create_system_config_router"
+        ],
+        "classes": [
+          "CachingConfigUpdate",
+          "ProviderConfigUpdate",
+          "ModelConfigUpdate",
+          "SystemConfigUpdate"
+        ],
+        "decorators": [],
+        "lines_of_code": 198,
+        "role": "Backend",
+        "is_init": false,
+        "has_main": false,
+        "has_tests": false,
+        "complexity_score": 38
+      },
+      {
+        "file": "/Users/markcarpenter/Desktop/pete/ollama_agent/src/vapi/api/ui_router.py",
+        "relative_path": "src/vapi/api/ui_router.py",
+        "imports": "{'utils', 'sys', 'pathlib', 'config', 'fastapi', 'vapi', 'typing', 'time', 'ai', 'json'}",
+        "local_imports": "{'utils', 'config'}",
+        "external_imports": "{'sys', 'pathlib', 'fastapi', 'vapi', 'typing', 'time', 'ai', 'json'}",
+        "functions": [
+          "create_ui_router",
+          "__init__",
+          "_setup_routes",
+          "token_iter",
+          "simulate_stream"
+        ],
+        "classes": [
+          "UIRouter"
+        ],
+        "decorators": [],
+        "lines_of_code": 249,
+        "role": "Utility",
+        "is_init": false,
+        "has_main": false,
+        "has_tests": false,
+        "complexity_score": 31
+      },
+      {
+        "file": "/Users/markcarpenter/Desktop/pete/ollama_agent/src/vapi/api/vapi_router.py",
+        "relative_path": "src/vapi/api/vapi_router.py",
+        "imports": "{'utils', 'pathlib', 'sys', 'config', 'datetime', 'fastapi', 'vapi', 'time', 'typing', 'ai', 'os', 'json'}",
+        "local_imports": "{'utils', 'config'}",
+        "external_imports": "{'pathlib', 'sys', 'datetime', 'fastapi', 'vapi', 'time', 'typing', 'ai', 'os', 'json'}",
+        "functions": [
+          "create_vapi_router",
+          "__init__",
+          "verify_vapi_auth",
+          "_setup_routes",
+          "_store_conversation_update",
+          "_store_call_data",
+          "_store_training_data",
+          "_store_vapi_interaction",
+          "_save_benchmark_data",
+          "token_iter"
+        ],
+        "classes": [
+          "VAPIRouter"
+        ],
+        "decorators": [],
+        "lines_of_code": 370,
+        "role": "Utility",
+        "is_init": false,
+        "has_main": false,
+        "has_tests": false,
+        "complexity_score": 56
+      },
+      {
+        "file": "/Users/markcarpenter/Desktop/pete/ollama_agent/src/vapi/conversation_manager.py",
+        "relative_path": "src/vapi/conversation_manager.py",
+        "imports": "{'dataclasses', 'datetime', 'threading', 're', 'typing', 'time', 'loguru', 'uuid'}",
+        "local_imports": "set()",
+        "external_imports": "{'dataclasses', 'datetime', 'threading', 're', 'typing', 'time', 'loguru', 'uuid'}",
+        "functions": [
+          "__init__",
+          "_start_cleanup_thread",
+          "create_conversation",
+          "get_conversation",
+          "add_to_context",
+          "get_context",
+          "add_to_buffer",
+          "get_buffer",
+          "clear_buffer",
+          "stop_conversation",
+          "is_conversation_active",
+          "_cleanup_old_sessions",
+          "clean_response",
+          "_remove_system_prompts",
+          "_remove_duplicates",
+          "_clean_formatting",
+          "__init__",
+          "start_stream",
+          "stop_stream",
+          "is_stream_active",
+          "add_to_stream_buffer",
+          "get_stream_buffer",
+          "clear_stream_buffer",
+          "cleanup_loop"
+        ],
+        "classes": [
+          "ConversationSession",
+          "ConversationManager",
+          "ResponseCleaner",
+          "ThreadManager"
+        ],
+        "decorators": [
+          "staticmethod",
+          "staticmethod",
+          "staticmethod",
+          "staticmethod"
+        ],
+        "lines_of_code": 236,
+        "role": "Utility",
+        "is_init": false,
+        "has_main": false,
+        "has_tests": false,
+        "complexity_score": 126
+      },
+      {
+        "file": "/Users/markcarpenter/Desktop/pete/ollama_agent/src/vapi/models/__init__.py",
+        "relative_path": "src/vapi/models/__init__.py",
+        "imports": "set()",
+        "local_imports": "set()",
+        "external_imports": "set()",
+        "functions": [],
+        "classes": [],
+        "decorators": [],
+        "lines_of_code": 0,
+        "role": "Utility",
+        "is_init": true,
+        "has_main": false,
+        "has_tests": false,
+        "complexity_score": 0
+      },
+      {
+        "file": "/Users/markcarpenter/Desktop/pete/ollama_agent/src/vapi/models/webhook_models.py",
+        "relative_path": "src/vapi/models/webhook_models.py",
+        "imports": "{'pydantic', 'datetime', 'typing'}",
+        "local_imports": "set()",
+        "external_imports": "{'pydantic', 'datetime', 'typing'}",
+        "functions": [
+          "create_error_response",
+          "create_model_availability_error"
+        ],
+        "classes": [
+          "VAPIMessage",
+          "VAPIChatRequest",
+          "VAPIChatResponse",
+          "ProviderError",
+          "ModelAvailabilityError",
+          "ModelInfo",
+          "PersonaModel",
+          "Persona",
+          "ProviderSettings",
+          "ProviderStatus",
+          "TestModelRequest",
+          "ModelPreloadRequest",
+          "ConversationStreamRequest",
+          "ModelSettingsUpdate",
+          "ProviderTestRequest",
+          "PerformanceMetrics",
+          "QualityMetrics",
+          "BenchmarkRecord",
+          "SystemStatus"
+        ],
+        "decorators": [],
+        "lines_of_code": 165,
+        "role": "Backend",
+        "is_init": false,
+        "has_main": false,
+        "has_tests": false,
+        "complexity_score": 119
+      },
+      {
+        "file": "/Users/markcarpenter/Desktop/pete/ollama_agent/src/vapi/modular_server.py",
+        "relative_path": "src/vapi/modular_server.py",
+        "imports": "{'utils', 'sys', 'pathlib', 'uvicorn', 'unittest', 'argparse', 'fastapi', 'vapi', 'ai', 'os'}",
+        "local_imports": "{'utils'}",
+        "external_imports": "{'sys', 'pathlib', 'uvicorn', 'unittest', 'argparse', 'fastapi', 'vapi', 'ai', 'os'}",
+        "functions": [
+          "create_app",
+          "main",
+          "__init__",
+          "_setup_services",
+          "_setup_static_files",
+          "_setup_routers",
+          "_setup_core_routes",
+          "run"
+        ],
+        "classes": [
+          "ModularVAPIServer"
+        ],
+        "decorators": [],
+        "lines_of_code": 169,
+        "role": "Backend",
+        "is_init": false,
+        "has_main": true,
+        "has_tests": false,
+        "complexity_score": 46
+      },
+      {
+        "file": "/Users/markcarpenter/Desktop/pete/ollama_agent/src/vapi/services/__init__.py",
+        "relative_path": "src/vapi/services/__init__.py",
+        "imports": "set()",
+        "local_imports": "set()",
+        "external_imports": "set()",
+        "functions": [],
+        "classes": [],
+        "decorators": [],
+        "lines_of_code": 0,
+        "role": "Utility",
+        "is_init": true,
+        "has_main": false,
+        "has_tests": false,
+        "complexity_score": 0
+      },
+      {
+        "file": "/Users/markcarpenter/Desktop/pete/ollama_agent/src/vapi/services/provider_service.py",
+        "relative_path": "src/vapi/services/provider_service.py",
+        "imports": "{'utils', 'pathlib', 'sys', 'config', 'datetime', 'vapi', 'typing', 'os', 'requests'}",
+        "local_imports": "{'utils', 'config'}",
+        "external_imports": "{'pathlib', 'sys', 'datetime', 'vapi', 'typing', 'os', 'requests'}",
+        "functions": [
+          "__init__",
+          "_process_openrouter_api_models",
+          "_convert_api_model_to_our_format",
+          "_is_suitable_for_property_management",
+          "_create_display_name",
+          "_create_model_description",
+          "_determine_base_model",
+          "_get_fallback_openrouter_personas",
+          "_get_fallback_personas"
+        ],
+        "classes": [
+          "ProviderService"
+        ],
+        "decorators": [],
+        "lines_of_code": 373,
+        "role": "Utility",
+        "is_init": false,
+        "has_main": false,
+        "has_tests": false,
+        "complexity_score": 39
+      },
+      {
+        "file": "/Users/markcarpenter/Desktop/pete/ollama_agent/src/vapi/webhook_server_legacy.py",
+        "relative_path": "src/vapi/webhook_server_legacy.py",
+        "imports": "{'sys', 'sqlite3', 'pendulum', 'database', 'pathlib', 'config', 'platform', 'datetime', 're', 'os', 'urllib', 'requests', 'utils', 'shutil', 'subprocess', 'time', 'ai', 'virtual_jamie_extractor', 'pydantic', 'uvicorn', 'fastapi', 'typing', 'asyncio', 'analytics', 'json'}",
+        "local_imports": "{'utils', 'config', 'virtual_jamie_extractor'}",
+        "external_imports": "{'sys', 'sqlite3', 'pendulum', 'database', 'pathlib', 'platform', 'datetime', 're', 'os', 'urllib', 'requests', 'shutil', 'subprocess', 'time', 'ai', 'pydantic', 'uvicorn', 'fastapi', 'typing', 'asyncio', 'analytics', 'json'}",
+        "functions": [
+          "__init__",
+          "verify_vapi_auth",
+          "setup_routes",
+          "_process_openrouter_api_models",
+          "_convert_api_model_to_our_format",
+          "_is_suitable_for_property_management",
+          "_create_display_name",
+          "_create_model_description",
+          "_determine_base_model",
+          "_get_fallback_openrouter_models",
+          "_extract_base_model_name",
+          "_save_benchmark_data",
+          "get_caller_context",
+          "store_conversation_update",
+          "store_call_data",
+          "_store_training_data",
+          "_store_vapi_interaction",
+          "iter_logs",
+          "token_iter"
+        ],
+        "classes": [
+          "VAPIMessage",
+          "VAPIChatRequest",
+          "VAPIChatResponse",
+          "ProviderError",
+          "ModelAvailabilityError",
+          "VAPIWebhookServer"
+        ],
+        "decorators": [],
+        "lines_of_code": 4394,
+        "role": "Backend",
+        "is_init": false,
+        "has_main": false,
+        "has_tests": false,
+        "complexity_score": 159
+      },
+      {
+        "file": "/Users/markcarpenter/Desktop/pete/ollama_agent/src/virtual_jamie_extractor.py",
+        "relative_path": "src/virtual_jamie_extractor.py",
+        "imports": "{'sqlalchemy', 'pandas', 'sqlite3', 'dotenv', 'datetime', 'loguru', 'os'}",
+        "local_imports": "set()",
+        "external_imports": "{'sqlalchemy', 'pandas', 'sqlite3', 'dotenv', 'datetime', 'loguru', 'os'}",
+        "functions": [
+          "main",
+          "__init__",
+          "_get_default_db_path",
+          "load_environment",
+          "setup_prod_connection",
+          "get_virtual_jamie_training_query",
+          "extract_training_data",
+          "create_local_database",
+          "verify_local_database",
+          "run_full_extraction"
+        ],
+        "classes": [
+          "VirtualJamieDataExtractor"
+        ],
+        "decorators": [],
+        "lines_of_code": 225,
+        "role": "Backend",
+        "is_init": false,
+        "has_main": true,
+        "has_tests": false,
+        "complexity_score": 56
+      },
+      {
+        "file": "/Users/markcarpenter/Desktop/pete/ollama_agent/src/webhook_only.py",
+        "relative_path": "src/webhook_only.py",
+        "imports": "{'utils', 'sys', 'pathlib', 'vapi', 'asyncio'}",
+        "local_imports": "{'utils'}",
+        "external_imports": "{'sys', 'asyncio', 'vapi', 'pathlib'}",
+        "functions": [
+          "main"
+        ],
+        "classes": [],
+        "decorators": [],
+        "lines_of_code": 23,
+        "role": "Utility",
+        "is_init": false,
+        "has_main": true,
+        "has_tests": false,
+        "complexity_score": 9
+      },
+      {
+        "file": "/Users/markcarpenter/Desktop/pete/ollama_agent/src/whats_working/__init__.py",
+        "relative_path": "src/whats_working/__init__.py",
+        "imports": "{'health_monitor', 'updater', 'feature_tracker', 'analyzer', 'core'}",
+        "local_imports": "{'feature_tracker', 'core'}",
+        "external_imports": "{'analyzer', 'updater', 'health_monitor'}",
+        "functions": [],
+        "classes": [],
+        "decorators": [],
+        "lines_of_code": 33,
+        "role": "Utility",
+        "is_init": true,
+        "has_main": false,
+        "has_tests": false,
+        "complexity_score": 0
+      },
+      {
+        "file": "/Users/markcarpenter/Desktop/pete/ollama_agent/src/whats_working/core.py",
+        "relative_path": "src/whats_working/core.py",
+        "imports": "{'sys', 'pathlib', 'datetime', 'health_monitor', 'updater', 'typing', 'feature_tracker', 'analyzer', 'os', 'json'}",
+        "local_imports": "{'feature_tracker'}",
+        "external_imports": "{'sys', 'pathlib', 'datetime', 'health_monitor', 'updater', 'typing', 'analyzer', 'os', 'json'}",
+        "functions": [
+          "__init__",
+          "analyze_codebase",
+          "track_features",
+          "update_test_results",
+          "get_system_health",
+          "run_full_analysis",
+          "_generate_summary_report",
+          "get_status"
+        ],
+        "classes": [
+          "WhatsWorking"
+        ],
+        "decorators": [],
+        "lines_of_code": 152,
+        "role": "Utility",
+        "is_init": false,
+        "has_main": false,
+        "has_tests": true,
+        "complexity_score": 60
+      },
+      {
+        "file": "/Users/markcarpenter/Desktop/pete/ollama_agent/src/whats_working_analyzer.py",
+        "relative_path": "src/whats_working_analyzer.py",
+        "imports": "{'pathlib', 'dataclasses', 'ast', 'sys', 'collections', 'fnmatch', 'pendulum', 're', 'typing', 'os', 'backend', 'json'}",
+        "local_imports": "{'backend'}",
+        "external_imports": "{'pathlib', 'dataclasses', 'ast', 'sys', 'collections', 'fnmatch', 'pendulum', 're', 'typing', 'os', 'json'}",
+        "functions": [
+          "main",
+          "__init__",
+          "_load_config",
+          "_get_default_config",
+          "_matches_pattern",
+          "_get_file_icon",
+          "_categorize_files",
+          "generate_mermaid_diagram",
+          "__init__",
+          "get_all_py_files",
+          "analyze_file",
+          "_classify_role",
+          "analyze_codebase",
+          "generate_mermaid_diagram",
+          "_generate_workflow_diagram",
+          "_generate_fallback_diagram",
+          "generate_summary_stats",
+          "generate_report",
+          "generate_pipeline_analysis_report",
+          "generate_end_user_flow_report",
+          "save_end_user_report",
+          "save_pipeline_report",
+          "save_report"
+        ],
+        "classes": [
+          "FileAnalysis",
+          "ArchitectureDiagramGenerator",
+          "CodebaseAnalyzer"
+        ],
+        "decorators": [],
+        "lines_of_code": 1015,
+        "role": "Utility",
+        "is_init": false,
+        "has_main": true,
+        "has_tests": false,
+        "complexity_score": 208
+      },
+      {
+        "file": "/Users/markcarpenter/Desktop/pete/ollama_agent/src/whats_working_feature_tracker.py",
+        "relative_path": "src/whats_working_feature_tracker.py",
+        "imports": "{'rich', 'os', 'datetime', 'loguru'}",
+        "local_imports": "set()",
+        "external_imports": "{'rich', 'os', 'datetime', 'loguru'}",
+        "functions": [
+          "parse_logs",
+          "build_feature_table",
+          "build_md_table",
+          "build_growth_section",
+          "main"
+        ],
+        "classes": [],
+        "decorators": [],
+        "lines_of_code": 101,
+        "role": "Utility",
+        "is_init": false,
+        "has_main": true,
+        "has_tests": false,
+        "complexity_score": 23
+      },
+      {
+        "file": "/Users/markcarpenter/Desktop/pete/ollama_agent/src/whats_working_updater.py",
+        "relative_path": "src/whats_working_updater.py",
+        "imports": "{'os', 'datetime', 'loguru', 'glob'}",
+        "local_imports": "set()",
+        "external_imports": "{'os', 'datetime', 'loguru', 'glob'}",
+        "functions": [
+          "find_latest"
+        ],
+        "classes": [],
+        "decorators": [],
+        "lines_of_code": 50,
+        "role": "Utility",
+        "is_init": false,
+        "has_main": false,
+        "has_tests": true,
+        "complexity_score": 3
+      },
+      {
+        "file": "/Users/markcarpenter/Desktop/pete/ollama_agent/src/whatsworking_platform/__init__.py",
+        "relative_path": "src/whatsworking_platform/__init__.py",
+        "imports": "{'collectors', 'core', 'cli'}",
+        "local_imports": "{'core', 'cli'}",
+        "external_imports": "{'collectors'}",
+        "functions": [],
+        "classes": [],
+        "decorators": [],
+        "lines_of_code": 26,
+        "role": "Utility",
+        "is_init": true,
+        "has_main": false,
+        "has_tests": false,
+        "complexity_score": 0
+      },
+      {
+        "file": "/Users/markcarpenter/Desktop/pete/ollama_agent/src/whatsworking_platform/cli/__init__.py",
+        "relative_path": "src/whatsworking_platform/cli/__init__.py",
+        "imports": "{'main'}",
+        "local_imports": "{'main'}",
+        "external_imports": "set()",
+        "functions": [],
+        "classes": [],
+        "decorators": [],
+        "lines_of_code": 6,
+        "role": "Utility",
+        "is_init": true,
+        "has_main": false,
+        "has_tests": false,
+        "complexity_score": 0
+      },
+      {
+        "file": "/Users/markcarpenter/Desktop/pete/ollama_agent/src/whatsworking_platform/cli/main.py",
+        "relative_path": "src/whatsworking_platform/cli/main.py",
+        "imports": "{'sys', 'pathlib', 'argparse', 'typing', 'rich', 'asyncio', 'core'}",
+        "local_imports": "{'core'}",
+        "external_imports": "{'sys', 'pathlib', 'argparse', 'typing', 'rich', 'asyncio'}",
+        "functions": [
+          "__init__",
+          "_display_analysis_results",
+          "show_help"
+        ],
+        "classes": [
+          "WhatsWorkingCLI"
+        ],
+        "decorators": [],
+        "lines_of_code": 219,
+        "role": "CLI",
+        "is_init": false,
+        "has_main": false,
+        "has_tests": false,
+        "complexity_score": 42
+      },
+      {
+        "file": "/Users/markcarpenter/Desktop/pete/ollama_agent/src/whatsworking_platform/collectors/__init__.py",
+        "relative_path": "src/whatsworking_platform/collectors/__init__.py",
+        "imports": "{'codebase_analyzer', 'infrastructure_monitor', 'feature_tracker'}",
+        "local_imports": "{'codebase_analyzer', 'infrastructure_monitor', 'feature_tracker'}",
+        "external_imports": "set()",
+        "functions": [],
+        "classes": [],
+        "decorators": [],
+        "lines_of_code": 16,
+        "role": "Utility",
+        "is_init": true,
+        "has_main": false,
+        "has_tests": false,
+        "complexity_score": 0
+      },
+      {
+        "file": "/Users/markcarpenter/Desktop/pete/ollama_agent/src/whatsworking_platform/collectors/codebase_analyzer.py",
+        "relative_path": "src/whatsworking_platform/collectors/codebase_analyzer.py",
+        "imports": "{'pathlib', 'dataclasses', 'ast', 'collections', 'pendulum', 'typing', 'os'}",
+        "local_imports": "set()",
+        "external_imports": "{'pathlib', 'dataclasses', 'ast', 'collections', 'pendulum', 'typing', 'os'}",
+        "functions": [
+          "__init__",
+          "get_all_py_files",
+          "analyze_file",
+          "_classify_role",
+          "analyze_codebase",
+          "generate_summary_stats",
+          "__init__",
+          "analyze",
+          "__init__",
+          "analyze",
+          "__init__",
+          "analyze"
+        ],
+        "classes": [
+          "FileAnalysis",
+          "CodebaseAnalyzer",
+          "InfrastructureAnalyzer",
+          "TestResultsAggregator",
+          "FeatureUsageTracker"
+        ],
+        "decorators": [],
+        "lines_of_code": 241,
+        "role": "Utility",
+        "is_init": false,
+        "has_main": false,
+        "has_tests": false,
+        "complexity_score": 86
+      },
+      {
+        "file": "/Users/markcarpenter/Desktop/pete/ollama_agent/src/whatsworking_platform/collectors/feature_tracker.py",
+        "relative_path": "src/whatsworking_platform/collectors/feature_tracker.py",
+        "imports": "{'pathlib', 'importlib', 'datetime', 'typing', 'rich', 'os', 'json', 'requests'}",
+        "local_imports": "set()",
+        "external_imports": "{'pathlib', 'importlib', 'datetime', 'typing', 'rich', 'os', 'json', 'requests'}",
+        "functions": [
+          "__init__",
+          "generate_codebase_report",
+          "generate_health_report",
+          "generate_goals_report",
+          "save_report",
+          "__init__",
+          "check_serverless_status",
+          "_check_environment",
+          "_check_files",
+          "_check_dependencies",
+          "check_twilio_status",
+          "display_status_table",
+          "generate_status_report"
+        ],
+        "classes": [
+          "ReportGenerator",
+          "StatusReporter"
+        ],
+        "decorators": [],
+        "lines_of_code": 198,
+        "role": "Utility",
+        "is_init": false,
+        "has_main": false,
+        "has_tests": false,
+        "complexity_score": 82
+      },
+      {
+        "file": "/Users/markcarpenter/Desktop/pete/ollama_agent/src/whatsworking_platform/collectors/infrastructure_monitor.py",
+        "relative_path": "src/whatsworking_platform/collectors/infrastructure_monitor.py",
+        "imports": "{'pathlib', 'shutil', 'typing', 'rich', 'os'}",
+        "local_imports": "set()",
+        "external_imports": "{'pathlib', 'shutil', 'typing', 'rich', 'os'}",
+        "functions": [
+          "__init__",
+          "_directory_has_code_files",
+          "search",
+          "copy_items",
+          "_search_recursive"
+        ],
+        "classes": [
+          "CodeFinder"
+        ],
+        "decorators": [],
+        "lines_of_code": 122,
+        "role": "Utility",
+        "is_init": false,
+        "has_main": false,
+        "has_tests": false,
+        "complexity_score": 25
+      },
+      {
+        "file": "/Users/markcarpenter/Desktop/pete/ollama_agent/src/whatsworking_platform/core/__init__.py",
+        "relative_path": "src/whatsworking_platform/core/__init__.py",
+        "imports": "{'models', 'engine', 'config'}",
+        "local_imports": "{'models', 'engine', 'config'}",
+        "external_imports": "set()",
+        "functions": [],
+        "classes": [],
+        "decorators": [],
+        "lines_of_code": 15,
+        "role": "Utility",
+        "is_init": true,
+        "has_main": false,
+        "has_tests": false,
+        "complexity_score": 0
+      },
+      {
+        "file": "/Users/markcarpenter/Desktop/pete/ollama_agent/src/whatsworking_platform/core/config.py",
+        "relative_path": "src/whatsworking_platform/core/config.py",
+        "imports": "{'pathlib', 'dataclasses', 'typing', 'os', 'json'}",
+        "local_imports": "set()",
+        "external_imports": "{'pathlib', 'dataclasses', 'typing', 'os', 'json'}",
+        "functions": [
+          "from_file",
+          "save_to_file",
+          "get_validation_threshold",
+          "is_methodology_requirement_enabled",
+          "to_dict"
+        ],
+        "classes": [
+          "PlatformConfig"
+        ],
+        "decorators": [
+          "classmethod"
+        ],
+        "lines_of_code": 121,
+        "role": "Utility",
+        "is_init": false,
+        "has_main": false,
+        "has_tests": false,
+        "complexity_score": 39
+      },
+      {
+        "file": "/Users/markcarpenter/Desktop/pete/ollama_agent/src/whatsworking_platform/core/engine.py",
+        "relative_path": "src/whatsworking_platform/core/engine.py",
+        "imports": "{'pathlib', 'models', 'config', 'logging', 'datetime', 'collectors', 'typing', 'project_intelligence', 'asyncio', 'json'}",
+        "local_imports": "{'models', 'config'}",
+        "external_imports": "{'pathlib', 'logging', 'datetime', 'collectors', 'typing', 'project_intelligence', 'asyncio', 'json'}",
+        "functions": [
+          "__init__",
+          "_load_state",
+          "_save_state",
+          "_setup_validation_gates",
+          "_setup_project_intelligence",
+          "_count_roles",
+          "get_llm_context",
+          "enforce_methodology",
+          "set_current_goal",
+          "add_critical_path_item",
+          "_validate_goal_alignment",
+          "_validate_action_gates",
+          "_validate_critical_path_focus"
+        ],
+        "classes": [
+          "WhatsWorkingEngine"
+        ],
+        "decorators": [],
+        "lines_of_code": 258,
+        "role": "Utility",
+        "is_init": false,
+        "has_main": false,
+        "has_tests": false,
+        "complexity_score": 70
+      },
+      {
+        "file": "/Users/markcarpenter/Desktop/pete/ollama_agent/src/whatsworking_platform/core/models.py",
+        "relative_path": "src/whatsworking_platform/core/models.py",
+        "imports": "{'pathlib', 'dataclasses', 'datetime', 'typing', 'enum'}",
+        "local_imports": "set()",
+        "external_imports": "{'pathlib', 'dataclasses', 'datetime', 'typing', 'enum'}",
+        "functions": [
+          "health_level",
+          "update_health",
+          "add_critical_path_item",
+          "add_architectural_decision",
+          "set_current_goal",
+          "validate",
+          "compliance_score"
+        ],
+        "classes": [
+          "GoalStatus",
+          "HealthLevel",
+          "HealthMetrics",
+          "ProjectState",
+          "ValidationGate",
+          "MethodologyEnforcement"
+        ],
+        "decorators": [
+          "property",
+          "property"
+        ],
+        "lines_of_code": 103,
+        "role": "Utility",
+        "is_init": false,
+        "has_main": false,
+        "has_tests": false,
+        "complexity_score": 66
+      },
+      {
+        "file": "/Users/markcarpenter/Desktop/pete/ollama_agent/src/whatsworking_platform/integration/__init__.py",
+        "relative_path": "src/whatsworking_platform/integration/__init__.py",
+        "imports": "{'mcp_server'}",
+        "local_imports": "{'mcp_server'}",
+        "external_imports": "set()",
+        "functions": [],
+        "classes": [],
+        "decorators": [],
+        "lines_of_code": 6,
+        "role": "Utility",
+        "is_init": true,
+        "has_main": false,
+        "has_tests": false,
+        "complexity_score": 0
+      },
+      {
+        "file": "/Users/markcarpenter/Desktop/pete/ollama_agent/src/whatsworking_platform/integration/mcp_server.py",
+        "relative_path": "src/whatsworking_platform/integration/mcp_server.py",
+        "imports": "{'pathlib', 'json', 'logging', 'datetime', 'typing', 'mcp', 'asyncio', 'core'}",
+        "local_imports": "{'core'}",
+        "external_imports": "{'pathlib', 'logging', 'datetime', 'typing', 'mcp', 'asyncio', 'json'}",
+        "functions": [
+          "__init__",
+          "_register_resources",
+          "_register_tools"
+        ],
+        "classes": [
+          "WhatsWorkingMCPServer"
+        ],
+        "decorators": [],
+        "lines_of_code": 295,
+        "role": "Utility",
+        "is_init": false,
+        "has_main": false,
+        "has_tests": false,
+        "complexity_score": 17
+      },
+      {
+        "file": "/Users/markcarpenter/Desktop/pete/ollama_agent/src/whatsworking_platform/main.py",
+        "relative_path": "src/whatsworking_platform/main.py",
+        "imports": "{'sys', 'pathlib', 'asyncio', 'cli'}",
+        "local_imports": "{'cli'}",
+        "external_imports": "{'sys', 'asyncio', 'pathlib'}",
+        "functions": [],
+        "classes": [],
+        "decorators": [],
+        "lines_of_code": 56,
+        "role": "CLI",
+        "is_init": false,
+        "has_main": false,
+        "has_tests": false,
+        "complexity_score": 0
+      },
+      {
+        "file": "/Users/markcarpenter/Desktop/pete/ollama_agent/test_default_model.py",
+        "relative_path": "test_default_model.py",
+        "imports": "{'os', 'json', 'requests'}",
+        "local_imports": "set()",
+        "external_imports": "{'os', 'json', 'requests'}",
+        "functions": [
+          "test_default_models"
+        ],
+        "classes": [],
+        "decorators": [],
+        "lines_of_code": 101,
+        "role": "Test",
+        "is_init": false,
+        "has_main": false,
+        "has_tests": true,
+        "complexity_score": 20
+      },
+      {
+        "file": "/Users/markcarpenter/Desktop/pete/ollama_agent/test_direct_endpoint.py",
+        "relative_path": "test_direct_endpoint.py",
+        "imports": "{'os', 'json', 'requests'}",
+        "local_imports": "set()",
+        "external_imports": "{'os', 'json', 'requests'}",
+        "functions": [
+          "test_direct_endpoint"
+        ],
+        "classes": [],
+        "decorators": [],
+        "lines_of_code": 140,
+        "role": "Test",
+        "is_init": false,
+        "has_main": false,
+        "has_tests": true,
+        "complexity_score": 20
+      },
+      {
+        "file": "/Users/markcarpenter/Desktop/pete/ollama_agent/test_endpoint_connectivity.py",
+        "relative_path": "test_endpoint_connectivity.py",
+        "imports": "{'sys', 'subprocess', 'urllib', 'socket', 'os', 'requests'}",
+        "local_imports": "set()",
+        "external_imports": "{'sys', 'subprocess', 'urllib', 'socket', 'os', 'requests'}",
+        "functions": [
+          "test_dns_resolution",
+          "test_port_connectivity",
+          "test_http_connectivity",
+          "test_curl_connectivity",
+          "main"
+        ],
+        "classes": [],
+        "decorators": [],
+        "lines_of_code": 117,
+        "role": "Test",
+        "is_init": false,
+        "has_main": true,
+        "has_tests": true,
+        "complexity_score": 39
+      },
+      {
+        "file": "/Users/markcarpenter/Desktop/pete/ollama_agent/test_native_api.py",
+        "relative_path": "test_native_api.py",
+        "imports": "{'os', 'json', 'requests'}",
+        "local_imports": "set()",
+        "external_imports": "{'os', 'json', 'requests'}",
+        "functions": [
+          "test_native_api"
+        ],
+        "classes": [],
+        "decorators": [],
+        "lines_of_code": 86,
+        "role": "Test",
+        "is_init": false,
+        "has_main": false,
+        "has_tests": true,
+        "complexity_score": 17
+      },
+      {
+        "file": "/Users/markcarpenter/Desktop/pete/ollama_agent/test_openai_models.py",
+        "relative_path": "test_openai_models.py",
+        "imports": "{'os', 'json', 'requests'}",
+        "local_imports": "set()",
+        "external_imports": "{'os', 'json', 'requests'}",
+        "functions": [
+          "test_openai_models"
+        ],
+        "classes": [],
+        "decorators": [],
+        "lines_of_code": 98,
+        "role": "Test",
+        "is_init": false,
+        "has_main": false,
+        "has_tests": true,
+        "complexity_score": 26
+      },
+      {
+        "file": "/Users/markcarpenter/Desktop/pete/ollama_agent/test_openrouter_chat.py",
+        "relative_path": "test_openrouter_chat.py",
+        "imports": "{'sys', 'pathlib', 'os', 'aiohttp', 'time', 'typing', 'asyncio', 'json'}",
+        "local_imports": "set()",
+        "external_imports": "{'sys', 'pathlib', 'os', 'aiohttp', 'time', 'typing', 'asyncio', 'json'}",
+        "functions": [],
+        "classes": [],
+        "decorators": [],
+        "lines_of_code": 193,
+        "role": "Test",
+        "is_init": false,
+        "has_main": false,
+        "has_tests": false,
+        "complexity_score": 0
+      },
+      {
+        "file": "/Users/markcarpenter/Desktop/pete/ollama_agent/test_openrouter_integration.py",
+        "relative_path": "test_openrouter_integration.py",
+        "imports": "{'sys', 'pathlib', 'os', 'traceback', 'vapi', 'typing', 'asyncio', 'json', 'requests'}",
+        "local_imports": "set()",
+        "external_imports": "{'sys', 'pathlib', 'os', 'traceback', 'vapi', 'typing', 'asyncio', 'json', 'requests'}",
+        "functions": [
+          "main"
+        ],
+        "classes": [],
+        "decorators": [],
+        "lines_of_code": 178,
+        "role": "Test",
+        "is_init": false,
+        "has_main": true,
+        "has_tests": false,
+        "complexity_score": 2
+      },
+      {
+        "file": "/Users/markcarpenter/Desktop/pete/ollama_agent/test_provider_api.py",
+        "relative_path": "test_provider_api.py",
+        "imports": "{'sys', 'pathlib', 'config', 'uvicorn', 'fastapi'}",
+        "local_imports": "{'config'}",
+        "external_imports": "{'sys', 'fastapi', 'uvicorn', 'pathlib'}",
+        "functions": [],
+        "classes": [],
+        "decorators": [],
+        "lines_of_code": 67,
+        "role": "Test",
+        "is_init": false,
+        "has_main": false,
+        "has_tests": false,
+        "complexity_score": 0
+      },
+      {
+        "file": "/Users/markcarpenter/Desktop/pete/ollama_agent/test_provider_comparison.py",
+        "relative_path": "test_provider_comparison.py",
+        "imports": "{'time', 'model_router', 'typing', 'json'}",
+        "local_imports": "{'model_router'}",
+        "external_imports": "{'time', 'typing', 'json'}",
+        "functions": [
+          "test_truncation_scenarios",
+          "analyze_response_quality",
+          "test_vapi_webhook_comparison",
+          "generate_comparison_report",
+          "main"
+        ],
+        "classes": [],
+        "decorators": [],
+        "lines_of_code": 292,
+        "role": "Test",
+        "is_init": false,
+        "has_main": true,
+        "has_tests": true,
+        "complexity_score": 71
+      },
+      {
+        "file": "/Users/markcarpenter/Desktop/pete/ollama_agent/test_provider_switching_e2e.py",
+        "relative_path": "test_provider_switching_e2e.py",
+        "imports": "{'sys', 'pathlib', 'traceback', 'time', 'asyncio', 'json'}",
+        "local_imports": "set()",
+        "external_imports": "{'sys', 'pathlib', 'traceback', 'time', 'asyncio', 'json'}",
+        "functions": [
+          "main",
+          "__init__",
+          "log_issue",
+          "log_dependency",
+          "log_race_condition",
+          "test_1_frontend_html_structure",
+          "test_2_backend_api_endpoints",
+          "test_3_model_settings_integration",
+          "test_4_frontend_backend_flow",
+          "test_5_error_handling",
+          "test_6_timing_and_race_conditions",
+          "test_7_integration_points",
+          "run_all_tests",
+          "print_detailed_report"
+        ],
+        "classes": [
+          "ProviderSwitchingE2ETest"
+        ],
+        "decorators": [],
+        "lines_of_code": 337,
+        "role": "Test",
+        "is_init": false,
+        "has_main": true,
+        "has_tests": true,
+        "complexity_score": 92
+      },
+      {
+        "file": "/Users/markcarpenter/Desktop/pete/ollama_agent/test_runpod_ai_alternative.py",
+        "relative_path": "test_runpod_ai_alternative.py",
+        "imports": "{'os', 'json', 'requests'}",
+        "local_imports": "set()",
+        "external_imports": "{'os', 'json', 'requests'}",
+        "functions": [
+          "test_alternative_apis"
+        ],
+        "classes": [],
+        "decorators": [],
+        "lines_of_code": 77,
+        "role": "Test",
+        "is_init": false,
+        "has_main": false,
+        "has_tests": true,
+        "complexity_score": 17
+      },
+      {
+        "file": "/Users/markcarpenter/Desktop/pete/ollama_agent/test_runpod_ai_endpoints.py",
+        "relative_path": "test_runpod_ai_endpoints.py",
+        "imports": "{'os', 'json', 'requests'}",
+        "local_imports": "set()",
+        "external_imports": "{'os', 'json', 'requests'}",
+        "functions": [
+          "test_runpod_ai_endpoints"
+        ],
+        "classes": [],
+        "decorators": [],
+        "lines_of_code": 86,
+        "role": "Test",
+        "is_init": false,
+        "has_main": false,
+        "has_tests": true,
+        "complexity_score": 18
+      },
+      {
+        "file": "/Users/markcarpenter/Desktop/pete/ollama_agent/test_runpod_ai_health.py",
+        "relative_path": "test_runpod_ai_health.py",
+        "imports": "{'os', 'json', 'requests'}",
+        "local_imports": "set()",
+        "external_imports": "{'os', 'json', 'requests'}",
+        "functions": [
+          "test_runpod_ai_health"
+        ],
+        "classes": [],
+        "decorators": [],
+        "lines_of_code": 69,
+        "role": "Test",
+        "is_init": false,
+        "has_main": false,
+        "has_tests": true,
+        "complexity_score": 19
+      },
+      {
+        "file": "/Users/markcarpenter/Desktop/pete/ollama_agent/test_simple_server.py",
+        "relative_path": "test_simple_server.py",
+        "imports": "{'sys', 'pathlib', 'uvicorn', 'fastapi', 'os'}",
+        "local_imports": "set()",
+        "external_imports": "{'sys', 'pathlib', 'uvicorn', 'fastapi', 'os'}",
+        "functions": [
+          "create_simple_server",
+          "main"
+        ],
+        "classes": [],
+        "decorators": [],
+        "lines_of_code": 54,
+        "role": "Test",
+        "is_init": false,
+        "has_main": true,
+        "has_tests": false,
+        "complexity_score": 20
+      },
+      {
+        "file": "/Users/markcarpenter/Desktop/pete/ollama_agent/test_system_config.py",
+        "relative_path": "test_system_config.py",
+        "imports": "{'sys', 'pathlib', 'config', 'traceback', 'os'}",
+        "local_imports": "{'config'}",
+        "external_imports": "{'sys', 'os', 'traceback', 'pathlib'}",
+        "functions": [
+          "test_system_config",
+          "test_caching_behavior",
+          "main"
+        ],
+        "classes": [],
+        "decorators": [],
+        "lines_of_code": 118,
+        "role": "Test",
+        "is_init": false,
+        "has_main": true,
+        "has_tests": true,
+        "complexity_score": 19
+      },
+      {
+        "file": "/Users/markcarpenter/Desktop/pete/ollama_agent/test_updated_handler.py",
+        "relative_path": "test_updated_handler.py",
+        "imports": "{'sys', 'pathlib', 'os', 'asyncio', 'loguru', 'serverless_handler'}",
+        "local_imports": "{'serverless_handler'}",
+        "external_imports": "{'sys', 'pathlib', 'asyncio', 'loguru', 'os'}",
+        "functions": [
+          "main"
+        ],
+        "classes": [],
+        "decorators": [],
+        "lines_of_code": 140,
+        "role": "Test",
+        "is_init": false,
+        "has_main": true,
+        "has_tests": false,
+        "complexity_score": 2
+      },
+      {
+        "file": "/Users/markcarpenter/Desktop/pete/ollama_agent/test_working_models.py",
+        "relative_path": "test_working_models.py",
+        "imports": "{'time', 'json', 'requests'}",
+        "local_imports": "set()",
+        "external_imports": "{'time', 'json', 'requests'}",
+        "functions": [
+          "test_model_accessibility"
+        ],
+        "classes": [],
+        "decorators": [],
+        "lines_of_code": 85,
+        "role": "Test",
+        "is_init": false,
+        "has_main": false,
+        "has_tests": true,
+        "complexity_score": 23
+      },
+      {
+        "file": "/Users/markcarpenter/Desktop/pete/ollama_agent/tests/test_full_conversations.py",
+        "relative_path": "tests/test_full_conversations.py",
+        "imports": "{'sys', 'pathlib', 'src', 'os', 'json'}",
+        "local_imports": "set()",
+        "external_imports": "{'sys', 'pathlib', 'src', 'os', 'json'}",
+        "functions": [
+          "show_sample_conversations",
+          "demonstrate_full_vs_fragment",
+          "test_complete_conversation_training",
+          "main"
+        ],
+        "classes": [],
+        "decorators": [],
+        "lines_of_code": 111,
+        "role": "Test",
+        "is_init": false,
+        "has_main": true,
+        "has_tests": true,
+        "complexity_score": 32
+      },
+      {
+        "file": "/Users/markcarpenter/Desktop/pete/ollama_agent/tests/test_jamie_manual.py",
+        "relative_path": "tests/test_jamie_manual.py",
+        "imports": "{'sys', 'subprocess'}",
+        "local_imports": "set()",
+        "external_imports": "{'sys', 'subprocess'}",
+        "functions": [
+          "test_jamie_model",
+          "quick_test"
+        ],
+        "classes": [],
+        "decorators": [],
+        "lines_of_code": 77,
+        "role": "Test",
+        "is_init": false,
+        "has_main": false,
+        "has_tests": true,
+        "complexity_score": 13
+      },
+      {
+        "file": "/Users/markcarpenter/Desktop/pete/ollama_agent/tests/test_runpod_handler.py",
+        "relative_path": "tests/test_runpod_handler.py",
+        "imports": "{'sys', 'pathlib', 'api_server', 'fastapi', 'runpod_handler', 'os', 'json'}",
+        "local_imports": "{'api_server', 'runpod_handler'}",
+        "external_imports": "{'sys', 'pathlib', 'fastapi', 'os', 'json'}",
+        "functions": [
+          "test_environment_setup",
+          "test_runpod_client_init",
+          "test_pete_handler_init",
+          "test_api_server",
+          "test_chat_request_format",
+          "test_vapi_webhook_format",
+          "test_api_endpoints",
+          "main",
+          "submit_sync_job",
+          "submit_sync_job"
+        ],
+        "classes": [
+          "MockRunPodClient",
+          "MockRunPodClient"
+        ],
+        "decorators": [],
+        "lines_of_code": 202,
+        "role": "Test",
+        "is_init": false,
+        "has_main": true,
+        "has_tests": true,
+        "complexity_score": 47
+      },
+      {
+        "file": "/Users/markcarpenter/Desktop/pete/ollama_agent/tests/test_serverless_integration.py",
+        "relative_path": "tests/test_serverless_integration.py",
+        "imports": "{'os', 'src', 'dotenv', 'traceback', 'asyncio'}",
+        "local_imports": "set()",
+        "external_imports": "{'os', 'src', 'dotenv', 'traceback', 'asyncio'}",
+        "functions": [],
+        "classes": [],
+        "decorators": [],
+        "lines_of_code": 34,
+        "role": "Test",
+        "is_init": false,
+        "has_main": false,
+        "has_tests": false,
+        "complexity_score": 0
+      },
+      {
+        "file": "/Users/markcarpenter/Desktop/pete/ollama_agent/train_jamie_enhanced.py",
+        "relative_path": "train_jamie_enhanced.py",
+        "imports": "{'sys', 'pathlib', 'src', 'datetime', 'os', 'json'}",
+        "local_imports": "set()",
+        "external_imports": "{'sys', 'pathlib', 'src', 'datetime', 'os', 'json'}",
+        "functions": [
+          "demonstrate_full_conversation_processing",
+          "create_enhanced_jamie_model",
+          "test_conversation_context_understanding",
+          "main"
+        ],
+        "classes": [],
+        "decorators": [],
+        "lines_of_code": 157,
+        "role": "Utility",
+        "is_init": false,
+        "has_main": true,
+        "has_tests": true,
+        "complexity_score": 53
+      },
+      {
+        "file": "/Users/markcarpenter/Desktop/pete/ollama_agent/train_jamie_langchain.py",
+        "relative_path": "train_jamie_langchain.py",
+        "imports": "{'sys', 'pathlib', 'src', 'datetime', 'os'}",
+        "local_imports": "set()",
+        "external_imports": "{'sys', 'pathlib', 'src', 'datetime', 'os'}",
+        "functions": [
+          "main",
+          "__init__",
+          "run_complete_training",
+          "_log_analysis_summary",
+          "get_training_summary"
+        ],
+        "classes": [
+          "JamieTrainer"
+        ],
+        "decorators": [],
+        "lines_of_code": 104,
+        "role": "Utility",
+        "is_init": false,
+        "has_main": true,
+        "has_tests": false,
+        "complexity_score": 45
+      },
+      {
+        "file": "/Users/markcarpenter/Desktop/pete/ollama_agent/train_model.py",
+        "relative_path": "train_model.py",
+        "imports": "{'sys', 'pathlib', 'database', 'ai', 'os'}",
+        "local_imports": "set()",
+        "external_imports": "{'sys', 'pathlib', 'database', 'ai', 'os'}",
+        "functions": [
+          "main"
+        ],
+        "classes": [],
+        "decorators": [],
+        "lines_of_code": 57,
+        "role": "Utility",
+        "is_init": false,
+        "has_main": true,
+        "has_tests": false,
+        "complexity_score": 21
+      }
+    ],
+    "CLI": [
+      {
+        "file": "/Users/markcarpenter/Desktop/pete/ollama_agent/cli.py",
+        "relative_path": "cli.py",
+        "imports": "{'sys', 'pathlib', 'src', 'subprocess', 'argparse', 'time', 'requests'}",
+        "local_imports": "set()",
+        "external_imports": "{'sys', 'pathlib', 'src', 'subprocess', 'argparse', 'time', 'requests'}",
+        "functions": [
+          "check_docker_running",
+          "check_service_health",
+          "start_containers",
+          "stop_containers",
+          "wait_for_services",
+          "launch_gui",
+          "show_status",
+          "extract_training_data",
+          "download_model",
+          "test_model",
+          "main"
+        ],
+        "classes": [],
+        "decorators": [],
+        "lines_of_code": 246,
+        "role": "CLI",
+        "is_init": false,
+        "has_main": true,
+        "has_tests": true,
+        "complexity_score": 55
+      }
+    ],
+    "Frontend": [
+      {
+        "file": "/Users/markcarpenter/Desktop/pete/ollama_agent/src/frontend/frontend_server.py",
+        "relative_path": "src/frontend/frontend_server.py",
+        "imports": "{'sys', 'pathlib', 'uvicorn', 'fastapi', 'os'}",
+        "local_imports": "set()",
+        "external_imports": "{'sys', 'pathlib', 'uvicorn', 'fastapi', 'os'}",
+        "functions": [
+          "create_frontend_server",
+          "main"
+        ],
+        "classes": [],
+        "decorators": [],
+        "lines_of_code": 81,
+        "role": "Frontend",
+        "is_init": false,
+        "has_main": true,
+        "has_tests": false,
+        "complexity_score": 28
+      }
+    ]
+  }
+}

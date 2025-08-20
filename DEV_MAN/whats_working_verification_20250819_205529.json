@@ -1,0 +1,160 @@
+{
+  "timestamp": "2025-08-19 20:55:29",
+  "project_root": "/Users/markcarpenter/Desktop/pete/ollama_agent",
+  "verification_summary": {
+    "total_claims": 5,
+    "verified_claims": 3,
+    "failed_claims": 2,
+    "verification_rate": "60.0%"
+  },
+  "verification_results": [
+    {
+      "claim": "File counts match documentation",
+      "documented_value": {
+        "total": 0,
+        "backend": 11,
+        "cli": 4,
+        "frontend": 1,
+        "test": 0,
+        "utility": 88
+      },
+      "actual_value": {
+        "total": 132,
+        "backend": 17,
+        "cli": 3,
+        "frontend": 1,
+        "test": 28,
+        "utility": 83
+      },
+      "verified": false,
+      "details": {
+        "python_files_found": 132,
+        "role_breakdown": {
+          "backend": 17,
+          "cli": 3,
+          "frontend": 1,
+          "test": 28,
+          "utility": 83
+        }
+      }
+    },
+    {
+      "claim": "Lines of code match documentation",
+      "documented_value": 0,
+      "actual_value": 36161,
+      "verified": false,
+      "details": {
+        "total_loc": 36161,
+        "files_analyzed": 132,
+        "sample_file_counts": {
+          "create_test_suite.py": 301,
+          "train_jamie_langchain.py": 141,
+          "analyze_openrouter_integration.py": 227,
+          "dev_server.py": 157,
+          "smart_model_versioner.py": 379,
+          "rp_handler_local_test.py": 71,
+          "provider_control_demo.py": 169,
+          "enhanced_model_trainer.py": 521,
+          "analyze_openrouter_detailed.py": 257,
+          "train_model.py": 82
+        }
+      }
+    },
+    {
+      "claim": "Import relationships work as documented",
+      "documented_value": "7 files with documented imports",
+      "actual_value": "7/7 files importable",
+      "verified": true,
+      "details": {
+        "files_tested": 7,
+        "files_importable": 7,
+        "import_test_results": [
+          {
+            "file": "DEV_MAN/whatsWorking.py",
+            "documented_imports": "{'requests', 'importlib', 'os', 'datetime', 'pathlib', 'sys', 'runpod_handler', 'dotenv', 'json', 'typing', 'api_server'}",
+            "importable": true,
+            "error": null
+          },
+          {
+            "file": "analyze_openrouter_detailed.py",
+            "documented_imports": "{'traceback', 'config', 'os', 'pathlib', 'sys', 'vapi', 'asyncio', 'json'}",
+            "importable": true,
+            "error": null
+          },
+          {
+            "file": "analyze_openrouter_integration.py",
+            "documented_imports": "{'traceback', 'config', 'os', 'pathlib', 'sys', 'vapi', 'json'}",
+            "importable": true,
+            "error": null
+          },
+          {
+            "file": "analyze_openrouter_models.py",
+            "documented_imports": "{'json', 'requests', 'typing', 'os'}",
+            "importable": true,
+            "error": null
+          },
+          {
+            "file": "analyze_questions.py",
+            "documented_imports": "{'collections', 're', 'pathlib', 'sys', 'json', 'typing'}",
+            "importable": true,
+            "error": null
+          },
+          {
+            "file": "cli.py",
+            "documented_imports": "{'requests', 'src', 'subprocess', 'pathlib', 'sys', 'time', 'argparse'}",
+            "importable": true,
+            "error": null
+          },
+          {
+            "file": "src/frontend/frontend_server.py",
+            "documented_imports": "{'os', 'uvicorn', 'pathlib', 'sys', 'fastapi'}",
+            "importable": true,
+            "error": null
+          }
+        ]
+      }
+    },
+    {
+      "claim": "Frontend functionality matches documentation",
+      "documented_value": "System config UI and admin dashboard",
+      "actual_value": "Frontend dir: True, System config UI: True, Admin dashboard: False",
+      "verified": true,
+      "details": {
+        "frontend_directory_exists": true,
+        "system_config_ui_exists": true,
+        "admin_dashboard_exists": false,
+        "total_ui_files": 12,
+        "ui_files": [
+          "src/frontend/index.html",
+          "src/frontend/html/system-config-ui.html",
+          "src/frontend/html/admin-ui.html",
+          "src/frontend/html/main-ui.html",
+          "src/frontend/js/admin-ui.js",
+          "src/frontend/js/main.js",
+          "src/frontend/js/main-ui.js",
+          "src/frontend/js/system-config-ui.js",
+          "src/frontend/css/system-config-ui.css",
+          "src/frontend/css/main-ui.css"
+        ]
+      }
+    },
+    {
+      "claim": "Configuration system works as documented",
+      "documented_value": "System configuration with caching, providers, and models",
+      "actual_value": "Config accessible: True, Modifiable: True",
+      "verified": true,
+      "details": {
+        "config_accessible": true,
+        "config_modifiable": true,
+        "current_threshold": 0.85,
+        "current_provider": "openrouter",
+        "global_settings_keys": [
+          "ollama_host",
+          "ollama_model",
+          "jamie_custom_model",
+          "max_tokens"
+        ]
+      }
+    }
+  ]
+}

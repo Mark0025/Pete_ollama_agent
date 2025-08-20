@@ -1,0 +1,157 @@
+{
+  "suite_name": "End-to-End Verification Test Suite",
+  "start_time": "2025-08-19 20:46:34",
+  "end_time": "2025-08-19 20:48:06",
+  "total_tests": 6,
+  "passed_tests": 5,
+  "failed_tests": 0,
+  "error_tests": 1,
+  "test_results": [
+    {
+      "test_name": "VAPI Integration",
+      "status": "ERROR",
+      "duration_ms": 30005.388021469116,
+      "details": {
+        "error": "HTTPConnectionPool(host='localhost', port=8000): Read timed out. (read timeout=30)"
+      },
+      "error_message": "HTTPConnectionPool(host='localhost', port=8000): Read timed out. (read timeout=30)",
+      "timestamp": null
+    },
+    {
+      "test_name": "Model Switching",
+      "status": "PASS",
+      "duration_ms": 53981.20594024658,
+      "details": {
+        "models_tested": 3,
+        "models_working": 2,
+        "detailed_results": {
+          "openai/gpt-3.5-turbo": {
+            "working": false,
+            "error": "HTTPConnectionPool(host='localhost', port=8000): Read timed out. (read timeout=30)"
+          },
+          "anthropic/claude-3-haiku": {
+            "working": true,
+            "status_code": 200,
+            "response_model": "anthropic/claude-3-haiku",
+            "response_time_ms": 21032.191000000003
+          },
+          "llama3:latest": {
+            "working": true,
+            "status_code": 200,
+            "response_model": "llama3:latest",
+            "response_time_ms": 2938.8390000000004
+          }
+        }
+      },
+      "error_message": null,
+      "timestamp": null
+    },
+    {
+      "test_name": "Environment Changes",
+      "status": "PASS",
+      "duration_ms": 1.2066364288330078,
+      "details": {
+        "error": "No module named 'config.system_config'",
+        "environment_variables": {
+          "OLLAMA_HOST": null,
+          "SIMILARITY_THRESHOLD": null,
+          "MAX_TOKENS": null
+        }
+      },
+      "error_message": null,
+      "timestamp": null
+    },
+    {
+      "test_name": "Configuration Changes",
+      "status": "PASS",
+      "duration_ms": 0.6070137023925781,
+      "details": {
+        "error": "No module named 'config.system_config'",
+        "config_modifiable": false
+      },
+      "error_message": null,
+      "timestamp": null
+    },
+    {
+      "test_name": "Frontend-Backend Sync",
+      "status": "PASS",
+      "duration_ms": 47.749996185302734,
+      "details": {
+        "endpoints_tested": 4,
+        "endpoints_accessible": 1,
+        "detailed_results": {
+          "/admin/system-config": {
+            "status_code": 200,
+            "accessible": true
+          },
+          "/api/system-config/global": {
+            "status_code": 404,
+            "accessible": false
+          },
+          "/api/system-config/providers": {
+            "status_code": 404,
+            "accessible": false
+          },
+          "/api/system-config/models": {
+            "status_code": 404,
+            "accessible": false
+          }
+        }
+      },
+      "error_message": null,
+      "timestamp": null
+    },
+    {
+      "test_name": "whatsWorking Documentation",
+      "status": "PASS",
+      "duration_ms": 7303.719758987427,
+      "details": {
+        "docs_found": 12,
+        "total_docs_size": 0,
+        "file_analysis": {
+          "END_USER_GUIDE_2025-08-19_v01_2025-08-19_20-31-50.md": {
+            "error": "\n**********************************************************************\n  Resource \u001b[93mpunkt_tab\u001b[0m not found.\n  Please use the NLTK Downloader to obtain the resource:\n\n  \u001b[31m>>> import nltk\n  >>> nltk.download('punkt_tab')\n  \u001b[0m\n  For more information see: https://www.nltk.org/data.html\n\n  Attempted to load \u001b[93mtokenizers/punkt_tab/english/\u001b[0m\n\n  Searched in:\n    - '/Users/markcarpenter/nltk_data'\n    - '/Users/markcarpenter/Desktop/pete/ollama_agent/.venv/nltk_data'\n    - '/Users/markcarpenter/Desktop/pete/ollama_agent/.venv/share/nltk_data'\n    - '/Users/markcarpenter/Desktop/pete/ollama_agent/.venv/lib/nltk_data'\n    - '/usr/share/nltk_data'\n    - '/usr/local/share/nltk_data'\n    - '/usr/lib/nltk_data'\n    - '/usr/local/lib/nltk_data'\n**********************************************************************\n"
+          },
+          "WHATS_WORKING_2025-08-19_v02_2025-08-19_20-39-15.md": {
+            "error": "\n**********************************************************************\n  Resource \u001b[93mpunkt_tab\u001b[0m not found.\n  Please use the NLTK Downloader to obtain the resource:\n\n  \u001b[31m>>> import nltk\n  >>> nltk.download('punkt_tab')\n  \u001b[0m\n  For more information see: https://www.nltk.org/data.html\n\n  Attempted to load \u001b[93mtokenizers/punkt_tab/english/\u001b[0m\n\n  Searched in:\n    - '/Users/markcarpenter/nltk_data'\n    - '/Users/markcarpenter/Desktop/pete/ollama_agent/.venv/nltk_data'\n    - '/Users/markcarpenter/Desktop/pete/ollama_agent/.venv/share/nltk_data'\n    - '/Users/markcarpenter/Desktop/pete/ollama_agent/.venv/lib/nltk_data'\n    - '/usr/share/nltk_data'\n    - '/usr/local/share/nltk_data'\n    - '/usr/lib/nltk_data'\n    - '/usr/local/lib/nltk_data'\n**********************************************************************\n"
+          },
+          "LATEST_REPORT.md": {
+            "error": "\n**********************************************************************\n  Resource \u001b[93mpunkt_tab\u001b[0m not found.\n  Please use the NLTK Downloader to obtain the resource:\n\n  \u001b[31m>>> import nltk\n  >>> nltk.download('punkt_tab')\n  \u001b[0m\n  For more information see: https://www.nltk.org/data.html\n\n  Attempted to load \u001b[93mtokenizers/punkt_tab/english/\u001b[0m\n\n  Searched in:\n    - '/Users/markcarpenter/nltk_data'\n    - '/Users/markcarpenter/Desktop/pete/ollama_agent/.venv/nltk_data'\n    - '/Users/markcarpenter/Desktop/pete/ollama_agent/.venv/share/nltk_data'\n    - '/Users/markcarpenter/Desktop/pete/ollama_agent/.venv/lib/nltk_data'\n    - '/usr/share/nltk_data'\n    - '/usr/local/share/nltk_data'\n    - '/usr/lib/nltk_data'\n    - '/usr/local/lib/nltk_data'\n**********************************************************************\n"
+          },
+          "WHATS_WORKING_2025-08-19_v01_2025-08-19_20-31-50.md": {
+            "error": "\n**********************************************************************\n  Resource \u001b[93mpunkt_tab\u001b[0m not found.\n  Please use the NLTK Downloader to obtain the resource:\n\n  \u001b[31m>>> import nltk\n  >>> nltk.download('punkt_tab')\n  \u001b[0m\n  For more information see: https://www.nltk.org/data.html\n\n  Attempted to load \u001b[93mtokenizers/punkt_tab/english/\u001b[0m\n\n  Searched in:\n    - '/Users/markcarpenter/nltk_data'\n    - '/Users/markcarpenter/Desktop/pete/ollama_agent/.venv/nltk_data'\n    - '/Users/markcarpenter/Desktop/pete/ollama_agent/.venv/share/nltk_data'\n    - '/Users/markcarpenter/Desktop/pete/ollama_agent/.venv/lib/nltk_data'\n    - '/usr/share/nltk_data'\n    - '/usr/local/share/nltk_data'\n    - '/usr/lib/nltk_data'\n    - '/usr/local/lib/nltk_data'\n**********************************************************************\n"
+          },
+          "LATEST_END_USER_GUIDE.md": {
+            "error": "\n**********************************************************************\n  Resource \u001b[93mpunkt_tab\u001b[0m not found.\n  Please use the NLTK Downloader to obtain the resource:\n\n  \u001b[31m>>> import nltk\n  >>> nltk.download('punkt_tab')\n  \u001b[0m\n  For more information see: https://www.nltk.org/data.html\n\n  Attempted to load \u001b[93mtokenizers/punkt_tab/english/\u001b[0m\n\n  Searched in:\n    - '/Users/markcarpenter/nltk_data'\n    - '/Users/markcarpenter/Desktop/pete/ollama_agent/.venv/nltk_data'\n    - '/Users/markcarpenter/Desktop/pete/ollama_agent/.venv/share/nltk_data'\n    - '/Users/markcarpenter/Desktop/pete/ollama_agent/.venv/lib/nltk_data'\n    - '/usr/share/nltk_data'\n    - '/usr/local/share/nltk_data'\n    - '/usr/lib/nltk_data'\n    - '/usr/local/lib/nltk_data'\n**********************************************************************\n"
+          },
+          "END_USER_GUIDE_2025-08-19_v02_2025-08-19_20-39-15.md": {
+            "error": "\n**********************************************************************\n  Resource \u001b[93mpunkt_tab\u001b[0m not found.\n  Please use the NLTK Downloader to obtain the resource:\n\n  \u001b[31m>>> import nltk\n  >>> nltk.download('punkt_tab')\n  \u001b[0m\n  For more information see: https://www.nltk.org/data.html\n\n  Attempted to load \u001b[93mtokenizers/punkt_tab/english/\u001b[0m\n\n  Searched in:\n    - '/Users/markcarpenter/nltk_data'\n    - '/Users/markcarpenter/Desktop/pete/ollama_agent/.venv/nltk_data'\n    - '/Users/markcarpenter/Desktop/pete/ollama_agent/.venv/share/nltk_data'\n    - '/Users/markcarpenter/Desktop/pete/ollama_agent/.venv/lib/nltk_data'\n    - '/usr/share/nltk_data'\n    - '/usr/local/share/nltk_data'\n    - '/usr/lib/nltk_data'\n    - '/usr/local/lib/nltk_data'\n**********************************************************************\n"
+          },
+          "platform_report.json": {
+            "error": "\n**********************************************************************\n  Resource \u001b[93mpunkt_tab\u001b[0m not found.\n  Please use the NLTK Downloader to obtain the resource:\n\n  \u001b[31m>>> import nltk\n  >>> nltk.download('punkt_tab')\n  \u001b[0m\n  For more information see: https://www.nltk.org/data.html\n\n  Attempted to load \u001b[93mtokenizers/punkt_tab/english/\u001b[0m\n\n  Searched in:\n    - '/Users/markcarpenter/nltk_data'\n    - '/Users/markcarpenter/Desktop/pete/ollama_agent/.venv/nltk_data'\n    - '/Users/markcarpenter/Desktop/pete/ollama_agent/.venv/share/nltk_data'\n    - '/Users/markcarpenter/Desktop/pete/ollama_agent/.venv/lib/nltk_data'\n    - '/usr/share/nltk_data'\n    - '/usr/local/share/nltk_data'\n    - '/usr/lib/nltk_data'\n    - '/usr/local/lib/nltk_data'\n**********************************************************************\n"
+          },
+          "architecture_2025-08-19_v02.json": {
+            "error": "\n**********************************************************************\n  Resource \u001b[93mpunkt_tab\u001b[0m not found.\n  Please use the NLTK Downloader to obtain the resource:\n\n  \u001b[31m>>> import nltk\n  >>> nltk.download('punkt_tab')\n  \u001b[0m\n  For more information see: https://www.nltk.org/data.html\n\n  Attempted to load \u001b[93mtokenizers/punkt_tab/english/\u001b[0m\n\n  Searched in:\n    - '/Users/markcarpenter/nltk_data'\n    - '/Users/markcarpenter/Desktop/pete/ollama_agent/.venv/nltk_data'\n    - '/Users/markcarpenter/Desktop/pete/ollama_agent/.venv/share/nltk_data'\n    - '/Users/markcarpenter/Desktop/pete/ollama_agent/.venv/lib/nltk_data'\n    - '/usr/share/nltk_data'\n    - '/usr/local/share/nltk_data'\n    - '/usr/lib/nltk_data'\n    - '/usr/local/lib/nltk_data'\n**********************************************************************\n"
+          },
+          "metadata_2025-08-19_v02.json": {
+            "error": "\n**********************************************************************\n  Resource \u001b[93mpunkt_tab\u001b[0m not found.\n  Please use the NLTK Downloader to obtain the resource:\n\n  \u001b[31m>>> import nltk\n  >>> nltk.download('punkt_tab')\n  \u001b[0m\n  For more information see: https://www.nltk.org/data.html\n\n  Attempted to load \u001b[93mtokenizers/punkt_tab/english/\u001b[0m\n\n  Searched in:\n    - '/Users/markcarpenter/nltk_data'\n    - '/Users/markcarpenter/Desktop/pete/ollama_agent/.venv/nltk_data'\n    - '/Users/markcarpenter/Desktop/pete/ollama_agent/.venv/share/nltk_data'\n    - '/Users/markcarpenter/Desktop/pete/ollama_agent/.venv/lib/nltk_data'\n    - '/usr/share/nltk_data'\n    - '/usr/local/share/nltk_data'\n    - '/usr/lib/nltk_data'\n    - '/usr/local/lib/nltk_data'\n**********************************************************************\n"
+          },
+          "system_health_report.json": {
+            "error": "\n**********************************************************************\n  Resource \u001b[93mpunkt_tab\u001b[0m not found.\n  Please use the NLTK Downloader to obtain the resource:\n\n  \u001b[31m>>> import nltk\n  >>> nltk.download('punkt_tab')\n  \u001b[0m\n  For more information see: https://www.nltk.org/data.html\n\n  Attempted to load \u001b[93mtokenizers/punkt_tab/english/\u001b[0m\n\n  Searched in:\n    - '/Users/markcarpenter/nltk_data'\n    - '/Users/markcarpenter/Desktop/pete/ollama_agent/.venv/nltk_data'\n    - '/Users/markcarpenter/Desktop/pete/ollama_agent/.venv/share/nltk_data'\n    - '/Users/markcarpenter/Desktop/pete/ollama_agent/.venv/lib/nltk_data'\n    - '/usr/share/nltk_data'\n    - '/usr/local/share/nltk_data'\n    - '/usr/lib/nltk_data'\n    - '/usr/local/lib/nltk_data'\n**********************************************************************\n"
+          },
+          "metadata_2025-08-19_v01.json": {
+            "error": "\n**********************************************************************\n  Resource \u001b[93mpunkt_tab\u001b[0m not found.\n  Please use the NLTK Downloader to obtain the resource:\n\n  \u001b[31m>>> import nltk\n  >>> nltk.download('punkt_tab')\n  \u001b[0m\n  For more information see: https://www.nltk.org/data.html\n\n  Attempted to load \u001b[93mtokenizers/punkt_tab/english/\u001b[0m\n\n  Searched in:\n    - '/Users/markcarpenter/nltk_data'\n    - '/Users/markcarpenter/Desktop/pete/ollama_agent/.venv/nltk_data'\n    - '/Users/markcarpenter/Desktop/pete/ollama_agent/.venv/share/nltk_data'\n    - '/Users/markcarpenter/Desktop/pete/ollama_agent/.venv/lib/nltk_data'\n    - '/usr/share/nltk_data'\n    - '/usr/local/share/nltk_data'\n    - '/usr/lib/nltk_data'\n    - '/usr/local/lib/nltk_data'\n**********************************************************************\n"
+          },
+          "architecture_2025-08-19_v01.json": {
+            "error": "\n**********************************************************************\n  Resource \u001b[93mpunkt_tab\u001b[0m not found.\n  Please use the NLTK Downloader to obtain the resource:\n\n  \u001b[31m>>> import nltk\n  >>> nltk.download('punkt_tab')\n  \u001b[0m\n  For more information see: https://www.nltk.org/data.html\n\n  Attempted to load \u001b[93mtokenizers/punkt_tab/english/\u001b[0m\n\n  Searched in:\n    - '/Users/markcarpenter/nltk_data'\n    - '/Users/markcarpenter/Desktop/pete/ollama_agent/.venv/nltk_data'\n    - '/Users/markcarpenter/Desktop/pete/ollama_agent/.venv/share/nltk_data'\n    - '/Users/markcarpenter/Desktop/pete/ollama_agent/.venv/lib/nltk_data'\n    - '/usr/share/nltk_data'\n    - '/usr/local/share/nltk_data'\n    - '/usr/lib/nltk_data'\n    - '/usr/local/lib/nltk_data'\n**********************************************************************\n"
+          }
+        },
+        "nltk_analysis": {
+          "error": "\n**********************************************************************\n  Resource \u001b[93mpunkt_tab\u001b[0m not found.\n  Please use the NLTK Downloader to obtain the resource:\n\n  \u001b[31m>>> import nltk\n  >>> nltk.download('punkt_tab')\n  \u001b[0m\n  For more information see: https://www.nltk.org/data.html\n\n  Attempted to load \u001b[93mtokenizers/punkt_tab/english/\u001b[0m\n\n  Searched in:\n    - '/Users/markcarpenter/nltk_data'\n    - '/Users/markcarpenter/Desktop/pete/ollama_agent/.venv/nltk_data'\n    - '/Users/markcarpenter/Desktop/pete/ollama_agent/.venv/share/nltk_data'\n    - '/Users/markcarpenter/Desktop/pete/ollama_agent/.venv/lib/nltk_data'\n    - '/usr/share/nltk_data'\n    - '/usr/local/share/nltk_data'\n    - '/usr/lib/nltk_data'\n    - '/usr/local/lib/nltk_data'\n**********************************************************************\n"
+        }
+      },
+      "error_message": null,
+      "timestamp": null
+    }
+  ]
+}

@@ -1,0 +1,65 @@
+{
+  "timestamp": "2025-08-19_20-55-18",
+  "version": 3,
+  "date": "2025-08-19",
+  "total_files": 132,
+  "total_loc": 27716,
+  "summary": {
+    "total_files": 132,
+    "total_loc": 27716,
+    "total_functions": 771,
+    "total_classes": 133,
+    "roles": {
+      "Utility": 88,
+      "Backend": 11,
+      "CLI": 4,
+      "Test": 28,
+      "Frontend": 1
+    },
+    "avg_loc_per_file": 209.96969696969697,
+    "most_complex": [
+      [
+        "src/whats_working_analyzer.py",
+        208
+      ],
+      [
+        "src/vapi/webhook_server_legacy.py",
+        159
+      ],
+      [
+        "tests/whats_working_claims_verification.py",
+        134
+      ],
+      [
+        "src/langchain/conversation_indexer.py",
+        130
+      ],
+      [
+        "tests/comprehensive_system_test_suite.py",
+        128
+      ]
+    ],
+    "most_connected": [
+      [
+        "src/vapi/webhook_server_legacy.py",
+        25
+      ],
+      [
+        "tests/comprehensive_system_test_suite.py",
+        17
+      ],
+      [
+        "src/ai/model_manager.py",
+        16
+      ],
+      [
+        "src/analytics/conversation_similarity.py",
+        15
+      ],
+      [
+        "src/ollama_proxy_streaming.py",
+        15
+      ]
+    ]
+  }
+}
