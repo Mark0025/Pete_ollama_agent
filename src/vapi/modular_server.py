@@ -36,10 +36,19 @@ class ModularVAPIServer:
             description="Modular VAPI webhook server with clean architecture"
         )
         
-        # Initialize services
+        # Initialize SystemConfigManager for unified configuration
+        try:
+            from src.config.system_config import system_config
+            self.config = system_config
+            logger.info("✅ SystemConfigManager initialized successfully")
+        except Exception as e:
+            logger.error(f"❌ Failed to initialize SystemConfigManager: {e}")
+            self.config = None
+        
+        # Initialize services with configuration
         self.model_manager = None
-        self.vapi_api_key = os.getenv("VAPI_API_KEY", "your-vapi-key-here")
-        self.runpod_api_key = os.getenv("RUNPOD_API_KEY")
+        self.vapi_api_key = self._get_config_value("VAPI_API_KEY", "your-vapi-key-here")
+        self.runpod_api_key = self._get_config_value("RUNPOD_API_KEY", "")
         
         # Setup server
         self._setup_services()
@@ -48,6 +57,30 @@ class ModularVAPIServer:
         self._setup_core_routes()
         
         logger.info("🚀 Modular VAPI Server initialized successfully")
+    
+    def _get_config_value(self, key: str, default: str = "") -> str:
+        """Get configuration value with fallback to environment variables"""
+        try:
+            if self.config:
+                # Try to get from system config first
+                if key == "RUNPOD_API_KEY" and hasattr(self.config, 'get_provider_config'):
+                    runpod_config = self.config.get_provider_config("runpod")
+                    if runpod_config and runpod_config.api_key:
+                        return runpod_config.api_key
+                
+                # Try to get from system config environment settings
+                if hasattr(self.config.config, 'environment') and hasattr(self.config.config, 'ollama_host'):
+                    # Map common keys to system config values
+                    if key == "OLLAMA_HOST" and self.config.config.ollama_host:
+                        return self.config.config.ollama_host
+                    if key == "MAX_TOKENS" and self.config.config.max_tokens:
+                        return str(self.config.config.max_tokens)
+            
+            # Fallback to environment variables
+            return os.getenv(key, default)
+        except Exception as e:
+            logger.warning(f"⚠️ Error getting config value for {key}: {e}, using environment variable")
+            return os.getenv(key, default)
     
     def _setup_services(self):
         """Initialize core services"""
