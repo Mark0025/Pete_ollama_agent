@@ -188,19 +188,22 @@ class OpenRouterHandler:
             print(f"⚠️ OpenRouter not available: {e}")
             self.available = False
     
-    def chat_completion(self, message: str, model: str = "meta-llama/llama-3.1-8b-instruct:free", **kwargs) -> Dict[str, Any]:
+    def chat_completion(self, message: str, model: str = "openai/gpt-3.5-turbo", **kwargs) -> Dict[str, Any]:
         """Handle chat completion requests using OpenRouter"""
         if not self.available:
             return {"error": "OpenRouter not configured", "status": "error"}
             
-        print(f"🌐 OpenRouter chat completion request")
-        print(f"📝 Message: {message}")
-        print(f"🤖 Model: {model}")
+        from utils.logger import logger
         
         # Extract conversation history if provided
         conversation_history = kwargs.get('conversation_history', [])
         max_tokens = kwargs.get('max_tokens', 1000)
         temperature = kwargs.get('temperature', 0.7)
+        
+        logger.info(f"🌐 OpenRouter chat completion request")
+        logger.info(f"📝 Message: {message[:100]}{'...' if len(message) > 100 else ''}")
+        logger.info(f"🤖 Model: {model}")
+        logger.info(f"🎛️ Max tokens: {max_tokens}")
         
         result = self.openrouter_client.chat_completion(
             message=message,
@@ -209,6 +212,25 @@ class OpenRouterHandler:
             temperature=temperature,
             conversation_history=conversation_history
         )
+        
+        if result and 'response' in result:
+            response_text = result['response']
+            response_length = len(response_text)
+            is_truncated = response_length >= max_tokens
+            
+            logger.info(f"✅ OpenRouter response received")
+            logger.info(f"📏 Response length: {response_length} chars")
+            logger.info(f"🎯 Max tokens requested: {max_tokens}")
+            logger.info(f"✂️ Truncated: {'YES' if is_truncated else 'NO'}")
+            logger.info(f"📄 Response preview: {response_text[:100]}{'...' if response_length > 100 else ''}")
+            
+            # Add truncation info to result
+            result['response_metadata'] = {
+                'length': response_length,
+                'max_tokens_requested': max_tokens,
+                'is_truncated': is_truncated,
+                'source': 'openrouter_direct'
+            }
         
         return result or {"error": "OpenRouter request failed", "status": "error"}
     

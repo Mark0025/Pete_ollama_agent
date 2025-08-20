@@ -15,6 +15,16 @@ import uvicorn
 import asyncio
 import subprocess
 
+# Load environment variables from .env file
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+    print("✅ Environment variables loaded from .env file")
+except ImportError:
+    print("⚠️ python-dotenv not installed, using system environment variables")
+except Exception as e:
+    print(f"⚠️ Error loading .env file: {e}")
+
 # Ensure src directory is on the import path when executed from project root
 sys.path.insert(0, str(Path(__file__).parent))
 

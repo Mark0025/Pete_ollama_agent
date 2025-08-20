@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>System Configuration - Jamie AI</title>
+    <link rel="icon" type="image/png" href="/favicon.ico">
+    <link rel="stylesheet" href="../css/system-config-ui.css">
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <h1>⚙️ System Configuration</h1>
+        <p>Control caching, providers, and models from one central location</p>
+    </div>
+
+    <!-- Navigation -->
+    <div class="nav-tabs">
+        <button class="nav-tab active" data-tab="caching">🔒 Caching</button>
+        <button class="nav-tab" data-tab="providers">🚀 Providers</button>
+        <button class="nav-tab" data-tab="models">🤖 Models</button>
+        <button class="nav-tab" data-tab="system">⚡ System</button>
+    </div>
+
+    <!-- Caching Tab -->
+    <div class="tab-content active" id="caching-tab">
+        <div class="section">
+            <h2>🔒 Global Caching Settings</h2>
+            <p class="description">Control how responses are cached across the entire system</p>
+            
+            <div class="setting-group">
+                <div class="setting-item">
+                    <label class="toggle-label">
+                        <input type="checkbox" id="global-caching-enabled" class="toggle-input">
+                        <span class="toggle-slider"></span>
+                        <span class="toggle-text">Enable Caching</span>
+                    </label>
+                    <p class="setting-help">Turn caching on/off for the entire system</p>
+                </div>
+
+                <div class="setting-item">
+                    <label for="similarity-threshold">Similarity Threshold</label>
+                    <div class="slider-container">
+                        <input type="range" id="similarity-threshold" min="0.5" max="1.0" step="0.05" class="slider">
+                        <span class="slider-value" id="similarity-threshold-value">0.75</span>
+                    </div>
+                    <p class="setting-help">How similar questions need to be to use cached responses (0.5 = loose, 1.0 = exact)</p>
+                </div>
+
+                <div class="setting-item">
+                    <label for="cache-duration">Cache Duration (hours)</label>
+                    <input type="number" id="cache-duration" min="1" max="168" class="number-input">
+                    <p class="setting-help">How long to keep cached responses (1-168 hours)</p>
+                </div>
+
+                <div class="setting-item">
+                    <label for="max-responses">Max Cached Responses</label>
+                    <input type="number" id="max-responses" min="100" max="10000" step="100" class="number-input">
+                    <p class="setting-help">Maximum number of responses to keep in cache</p>
+                </div>
+            </div>
+
+            <div class="action-buttons">
+                <button id="save-caching" class="btn btn-primary">💾 Save Caching Settings</button>
+                <button id="reset-caching" class="btn btn-secondary">🔄 Reset to Defaults</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Providers Tab -->
+    <div class="tab-content" id="providers-tab">
+        <div class="section">
+            <h2>🚀 Provider Configuration</h2>
+            <p class="description">Configure how each AI provider works and caches responses</p>
+            
+            <div class="provider-grid">
+                <!-- OpenRouter -->
+                <div class="provider-card">
+                    <div class="provider-header">
+                        <h3>🌐 OpenRouter</h3>
+                        <span class="provider-status active">Active</span>
+                    </div>
+                    
+                    <div class="setting-item">
+                        <label class="toggle-label">
+                            <input type="checkbox" id="openrouter-enabled" class="toggle-input" checked>
+                            <span class="toggle-slider"></span>
+                            <span class="toggle-text">Enable Provider</span>
+                        </label>
+                    </div>
+
+                    <div class="setting-item">
+                        <label class="toggle-label">
+                            <input type="checkbox" id="openrouter-caching" class="toggle-input" checked>
+                            <span class="toggle-slider"></span>
+                            <span class="toggle-text">Enable Caching</span>
+                        </label>
+                    </div>
+
+                    <div class="setting-item">
+                        <label for="openrouter-threshold">Caching Threshold</label>
+                        <div class="slider-container">
+                            <input type="range" id="openrouter-threshold" min="0.5" max="1.0" step="0.05" class="slider">
+                            <span class="slider-value" id="openrouter-threshold-value">0.80</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- RunPod -->
+                <div class="provider-card">
+                    <div class="provider-header">
+                        <h3>⚡ RunPod</h3>
+                        <span class="provider-status active">Active</span>
+                    </div>
+                    
+                    <div class="setting-item">
+                        <label class="toggle-label">
+                            <input type="checkbox" id="runpod-enabled" class="toggle-input" checked>
+                            <span class="toggle-slider"></span>
+                            <span class="toggle-text">Enable Provider</span>
+                        </label>
+                    </div>
+
+                    <div class="setting-item">
+                        <label class="toggle-label">
+                            <input type="checkbox" id="runpod-caching" class="toggle-input">
+                            <span class="toggle-slider"></span>
+                            <span class="toggle-text">Enable Caching</span>
+                        </label>
+                    </div>
+
+                    <div class="setting-item">
+                        <label for="runpod-threshold">Caching Threshold</label>
+                        <div class="slider-container">
+                            <input type="range" id="runpod-threshold" min="0.5" max="1.0" step="0.05" class="slider">
+                            <span class="slider-value" id="runpod-threshold-value">0.70</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Ollama -->
+                <div class="provider-card">
+                    <div class="provider-header">
+                        <h3>🦙 Ollama</h3>
+                        <span class="provider-status active">Active</span>
+                    </div>
+                    
+                    <div class="setting-item">
+                        <label class="toggle-label">
+                            <input type="checkbox" id="ollama-enabled" class="toggle-input" checked>
+                            <span class="toggle-slider"></span>
+                            <span class="toggle-text">Enable Provider</span>
+                        </label>
+                    </div>
+
+                    <div class="setting-item">
+                        <label class="toggle-label">
+                            <input type="checkbox" id="ollama-caching" class="toggle-input" checked>
+                            <span class="toggle-slider"></span>
+                            <span class="toggle-text">Enable Caching</span>
+                        </label>
+                    </div>
+
+                    <div class="setting-item">
+                        <label for="ollama-threshold">Caching Threshold</label>
+                        <div class="slider-container">
+                            <input type="range" id="ollama-threshold" min="0.5" max="1.0" step="0.05" class="slider">
+                            <span class="slider-value" id="ollama-threshold-value">0.75</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="action-buttons">
+                <button id="save-providers" class="btn btn-primary">💾 Save Provider Settings</button>
+                <button id="reset-providers" class="btn btn-secondary">🔄 Reset to Defaults</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Models Tab -->
+    <div class="tab-content" id="models-tab">
+        <div class="section">
+            <h2>🤖 Model-Specific Settings</h2>
+            <p class="description">Fine-tune caching behavior for individual models</p>
+            
+            <div class="model-grid">
+                <!-- GPT-3.5 -->
+                <div class="model-card">
+                    <div class="model-header">
+                        <h3>🤖 GPT-3.5 Turbo</h3>
+                        <span class="model-provider">OpenRouter</span>
+                    </div>
+                    
+                    <div class="setting-item">
+                        <label class="toggle-label">
+                            <input type="checkbox" id="gpt35-caching" class="toggle-input" checked>
+                            <span class="toggle-slider"></span>
+                            <span class="toggle-text">Enable Caching</span>
+                        </label>
+                    </div>
+
+                    <div class="setting-item">
+                        <label for="gpt35-threshold">Caching Threshold</label>
+                        <div class="slider-container">
+                            <input type="range" id="gpt35-threshold" min="0.5" max="1.0" step="0.05" class="slider">
+                            <span class="slider-value" id="gpt35-threshold-value">0.90</span>
+                        </div>
+                    </div>
+
+                    <div class="setting-item">
+                        <label for="gpt35-tokens">Max Tokens</label>
+                        <input type="number" id="gpt35-tokens" min="100" max="4000" step="100" class="number-input">
+                    </div>
+                </div>
+
+                <!-- Claude -->
+                <div class="model-card">
+                    <div class="model-header">
+                        <h3>🧠 Claude 3 Haiku</h3>
+                        <span class="model-provider">OpenRouter</span>
+                    </div>
+                    
+                    <div class="setting-item">
+                        <label class="toggle-label">
+                            <input type="checkbox" id="claude-caching" class="toggle-input" checked>
+                            <span class="toggle-slider"></span>
+                            <span class="toggle-text">Enable Caching</span>
+                        </label>
+                    </div>
+
+                    <div class="setting-item">
+                        <label for="claude-threshold">Caching Threshold</label>
+                        <div class="slider-container">
+                            <input type="range" id="claude-threshold" min="0.5" max="1.0" step="0.05" class="slider">
+                            <span class="slider-value" id="claude-threshold-value">0.85</span>
+                        </div>
+                    </div>
+
+                    <div class="setting-item">
+                        <label for="claude-tokens">Max Tokens</label>
+                        <input type="number" id="claude-tokens" min="100" max="8000" step="100" class="number-input">
+                    </div>
+                </div>
+
+                <!-- Llama -->
+                <div class="model-card">
+                    <div class="model-header">
+                        <h3>🦙 Llama 3</h3>
+                        <span class="model-provider">RunPod</span>
+                    </div>
+                    
+                    <div class="setting-item">
+                        <label class="toggle-label">
+                            <input type="checkbox" id="llama-caching" class="toggle-input">
+                            <span class="toggle-slider"></span>
+                            <span class="toggle-text">Enable Caching</span>
+                        </label>
+                    </div>
+
+                    <div class="setting-item">
+                        <label for="llama-threshold">Caching Threshold</label>
+                        <div class="slider-container">
+                            <input type="range" id="llama-threshold" min="0.5" max="1.0" step="0.05" class="slider">
+                            <span class="slider-value" id="llama-threshold-value">0.70</span>
+                        </div>
+                    </div>
+
+                    <div class="setting-item">
+                        <label for="llama-tokens">Max Tokens</label>
+                        <input type="number" id="llama-tokens" min="100" max="8000" step="100" class="number-input">
+                    </div>
+                </div>
+            </div>
+
+            <div class="action-buttons">
+                <button id="save-models" class="btn btn-primary">💾 Save Model Settings</button>
+                <button id="reset-models" class="btn btn-secondary">🔄 Reset to Defaults</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- System Tab -->
+    <div class="tab-content" id="system-tab">
+        <div class="section">
+            <h2>⚡ System Settings</h2>
+            <p class="description">Control overall system behavior and defaults</p>
+            
+            <div class="setting-group">
+                <div class="setting-item">
+                    <label for="default-provider">Default Provider</label>
+                    <select id="default-provider" class="select-input">
+                        <option value="openrouter">🌐 OpenRouter</option>
+                        <option value="runpod">⚡ RunPod</option>
+                        <option value="ollama">🦙 Ollama</option>
+                    </select>
+                    <p class="setting-help">Which provider to use when none is specified</p>
+                </div>
+
+                <div class="setting-item">
+                    <label class="toggle-label">
+                        <input type="checkbox" id="fallback-enabled" class="toggle-input" checked>
+                        <span class="toggle-slider"></span>
+                        <span class="toggle-text">Enable Fallback Provider</span>
+                    </label>
+                    <p class="setting-help">Automatically switch to backup provider if primary fails</p>
+                </div>
+
+                <div class="setting-item">
+                    <label for="fallback-provider">Fallback Provider</label>
+                    <select id="fallback-provider" class="select-input">
+                        <option value="runpod">⚡ RunPod</option>
+                        <option value="openrouter">🌐 OpenRouter</option>
+                        <option value="ollama">🦙 Ollama</option>
+                    </select>
+                    <p class="setting-help">Provider to use when primary provider fails</p>
+                </div>
+
+                <div class="setting-item">
+                    <label class="toggle-label">
+                        <input type="checkbox" id="auto-switch" class="toggle-input" checked>
+                        <span class="toggle-slider"></span>
+                        <span class="toggle-text">Auto-Switch Providers</span>
+                    </label>
+                    <p class="setting-help">Automatically switch providers based on performance</p>
+                </div>
+            </div>
+
+            <div class="action-buttons">
+                <button id="save-system" class="btn btn-primary">💾 Save System Settings</button>
+                <button id="reset-system" class="btn btn-secondary">🔄 Reset to Defaults</button>
+            </div>
+        </div>
+
+        <!-- Configuration Summary -->
+        <div class="section">
+            <h2>📊 Current Configuration Summary</h2>
+            <div class="config-summary" id="config-summary">
+                <p>Loading configuration...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Area -->
+    <div id="notification-area" class="notification-area"></div>
+
+    <!-- Scripts -->
+    <script src="../js/system-config-ui.js"></script>
+</body>
+</html>

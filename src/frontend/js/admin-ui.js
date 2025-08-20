@@ -278,3 +278,157 @@ modelSelect.onchange = async () => {
 
 // Initialize environment status on page load
 loadEnvironmentStatus();
+
+// ===== CONFIGURATION MANAGEMENT FUNCTIONS =====
+
+// Load environment variables
+document.getElementById('loadEnvVars').onclick = async () => {
+    try {
+        const response = await fetch('/admin/environment-variables');
+        const result = await response.json();
+        
+        const display = document.getElementById('envVarsDisplay');
+        display.style.display = 'block';
+        
+        if (result.success) {
+            let html = '<h5>🔑 Environment Variables:</h5>';
+            html += `<p><strong>Total:</strong> ${result.total_vars} variables loaded</p>`;
+            html += `<p><em>${result.note}</em></p><br>`;
+            
+            for (const [key, value] of Object.entries(result.environment_variables)) {
+                html += `<div style="margin:5px 0;padding:5px;background:white;border-radius:3px;">`;
+                html += `<strong>${key}:</strong> <code>${value}</code></div>`;
+            }
+            
+            display.innerHTML = html;
+        } else {
+            display.innerHTML = `<div class="error">❌ Error: ${result.error || 'Failed to load environment variables'}</div>`;
+        }
+    } catch (e) {
+        document.getElementById('envVarsDisplay').innerHTML = `<div class="error">❌ Network Error: ${e.message}</div>`;
+        document.getElementById('envVarsDisplay').style.display = 'block';
+    }
+};
+
+// Load configuration settings
+document.getElementById('loadConfig').onclick = async () => {
+    try {
+        const response = await fetch('/admin/configuration');
+        const result = await response.json();
+        
+        const display = document.getElementById('configDisplay');
+        display.style.display = 'block';
+        
+        if (result.success) {
+            const config = result.configuration;
+            let html = '<h5>⚙️ Configuration Settings:</h5>';
+            
+            // Models section
+            html += '<div style="margin:10px 0;padding:10px;background:white;border-radius:4px;">';
+            html += '<h6>📚 Models:</h6>';
+            html += `<p><strong>Total:</strong> ${config.models.total} • <strong>Jamie:</strong> ${config.models.jamie_models} • <strong>UI:</strong> ${config.models.ui_models} • <strong>Auto-preload:</strong> ${config.models.auto_preload}</p>`;
+            html += '</div>';
+            
+            // Providers section
+            html += '<div style="margin:10px 0;padding:10px;background:white;border-radius:4px;">';
+            html += '<h6>🌐 Providers:</h6>';
+            html += `<p><strong>Current:</strong> ${config.providers.current} • <strong>Fallback:</strong> ${config.providers.fallback_enabled ? 'Enabled' : 'Disabled'}`;
+            if (config.providers.fallback_provider) {
+                html += ` • <strong>Fallback Provider:</strong> ${config.providers.fallback_provider}`;
+            }
+            html += '</p></div>';
+            
+            // System section
+            html += '<div style="margin:10px 0;padding:10px;background:white;border-radius:4px;">';
+            html += '<h6>💻 System:</h6>';
+            html += `<p><strong>Config File:</strong> ${config.system.config_file} • <strong>Last Updated:</strong> ${config.system.last_updated} • <strong>Total Models:</strong> ${config.system.total_models}</p>`;
+            html += '</div>';
+            
+            display.innerHTML = html;
+        } else {
+            display.innerHTML = `<div class="error">❌ Error: ${result.error || 'Failed to load configuration'}</div>`;
+        }
+    } catch (e) {
+        document.getElementById('configDisplay').innerHTML = `<div class="error">❌ Network Error: ${e.message}</div>`;
+        document.getElementById('configDisplay').style.display = 'block';
+    }
+};
+
+// Export configuration
+document.getElementById('exportConfig').onclick = async () => {
+    try {
+        const response = await fetch('/admin/configuration/export');
+        const result = await response.json();
+        
+        const display = document.getElementById('exportDisplay');
+        display.style.display = 'block';
+        
+        if (result.success) {
+            let html = '<h5>📤 Configuration Export:</h5>';
+            html += `<p><strong>Exported at:</strong> ${result.exported_at}</p>`;
+            html += `<p><em>${result.note}</em></p><br>`;
+            
+            // Create download link for full config
+            const configBlob = new Blob([JSON.stringify(result.configuration, null, 2)], {type: 'application/json'});
+            const configUrl = URL.createObjectURL(configBlob);
+            html += `<a href="${configUrl}" download="peteollama_config_${new Date().toISOString().split('T')[0]}.json" style="display:inline-block;margin:10px 0;padding:10px;background:#007acc;color:white;text-decoration:none;border-radius:4px;">💾 Download Full Configuration</a>`;
+            
+            display.innerHTML = html;
+        } else {
+            display.innerHTML = `<div class="error">❌ Error: ${result.error || 'Failed to export configuration'}</div>`;
+        }
+    } catch (e) {
+        document.getElementById('exportDisplay').innerHTML = `<div class="error">❌ Network Error: ${e.message}</div>`;
+        document.getElementById('exportDisplay').style.display = 'block';
+    }
+};
+
+// Update configuration
+document.getElementById('updateConfig').onclick = async () => {
+    const section = document.getElementById('configSection').value;
+    const key = document.getElementById('configKey').value.trim();
+    const value = document.getElementById('configValue').value.trim();
+    const resultDiv = document.getElementById('updateResult');
+    
+    if (!key || !value) {
+        resultDiv.innerHTML = '<div class="error">❌ Please fill in both key and value fields</div>';
+        resultDiv.style.display = 'block';
+        return;
+    }
+    
+    try {
+        const body = {section, key, value};
+        
+        // Add model_name for model section
+        if (section === 'model') {
+            const modelName = prompt('Enter model name for this setting:');
+            if (!modelName) {
+                resultDiv.innerHTML = '<div class="error">❌ Model name is required for model settings</div>';
+                resultDiv.style.display = 'block';
+                return;
+            }
+            body.model_name = modelName;
+        }
+        
+        const response = await fetch('/admin/configuration/update', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(body)
+        });
+        
+        const result = await response.json();
+        resultDiv.style.display = 'block';
+        
+        if (result.success) {
+            resultDiv.innerHTML = `<div class="success">✅ ${result.message}</div>`;
+            // Clear input fields
+            document.getElementById('configKey').value = '';
+            document.getElementById('configValue').value = '';
+        } else {
+            resultDiv.innerHTML = `<div class="error">❌ Error: ${result.error || 'Update failed'}</div>`;
+        }
+    } catch (e) {
+        resultDiv.innerHTML = `<div class="error">❌ Network Error: ${e.message}</div>`;
+        resultDiv.style.display = 'block';
+    }
+};

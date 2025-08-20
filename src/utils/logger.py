@@ -9,6 +9,15 @@ import sys
 from pathlib import Path
 from loguru import logger
 import os
+import pendulum
+
+# Configure loguru to use CST timezone
+from loguru import logger
+import time
+
+def get_cst_time():
+    """Get current time in CST timezone"""
+    return pendulum.now("America/Chicago")
 
 def setup_logger(name: str = None, log_level: str = "INFO") -> None:
     """
@@ -26,8 +35,14 @@ def setup_logger(name: str = None, log_level: str = "INFO") -> None:
     logger.add(
         sys.stdout,
         level=log_level.upper(),
-        format="<green>{time:HH:mm:ss}</green> | <level>{level: <8}</level> | <cyan>{name}</cyan>:<cyan>{function}</cyan>:<cyan>{line}</cyan> | <level>{message}</level>",
-        colorize=True
+        format="<green>{extra[time]:MM/DD/YYYY h:mm A}</green> | <level>{level: <8}</level> | <cyan>{name}</cyan>:<cyan>{function}</cyan>:<cyan>{line}</cyan> | <level>{message}</level>",
+        colorize=True,
+        enqueue=True,
+        catch=True,
+        serialize=False,
+        backtrace=True,
+        diagnose=True,
+        filter=lambda record: record.update(extra={"time": get_cst_time()})
     )
     
     # File handler with rotation
@@ -40,10 +55,11 @@ def setup_logger(name: str = None, log_level: str = "INFO") -> None:
         logger.add(
             str(log_file),
             level=log_level.upper(),
-            format="{time:YYYY-MM-DD HH:mm:ss} | {level: <8} | {name}:{function}:{line} | {message}",
-            rotation="5 MB",
-            retention="10 days",
-            compression="zip"
+            format="{extra[time]:MM/DD/YYYY h:mm A} | {level: <8} | {name}:{function}:{line} | {message}",
+                    rotation="5 MB",
+        retention="10 days",
+        compression="zip",
+        filter=lambda record: record.update(extra={"time": get_cst_time()})
         )
         
     except Exception as e:

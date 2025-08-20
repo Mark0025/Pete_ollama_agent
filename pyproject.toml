@@ -5,7 +5,7 @@ description = "PeteOllama Serverless - Routes all requests through RunPod"
 authors = [
     {name = "Pete", email = "pete@peteproperties.com"}
 ]
-requires-python = ">=3.11"
+requires-python = ">=3.12"
 dependencies = [
     # Core Framework (Required)
     "fastapi>=0.104.1",
@@ -17,6 +17,11 @@ dependencies = [
     # Environment Management (Required)
     "python-dotenv>=1.0.0",
     "psutil>=7.0.0",
+    "pendulum>=3.1.0",
+    "beartype>=0.21.0",
+    "rich>=14.1.0",
+    "mcp>=1.13.0",
+    "loguru>=0.7.3",
 ]
 
 [project.optional-dependencies]

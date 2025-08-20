@@ -1,0 +1,204 @@
+{
+  "timestamp": "2025-08-19T18:26:57.065711",
+  "project": "Ollama Agent",
+  "total_files_analyzed": 20,
+  "file_types": {
+    "python": 20
+  },
+  "statistics": {
+    "total_lines": 4499,
+    "total_classes": 7,
+    "total_functions": 100,
+    "total_imports": 109
+  },
+  "files": [
+    {
+      "file": "test_provider_comparison.py",
+      "size": 18214,
+      "lines": 413,
+      "classes": 0,
+      "functions": 5,
+      "imports": 4,
+      "type": "python"
+    },
+    {
+      "file": "create_test_suite.py",
+      "size": 11795,
+      "lines": 302,
+      "classes": 0,
+      "functions": 6,
+      "imports": 6,
+      "type": "python"
+    },
+    {
+      "file": "train_jamie_langchain.py",
+      "size": 5456,
+      "lines": 141,
+      "classes": 1,
+      "functions": 5,
+      "imports": 7,
+      "type": "python"
+    },
+    {
+      "file": "analyze_openrouter_integration.py",
+      "size": 9092,
+      "lines": 228,
+      "classes": 0,
+      "functions": 1,
+      "imports": 7,
+      "type": "python"
+    },
+    {
+      "file": "test_native_api.py",
+      "size": 4003,
+      "lines": 114,
+      "classes": 0,
+      "functions": 1,
+      "imports": 3,
+      "type": "python"
+    },
+    {
+      "file": "dev_server.py",
+      "size": 5070,
+      "lines": 158,
+      "classes": 1,
+      "functions": 7,
+      "imports": 9,
+      "type": "python"
+    },
+    {
+      "file": "smart_model_versioner.py",
+      "size": 15105,
+      "lines": 379,
+      "classes": 1,
+      "functions": 14,
+      "imports": 11,
+      "type": "python"
+    },
+    {
+      "file": "test_runpod_ai_health.py",
+      "size": 2794,
+      "lines": 91,
+      "classes": 0,
+      "functions": 1,
+      "imports": 3,
+      "type": "python"
+    },
+    {
+      "file": "rp_handler_local_test.py",
+      "size": 2176,
+      "lines": 72,
+      "classes": 0,
+      "functions": 2,
+      "imports": 5,
+      "type": "python"
+    },
+    {
+      "file": "provider_control_demo.py",
+      "size": 5800,
+      "lines": 170,
+      "classes": 0,
+      "functions": 6,
+      "imports": 4,
+      "type": "python"
+    },
+    {
+      "file": "test_direct_endpoint.py",
+      "size": 5651,
+      "lines": 175,
+      "classes": 0,
+      "functions": 1,
+      "imports": 3,
+      "type": "python"
+    },
+    {
+      "file": "enhanced_model_trainer.py",
+      "size": 22883,
+      "lines": 521,
+      "classes": 1,
+      "functions": 18,
+      "imports": 11,
+      "type": "python"
+    },
+    {
+      "file": "analyze_openrouter_detailed.py",
+      "size": 10725,
+      "lines": 258,
+      "classes": 0,
+      "functions": 1,
+      "imports": 8,
+      "type": "python"
+    },
+    {
+      "file": "train_model.py",
+      "size": 2510,
+      "lines": 82,
+      "classes": 0,
+      "functions": 1,
+      "imports": 5,
+      "type": "python"
+    },
+    {
+      "file": "check_runpod_endpoint.py",
+      "size": 5232,
+      "lines": 140,
+      "classes": 0,
+      "functions": 2,
+      "imports": 4,
+      "type": "python"
+    },
+    {
+      "file": "test_default_model.py",
+      "size": 4581,
+      "lines": 131,
+      "classes": 0,
+      "functions": 1,
+      "imports": 3,
+      "type": "python"
+    },
+    {
+      "file": "openrouter_handler.py",
+      "size": 13457,
+      "lines": 346,
+      "classes": 2,
+      "functions": 9,
+      "imports": 5,
+      "type": "python"
+    },
+    {
+      "file": "setup_openrouter.py",
+      "size": 8540,
+      "lines": 273,
+      "classes": 0,
+      "functions": 6,
+      "imports": 3,
+      "type": "python"
+    },
+    {
+      "file": "openrouter_models.py",
+      "size": 13823,
+      "lines": 369,
+      "classes": 1,
+      "functions": 11,
+      "imports": 5,
+      "type": "python"
+    },
+    {
+      "file": "check_runpod_account.py",
+      "size": 5060,
+      "lines": 136,
+      "classes": 0,
+      "functions": 2,
+      "imports": 3,
+      "type": "python"
+    }
+  ],
+  "architecture": {
+    "frontend": "src/frontend/",
+    "api": "src/vapi/",
+    "ai": "src/ai/",
+    "config": "src/config/",
+    "utils": "src/utils/",
+    "whatsworking": "src/whatsworking_platform/"
+  }
+}

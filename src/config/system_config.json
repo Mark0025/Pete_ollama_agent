@@ -1,0 +1,121 @@
+{
+  "global_caching": {
+    "enabled": true,
+    "threshold": 0.9,
+    "max_cache_age_hours": 48,
+    "max_responses": 1000,
+    "similarity_analyzer_enabled": true,
+    "fallback_cache_enabled": true
+  },
+  "providers": {
+    "openrouter": {
+      "name": "openrouter",
+      "enabled": true,
+      "priority": 1,
+      "caching": {
+        "enabled": true,
+        "threshold": 0.8,
+        "max_cache_age_hours": 24,
+        "max_responses": 1000,
+        "similarity_analyzer_enabled": true,
+        "fallback_cache_enabled": true
+      },
+      "api_key": "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",
+      "endpoint": "",
+      "timeout": 30,
+      "max_retries": 3
+    },
+    "runpod": {
+      "name": "runpod",
+      "enabled": true,
+      "priority": 2,
+      "caching": {
+        "enabled": false,
+        "threshold": 0.7,
+        "max_cache_age_hours": 12,
+        "max_responses": 1000,
+        "similarity_analyzer_enabled": true,
+        "fallback_cache_enabled": true
+      },
+      "api_key": "rpa_DPL09BE6U4Z1NUDSXW8TQLR9NVQVSX4UB0S258R51a0e8y",
+      "endpoint": "vk7efas3wu5vd7",
+      "timeout": 60,
+      "max_retries": 5
+    },
+    "ollama": {
+      "name": "ollama",
+      "enabled": true,
+      "priority": 3,
+      "caching": {
+        "enabled": true,
+        "threshold": 0.75,
+        "max_cache_age_hours": 48,
+        "max_responses": 1000,
+        "similarity_analyzer_enabled": true,
+        "fallback_cache_enabled": true
+      },
+      "api_key": "",
+      "endpoint": "",
+      "timeout": 30,
+      "max_retries": 2
+    }
+  },
+  "default_provider": "openrouter",
+  "fallback_enabled": true,
+  "fallback_provider": "runpod",
+  "auto_switch": true,
+  "models": {
+    "openai/gpt-3.5-turbo": {
+      "name": "openai/gpt-3.5-turbo",
+      "provider": "openrouter",
+      "enabled": true,
+      "caching": {
+        "enabled": true,
+        "threshold": 0.8,
+        "max_cache_age_hours": 24,
+        "max_responses": 1000,
+        "similarity_analyzer_enabled": true,
+        "fallback_cache_enabled": true
+      },
+      "max_tokens": 2048,
+      "temperature": 0.7,
+      "context_length": 16385
+    },
+    "anthropic/claude-3-haiku": {
+      "name": "anthropic/claude-3-haiku",
+      "provider": "openrouter",
+      "enabled": true,
+      "caching": {
+        "enabled": true,
+        "threshold": 0.85,
+        "max_cache_age_hours": 12,
+        "max_responses": 1000,
+        "similarity_analyzer_enabled": true,
+        "fallback_cache_enabled": true
+      },
+      "max_tokens": 4000,
+      "temperature": 0.7,
+      "context_length": 200000
+    },
+    "llama3:latest": {
+      "name": "llama3:latest",
+      "provider": "runpod",
+      "enabled": true,
+      "caching": {
+        "enabled": false,
+        "threshold": 0.7,
+        "max_cache_age_hours": 6,
+        "max_responses": 1000,
+        "similarity_analyzer_enabled": true,
+        "fallback_cache_enabled": true
+      },
+      "max_tokens": 4096,
+      "temperature": 0.7,
+      "context_length": 8192
+    }
+  },
+  "default_model": "openai/gpt-3.5-turbo",
+  "environment": "development",
+  "debug": false,
+  "log_level": "INFO"
+}

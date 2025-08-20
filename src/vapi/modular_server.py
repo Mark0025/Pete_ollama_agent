@@ -23,6 +23,7 @@ from ai.model_manager import ModelManager
 from vapi.api.vapi_router import create_vapi_router
 from vapi.api.admin_router import create_admin_router
 from vapi.api.ui_router import create_ui_router
+from vapi.api.system_config_router import create_system_config_router
 
 class ModularVAPIServer:
     """Modular VAPI Server with clean separation of concerns"""
@@ -102,11 +103,13 @@ class ModularVAPIServer:
             ui_router = create_ui_router(self.model_manager)
             admin_router = create_admin_router(self.model_manager, self.runpod_api_key)
             vapi_router = create_vapi_router(self.model_manager, self.vapi_api_key)
+            system_config_router = create_system_config_router()
             
             # Include routers
             self.app.include_router(ui_router)
             self.app.include_router(admin_router)
             self.app.include_router(vapi_router)
+            self.app.include_router(system_config_router)
             
             logger.info("✅ All routers included successfully")
             

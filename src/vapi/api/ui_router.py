@@ -252,6 +252,76 @@ class UIRouter:
                     "error": str(e),
                     "message": f"Failed to switch provider: {str(e)}"
                 }
+        
+        @self.router.post("/test/stream")
+        async def test_stream(request: Request):
+            """Stream AI response token-by-token for testing"""
+            import json
+            import time
+            
+            start_time = time.time()
+            request_id = f"req_{int(start_time)}_{hash(time.time()) % 10000}"
+            
+            try:
+                from fastapi.responses import StreamingResponse
+                
+                body = await request.json()
+                message = body.get('message', '')
+                model_name = body.get('model')
+                
+                if not message:
+                    raise HTTPException(status_code=400, detail="Message required")
+
+                logger.info(f"🔄 UI STREAM [{request_id}] Starting - Model: {model_name}, Message: {message[:50]}...")
+                
+                # Check if model manager supports streaming
+                if hasattr(self.model_manager, 'generate_stream'):
+                    # Use streaming if available
+                    def token_iter():
+                        full_response = ""
+                        token_count = 0
+                        first_token_time = None
+                        
+                        for token in self.model_manager.generate_stream(message, model_name=model_name):
+                            if first_token_time is None:
+                                first_token_time = time.time()
+                            
+                            full_response += token
+                            token_count += 1
+                            yield token
+                        
+                        # Log completion
+                        end_time = time.time()
+                        total_duration = end_time - start_time
+                        first_token_latency = (first_token_time - start_time) if first_token_time else 0
+                        tokens_per_second = token_count / total_duration if total_duration > 0 else 0
+                        
+                        logger.info(f"📊 UI STREAM [{request_id}] Complete - Duration: {total_duration:.2f}s, Tokens: {token_count}, TPS: {tokens_per_second:.2f}")
+                    
+                    return StreamingResponse(token_iter(), media_type='text/plain')
+                else:
+                    # Fallback to regular response if streaming not available
+                    response = self.model_manager.generate_response(message, model_name=model_name)
+                    
+                    # Simulate streaming by yielding chunks
+                    def simulate_stream():
+                        words = response.split()
+                        for i, word in enumerate(words):
+                            if i == 0:
+                                yield word
+                            else:
+                                yield " " + word
+                            # Small delay to simulate streaming
+                            import time
+                            time.sleep(0.05)
+                    
+                    return StreamingResponse(simulate_stream(), media_type='text/plain')
+                    
+            except Exception as e:
+                end_time = time.time()
+                error_duration = end_time - start_time
+                logger.error(f"❌ UI STREAM [{request_id}] Error after {error_duration:.2f}s: {str(e)}")
+                raise HTTPException(status_code=500, detail=str(e))
 
 def create_ui_router(model_manager: ModelManager) -> APIRouter:
     """Factory function to create UI router"""

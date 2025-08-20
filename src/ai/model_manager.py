@@ -22,9 +22,9 @@ except ImportError:
 
 # Import OpenRouter handler for provider switching
 try:
-    from openrouter_handler import OpenRouterHandler
+    from ..openrouter_handler import OpenRouterHandler
 except ImportError:
-    sys.path.insert(0, str(Path(__file__).parent.parent.parent))
+    sys.path.insert(0, str(Path(__file__).parent.parent))
     from openrouter_handler import OpenRouterHandler
 
 # Import conversation similarity system for intelligent instant responses
@@ -54,20 +54,31 @@ class ModelManager:
         self.settings_file = Path("config/model_settings.json")
         self.default_model = self._load_default_model()
         
-        # Base and fine-tuned model names can be overridden via env vars so they can be
-        # changed at deploy time without rebuilding the image.
-        # Fall back to a small quantised model that is quick to pull/start.
-        self.model_name = os.getenv('OLLAMA_BASE_MODEL', 'mistral:7b-instruct-q4_K_M')
-        self.custom_model_name = os.getenv('OLLAMA_CUSTOM_MODEL', self.default_model or 'peteollama:property-manager')
+        # Base and fine-tuned model names from system configuration
+        try:
+            from config.system_config import system_config
+            global_settings = system_config.get_global_settings()
+            self.model_name = global_settings['ollama_model']
+            self.custom_model_name = global_settings['jamie_custom_model']
+            self.max_tokens = global_settings['max_tokens']
+        except Exception as e:
+            print(f"⚠️ Failed to load system config, using fallback: {e}")
+            self.model_name = os.getenv('OLLAMA_BASE_MODEL', 'mistral:7b-instruct-q4_K_M')
+            self.custom_model_name = os.getenv('OLLAMA_CUSTOM_MODEL', self.default_model or 'peteollama:property-manager')
+            self.max_tokens = int(os.getenv('MAX_TOKENS', '4096'))
         
         # Model configuration
         self.temperature = 0.7
-        self.max_tokens = int(os.getenv('MAX_TOKENS', '4096'))  # Increased for longer responses
         self.context_window = 128000
         
         # Initialize conversation similarity analyzer for intelligent responses
-        # Set similarity threshold for instant responses (0.75 = 75% similarity)
-        self.similarity_threshold = float(os.getenv('SIMILARITY_THRESHOLD', '0.75'))
+        # Get similarity threshold from system configuration
+        try:
+            from config.system_config import system_config
+            self.similarity_threshold = system_config.get_caching_config().threshold
+        except Exception as e:
+            print(f"⚠️ Failed to load system config, using fallback: {e}")
+            self.similarity_threshold = float(os.getenv('SIMILARITY_THRESHOLD', '0.75'))
         self.similarity_analyzer = None  # Lazy load to avoid startup delays
         
         # Initialize provider handlers
@@ -99,31 +110,58 @@ class ModelManager:
         return self.openrouter_handler
     
     def _get_current_provider(self) -> str:
-        """Get current provider from settings"""
+        """Get current provider from system configuration"""
         try:
-            # Import model settings to get current provider
-            from config.model_settings import model_settings
-            settings = model_settings.get_provider_settings()
-            provider = settings.get('default_provider', 'ollama')
+            # Import system config to get current provider
+            from config.system_config import system_config
+            provider = system_config.config.default_provider
             print(f"🔧 Current provider: {provider}")
             return provider
         except Exception as e:
-            print(f"⚠️ Error getting current provider: {e}, defaulting to ollama")
-            return 'ollama'
+            print(f"⚠️ Error getting current provider from system config: {e}")
+            try:
+                # Fallback to old model settings
+                from config.model_settings import model_settings
+                settings = model_settings.get_provider_settings()
+                provider = settings.get('default_provider', 'ollama')
+                print(f"🔧 Fallback provider: {provider}")
+                return provider
+            except Exception as e2:
+                print(f"⚠️ Fallback failed: {e2}, defaulting to ollama")
+                return 'ollama'
     
     def _route_to_provider(self, prompt: str, model_name: str = None, **kwargs) -> Dict[str, Any]:
         """Route request to appropriate provider based on settings"""
         provider = self._get_current_provider()
         
         if provider == 'openrouter':
-            print(f"🌐 Routing to OpenRouter")
+            from utils.logger import logger
+            logger.info(f"🌐 ROUTING TO OPENROUTER")
+            logger.info(f"🎯 Requested model: {model_name}")
+            logger.info(f"📝 Prompt length: {len(prompt)} chars")
+            
             handler = self._get_openrouter_handler()
             if handler and handler.available:
                 # Map Ollama model names to OpenRouter models
                 openrouter_model = self._map_to_openrouter_model(model_name)
-                return handler.chat_completion(prompt, model=openrouter_model, **kwargs)
+                logger.info(f"🔄 Mapped to OpenRouter model: {openrouter_model}")
+                
+                result = handler.chat_completion(prompt, model=openrouter_model, **kwargs)
+                
+                # Log the response source and metadata
+                if result and 'response_metadata' in result:
+                    metadata = result['response_metadata']
+                    logger.info(f"✅ OpenRouter response completed")
+                    logger.info(f"📊 Source: {metadata.get('source', 'unknown')}")
+                    logger.info(f"📏 Length: {metadata.get('length', 'unknown')} chars")
+                    logger.info(f"✂️ Truncated: {metadata.get('is_truncated', 'unknown')}")
+                elif result and 'response' in result:
+                    logger.info(f"✅ OpenRouter response completed (no metadata)")
+                    logger.info(f"📏 Response length: {len(result['response'])} chars")
+                
+                return result
             else:
-                print(f"⚠️ OpenRouter not available, falling back to RunPod")
+                logger.warning(f"⚠️ OpenRouter not available, falling back to RunPod")
                 return pete_handler.chat_completion(prompt, model=model_name, **kwargs)
         
         elif provider == 'ollama':
@@ -146,18 +184,19 @@ class ModelManager:
     def _map_to_openrouter_model(self, ollama_model: str) -> str:
         """Map Ollama model names to OpenRouter model names"""
         if not ollama_model:
-            return "meta-llama/llama-3.1-8b-instruct:free"
+            return "openai/gpt-3.5-turbo"  # Use working model as default
         
-        # Simple mapping - can be expanded
+        # Map to working OpenRouter models
         model_mapping = {
-            "llama3:latest": "meta-llama/llama-3.1-8b-instruct:free",
-            "llama3:8b": "meta-llama/llama-3.1-8b-instruct:free",
-            "mistral:latest": "mistralai/mistral-7b-instruct:free",
-            "mixtral:latest": "mistralai/mixtral-8x7b-instruct:free",
+            "llama3:latest": "openai/gpt-3.5-turbo",
+            "llama3:8b": "openai/gpt-3.5-turbo",
+            "mistral:latest": "anthropic/claude-3-haiku",
+            "mixtral:latest": "openai/gpt-4o-mini",
         }
         
-        # Default to a good free model if no mapping found
-        return model_mapping.get(ollama_model, "meta-llama/llama-3.1-8b-instruct:free")
+        # Default to working models if no mapping found
+        working_models = ["openai/gpt-3.5-turbo", "openai/gpt-4o-mini", "anthropic/claude-3-haiku"]
+        return model_mapping.get(ollama_model, working_models[0])
     
     def _ollama_completion(self, prompt: str, model_name: str = None, **kwargs) -> Dict[str, Any]:
         """Direct Ollama API completion"""
@@ -304,14 +343,21 @@ class ModelManager:
                     # Check if similarity is high enough for instant response
                     if similarity_result.similarity_score >= self.similarity_threshold and similarity_result.best_match:
                         response = similarity_result.best_match.agent_response
-                        print(f"🎯 SIMILARITY HIT ({similarity_time:.0f}ms, {similarity_result.similarity_score:.3f}): {prompt[:50]}...")
-                        print(f"   📝 Response: {response[:80]}...")
+                        response_length = len(response)
+                        
+                        from utils.logger import logger
+                        logger.info(f"🎯 CONVERSATION SIMILARITY HIT - Using cached response")
+                        logger.info(f"📊 Similarity score: {similarity_result.similarity_score:.3f}")
+                        logger.info(f"⏱️ Response time: {similarity_time:.0f}ms (instant)")
+                        logger.info(f"📏 Response length: {response_length} chars")
+                        logger.info(f"📄 Response preview: {response[:100]}{'...' if response_length > 100 else ''}")
+                        logger.info(f"🔑 Source: conversation_similarity_analyzer")
                         
                         # Add to fallback cache for future use
                         try:
                             response_cache.add_response_to_cache(prompt, response)
                         except Exception as cache_error:
-                            print(f"⚠️ Cache update failed: {cache_error}")
+                            logger.warning(f"⚠️ Cache update failed: {cache_error}")
                         
                         return response
                     else:
@@ -328,11 +374,20 @@ class ModelManager:
             cached_response = get_instant_response(prompt)
             if cached_response:
                 cache_time = (time.time() - cache_start) * 1000
-                print(f"⚡ FALLBACK CACHE HIT ({cache_time:.1f}ms): {prompt[:50]}...")
+                response_length = len(cached_response)
+                
+                from utils.logger import logger
+                logger.info(f"⚡ FALLBACK CACHE HIT - Using cached response")
+                logger.info(f"⏱️ Response time: {cache_time:.1f}ms (instant)")
+                logger.info(f"📏 Response length: {response_length} chars")
+                logger.info(f"📄 Response preview: {cached_response[:100]}{'...' if response_length > 100 else ''}")
+                logger.info(f"🔑 Source: fallback_response_cache")
+                
                 return cached_response
             
             cache_time = (time.time() - cache_start) * 1000
-            print(f"🔍 All caches miss ({cache_time:.1f}ms), routing to provider...")
+            from utils.logger import logger
+            logger.info(f"🔍 All caches miss ({cache_time:.1f}ms), routing to provider...")
             
             # STEP 3: Route to appropriate provider based on settings
             full_prompt = self._prepare_prompt(prompt, context)
@@ -348,13 +403,21 @@ class ModelManager:
             if result.get('status') == 'success':
                 response = result.get('response', 'No response generated.')
                 actual_provider = result.get('provider', provider)
-                print(f"✅ {actual_provider.upper()} response ({provider_time:.0f}ms): {response[:50]}...")
+                response_length = len(response)
+                
+                from utils.logger import logger
+                logger.info(f"✅ {actual_provider.upper()} response completed")
+                logger.info(f"⏱️ Response time: {provider_time:.0f}ms")
+                logger.info(f"📏 Response length: {response_length} chars")
+                logger.info(f"📄 Response preview: {response[:100]}{'...' if response_length > 100 else ''}")
+                logger.info(f"🔑 Source: {actual_provider}_provider")
                 
                 # STEP 4: Add successful response to cache for future instant replies
                 try:
                     response_cache.add_response_to_cache(prompt, response)
+                    logger.info(f"💾 Response added to cache for future use")
                 except Exception as cache_error:
-                    print(f"⚠️ Cache update failed: {cache_error}")
+                    logger.warning(f"⚠️ Cache update failed: {cache_error}")
                 
                 return response
             else:

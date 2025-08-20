@@ -286,5 +286,10 @@
       "last_updated": "2025-08-19T15:35:48.863311"
     }
   },
-  "last_updated": "2025-08-19T15:35:48.863509"
+  "last_updated": "2025-08-19T15:35:48.863509",
+  "provider_settings": {
+    "default_provider": "openrouter",
+    "fallback_enabled": false,
+    "last_updated": "2025-08-19T17:18:55.706255"
+  }
 }

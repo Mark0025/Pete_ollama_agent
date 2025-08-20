@@ -1,0 +1,618 @@
+{
+  "suite_name": "Comprehensive System Test Suite",
+  "start_time": "2025-08-19T19:50:14.308513",
+  "end_time": "2025-08-19T19:52:13.758207",
+  "total_tests": 13,
+  "passed_tests": 13,
+  "failed_tests": 0,
+  "error_tests": 0,
+  "skipped_tests": 0,
+  "test_results": [
+    {
+      "test_name": "System Config Loading",
+      "status": "PASS",
+      "duration_ms": 0.8702278137207031,
+      "details": {
+        "result": "Test passed successfully"
+      },
+      "error_message": null,
+      "timestamp": "2025-08-19T19:50:14.309708"
+    },
+    {
+      "test_name": "Model Settings Loading",
+      "status": "PASS",
+      "duration_ms": 0.6940364837646484,
+      "details": {
+        "result": "Test passed successfully"
+      },
+      "error_message": null,
+      "timestamp": "2025-08-19T19:50:14.310599"
+    },
+    {
+      "test_name": "Environment Variables",
+      "status": "PASS",
+      "duration_ms": 0.34809112548828125,
+      "details": {
+        "result": "Test passed successfully"
+      },
+      "error_message": null,
+      "timestamp": "2025-08-19T19:50:14.311106"
+    },
+    {
+      "test_name": "Configuration Conflicts",
+      "status": "PASS",
+      "duration_ms": 1.0061264038085938,
+      "details": {
+        "result": {
+          "conflicts_found": 0,
+          "conflicts": {},
+          "has_conflicts": false
+        }
+      },
+      "error_message": null,
+      "timestamp": "2025-08-19T19:50:14.312422"
+    },
+    {
+      "test_name": "ModelManager Initialization",
+      "status": "PASS",
+      "duration_ms": 52334.526777267456,
+      "details": {
+        "result": "Test passed successfully"
+      },
+      "error_message": null,
+      "timestamp": "2025-08-19T19:51:06.647552"
+    },
+    {
+      "test_name": "ModelManager Config Source",
+      "status": "PASS",
+      "duration_ms": 1.2049674987792969,
+      "details": {
+        "result": {
+          "current_values": {
+            "similarity_threshold": 0.9,
+            "current_provider": "openrouter",
+            "base_url": "http://localhost:11434",
+            "model_name": "qwen2.5:7b",
+            "max_tokens": 4096
+          },
+          "expected_values": {
+            "system_config": {
+              "similarity_threshold": 0.9,
+              "default_provider": "openrouter",
+              "default_model": "openai/gpt-3.5-turbo"
+            },
+            "model_settings": {
+              "default_provider": "openrouter",
+              "fallback_provider": "runpod"
+            },
+            "environment": {
+              "similarity_threshold": null,
+              "ollama_host": null,
+              "max_tokens": null
+            }
+          },
+          "configuration_source": "ModelManager internal state"
+        }
+      },
+      "error_message": null,
+      "timestamp": "2025-08-19T19:51:06.648976"
+    },
+    {
+      "test_name": "API Endpoints",
+      "status": "PASS",
+      "duration_ms": 1833.956241607666,
+      "details": {
+        "result": {
+          "/admin": {
+            "status_code": 200,
+            "content_type": "text/html; charset=utf-8",
+            "content_length": 9055,
+            "accessible": true
+          },
+          "/admin/system-config": {
+            "status_code": 200,
+            "content_type": "text/html; charset=utf-8",
+            "content_length": 16474,
+            "accessible": true
+          },
+          "/admin/status": {
+            "status_code": 200,
+            "content_type": "application/json",
+            "content_length": 570,
+            "accessible": true
+          },
+          "/admin/provider-settings": {
+            "status_code": 200,
+            "content_type": "application/json",
+            "content_length": 102,
+            "accessible": true
+          },
+          "/vapi/v1/chat/completions": {
+            "status_code": 405,
+            "content_type": "application/json",
+            "content_length": 31,
+            "accessible": false
+          },
+          "/vapi/personas": {
+            "status_code": 200,
+            "content_type": "application/json",
+            "content_length": 10086,
+            "accessible": true
+          },
+          "/css/system-config-ui.css": {
+            "status_code": 200,
+            "content_type": "text/css; charset=utf-8",
+            "content_length": 8663,
+            "accessible": true
+          },
+          "/js/system-config-ui.js": {
+            "status_code": 200,
+            "content_type": "text/javascript; charset=utf-8",
+            "content_length": 20973,
+            "accessible": true
+          }
+        }
+      },
+      "error_message": null,
+      "timestamp": "2025-08-19T19:51:08.483329"
+    },
+    {
+      "test_name": "Chat Completions Endpoint",
+      "status": "PASS",
+      "duration_ms": 64621.99306488037,
+      "details": {
+        "result": {
+          "openai/gpt-3.5-turbo_Hello, how are you?": {
+            "model": "openai/gpt-3.5-turbo",
+            "prompt": "Hello, how are you?",
+            "error": "HTTPConnectionPool(host='localhost', port=8000): Read timed out. (read timeout=30)",
+            "success": false
+          },
+          "openai/gpt-3.5-turbo_What is 2+2?": {
+            "model": "openai/gpt-3.5-turbo",
+            "prompt": "What is 2+2?",
+            "status_code": 200,
+            "response_time_ms": 26564.920000000002,
+            "response_size": 405,
+            "success": true,
+            "response_data": {
+              "id": "chatcmpl-48589120",
+              "object": "chat.completion",
+              "created": 1755651125,
+              "model": "openai/gpt-3.5-turbo",
+              "choices": [
+                {
+                  "index": 0,
+                  "message": {
+                    "role": "assistant",
+                    "content": "Hello,\n\n2 + 2 equals 4. If you have any other questions or need assistance with property management tasks, feel free to ask.\n\nThank you."
+                  },
+                  "finish_reason": "stop"
+                }
+              ],
+              "usage": {
+                "prompt_tokens": 3,
+                "completion_tokens": 25,
+                "total_tokens": 28
+              }
+            }
+          },
+          "openai/gpt-3.5-turbo_Explain quantum comp": {
+            "model": "openai/gpt-3.5-turbo",
+            "prompt": "Explain quantum computing in simple terms",
+            "status_code": 200,
+            "response_time_ms": 1128.972,
+            "response_size": 612,
+            "success": true,
+            "response_data": {
+              "id": "chatcmpl--3699504",
+              "object": "chat.completion",
+              "created": 1755651126,
+              "model": "openai/gpt-3.5-turbo",
+              "choices": [
+                {
+                  "index": 0,
+                  "message": {
+                    "role": "assistant",
+                    "content": "Quantum computing is a type of computing that uses quantum-mechanical phenomena, such as superposition and entanglement, to perform operations on data. In simple terms, it allows for calculations to be done much faster and more efficiently than traditional computers. If you have any more questions or need further clarification, feel free to ask!"
+                  },
+                  "finish_reason": "stop"
+                }
+              ],
+              "usage": {
+                "prompt_tokens": 6,
+                "completion_tokens": 53,
+                "total_tokens": 59
+              }
+            }
+          },
+          "anthropic/claude-3-haiku_Hello, how are you?": {
+            "model": "anthropic/claude-3-haiku",
+            "prompt": "Hello, how are you?",
+            "status_code": 200,
+            "response_time_ms": 153.703,
+            "response_size": 290,
+            "success": true,
+            "response_data": {
+              "id": "chatcmpl-42165495",
+              "object": "chat.completion",
+              "created": 1755651126,
+              "model": "anthropic/claude-3-haiku",
+              "choices": [
+                {
+                  "index": 0,
+                  "message": {
+                    "role": "assistant",
+                    "content": "I'll get that sent over"
+                  },
+                  "finish_reason": "stop"
+                }
+              ],
+              "usage": {
+                "prompt_tokens": 4,
+                "completion_tokens": 5,
+                "total_tokens": 9
+              }
+            }
+          },
+          "anthropic/claude-3-haiku_What is 2+2?": {
+            "model": "anthropic/claude-3-haiku",
+            "prompt": "What is 2+2?",
+            "status_code": 200,
+            "response_time_ms": 1069.41,
+            "response_size": 395,
+            "success": true,
+            "response_data": {
+              "id": "chatcmpl-61954606",
+              "object": "chat.completion",
+              "created": 1755651127,
+              "model": "anthropic/claude-3-haiku",
+              "choices": [
+                {
+                  "index": 0,
+                  "message": {
+                    "role": "assistant",
+                    "content": "Hello, \n\nThe sum of 2+2 is 4. Let me know if you have any other questions or if there's anything else I can assist you with."
+                  },
+                  "finish_reason": "stop"
+                }
+              ],
+              "usage": {
+                "prompt_tokens": 3,
+                "completion_tokens": 26,
+                "total_tokens": 29
+              }
+            }
+          },
+          "anthropic/claude-3-haiku_Explain quantum comp": {
+            "model": "anthropic/claude-3-haiku",
+            "prompt": "Explain quantum computing in simple terms",
+            "status_code": 200,
+            "response_time_ms": 1173.413,
+            "response_size": 693,
+            "success": true,
+            "response_data": {
+              "id": "chatcmpl--5084742",
+              "object": "chat.completion",
+              "created": 1755651128,
+              "model": "anthropic/claude-3-haiku",
+              "choices": [
+                {
+                  "index": 0,
+                  "message": {
+                    "role": "assistant",
+                    "content": "Quantum computing is a type of computing that uses quantum-mechanical phenomena, such as superposition and entanglement, to perform operations on data. Unlike classical computing, which uses bits to represent data as either 0 or 1, quantum computing uses quantum bits or qubits, which can represent 0, 1, or both at the same time. This allows quantum computers to solve certain problems much faster than classical computers."
+                  },
+                  "finish_reason": "stop"
+                }
+              ],
+              "usage": {
+                "prompt_tokens": 6,
+                "completion_tokens": 66,
+                "total_tokens": 72
+              }
+            }
+          },
+          "llama3:latest_Hello, how are you?": {
+            "model": "llama3:latest",
+            "prompt": "Hello, how are you?",
+            "status_code": 200,
+            "response_time_ms": 159.17000000000002,
+            "response_size": 279,
+            "success": true,
+            "response_data": {
+              "id": "chatcmpl-42165495",
+              "object": "chat.completion",
+              "created": 1755651128,
+              "model": "llama3:latest",
+              "choices": [
+                {
+                  "index": 0,
+                  "message": {
+                    "role": "assistant",
+                    "content": "I'll get that sent over"
+                  },
+                  "finish_reason": "stop"
+                }
+              ],
+              "usage": {
+                "prompt_tokens": 4,
+                "completion_tokens": 5,
+                "total_tokens": 9
+              }
+            }
+          },
+          "llama3:latest_What is 2+2?": {
+            "model": "llama3:latest",
+            "prompt": "What is 2+2?",
+            "status_code": 200,
+            "response_time_ms": 784.825,
+            "response_size": 330,
+            "success": true,
+            "response_data": {
+              "id": "chatcmpl-92165728",
+              "object": "chat.completion",
+              "created": 1755651129,
+              "model": "llama3:latest",
+              "choices": [
+                {
+                  "index": 0,
+                  "message": {
+                    "role": "assistant",
+                    "content": "Hello, \n\n2+2 equals 4. Let me know if you need any further assistance."
+                  },
+                  "finish_reason": "stop"
+                }
+              ],
+              "usage": {
+                "prompt_tokens": 3,
+                "completion_tokens": 13,
+                "total_tokens": 16
+              }
+            }
+          },
+          "llama3:latest_Explain quantum comp": {
+            "model": "llama3:latest",
+            "prompt": "Explain quantum computing in simple terms",
+            "status_code": 200,
+            "response_time_ms": 1156.8290000000002,
+            "response_size": 717,
+            "success": true,
+            "response_data": {
+              "id": "chatcmpl-73061916",
+              "object": "chat.completion",
+              "created": 1755651130,
+              "model": "llama3:latest",
+              "choices": [
+                {
+                  "index": 0,
+                  "message": {
+                    "role": "assistant",
+                    "content": "Quantum computing is a type of computing that uses quantum-mechanical phenomena, such as superposition and entanglement, to perform operations on data. Traditional computers use bits, which can be either 0 or 1, while quantum computers use quantum bits or qubits, which can represent 0, 1, or both at the same time. This allows quantum computers to process huge amounts of data simultaneously and solve complex problems much faster than traditional computers."
+                  },
+                  "finish_reason": "stop"
+                }
+              ],
+              "usage": {
+                "prompt_tokens": 6,
+                "completion_tokens": 71,
+                "total_tokens": 77
+              }
+            }
+          },
+          "mistral:7b-instruct-q4_K_M_Hello, how are you?": {
+            "model": "mistral:7b-instruct-q4_K_M",
+            "prompt": "Hello, how are you?",
+            "status_code": 200,
+            "response_time_ms": 144.16,
+            "response_size": 292,
+            "success": true,
+            "response_data": {
+              "id": "chatcmpl-42165495",
+              "object": "chat.completion",
+              "created": 1755651130,
+              "model": "mistral:7b-instruct-q4_K_M",
+              "choices": [
+                {
+                  "index": 0,
+                  "message": {
+                    "role": "assistant",
+                    "content": "I'll get that sent over"
+                  },
+                  "finish_reason": "stop"
+                }
+              ],
+              "usage": {
+                "prompt_tokens": 4,
+                "completion_tokens": 5,
+                "total_tokens": 9
+              }
+            }
+          },
+          "mistral:7b-instruct-q4_K_M_What is 2+2?": {
+            "model": "mistral:7b-instruct-q4_K_M",
+            "prompt": "What is 2+2?",
+            "status_code": 200,
+            "response_time_ms": 1052.649,
+            "response_size": 380,
+            "success": true,
+            "response_data": {
+              "id": "chatcmpl-43464213",
+              "object": "chat.completion",
+              "created": 1755651131,
+              "model": "mistral:7b-instruct-q4_K_M",
+              "choices": [
+                {
+                  "index": 0,
+                  "message": {
+                    "role": "assistant",
+                    "content": "Hi there! The answer to 2+2 is 4. If you have any other questions or need assistance, feel free to reach out."
+                  },
+                  "finish_reason": "stop"
+                }
+              ],
+              "usage": {
+                "prompt_tokens": 3,
+                "completion_tokens": 22,
+                "total_tokens": 25
+              }
+            }
+          },
+          "mistral:7b-instruct-q4_K_M_Explain quantum comp": {
+            "model": "mistral:7b-instruct-q4_K_M",
+            "prompt": "Explain quantum computing in simple terms",
+            "status_code": 200,
+            "response_time_ms": 1207.581,
+            "response_size": 724,
+            "success": true,
+            "response_data": {
+              "id": "chatcmpl-67557029",
+              "object": "chat.completion",
+              "created": 1755651133,
+              "model": "mistral:7b-instruct-q4_K_M",
+              "choices": [
+                {
+                  "index": 0,
+                  "message": {
+                    "role": "assistant",
+                    "content": "Quantum computing is a type of computing that uses quantum-mechanical phenomena, like superposition and entanglement, to perform operations on data. This allows quantum computers to process information in a fundamentally different way than traditional computers, potentially solving complex problems much faster. Think of it as a new kind of computer that can tackle tasks that are currently impossible or very difficult for regular computers to handle."
+                  },
+                  "finish_reason": "stop"
+                }
+              ],
+              "usage": {
+                "prompt_tokens": 6,
+                "completion_tokens": 66,
+                "total_tokens": 72
+              }
+            }
+          }
+        }
+      },
+      "error_message": null,
+      "timestamp": "2025-08-19T19:52:13.105750"
+    },
+    {
+      "test_name": "OpenRouter Handler",
+      "status": "PASS",
+      "duration_ms": 0.5118846893310547,
+      "details": {
+        "result": {
+          "error": "'OpenRouterHandler' object has no attribute 'list_models'"
+        }
+      },
+      "error_message": null,
+      "timestamp": "2025-08-19T19:52:13.108552"
+    },
+    {
+      "test_name": "RunPod Handler",
+      "status": "PASS",
+      "duration_ms": 627.683162689209,
+      "details": {
+        "result": {
+          "available": true,
+          "test_completion_success": true,
+          "test_result": {
+            "error": "Failed to submit job",
+            "status": "error"
+          }
+        }
+      },
+      "error_message": null,
+      "timestamp": "2025-08-19T19:52:13.736434"
+    },
+    {
+      "test_name": "Pydantic Validation",
+      "status": "PASS",
+      "duration_ms": 0.5939006805419922,
+      "details": {
+        "result": {
+          "VAPIChatRequest": {
+            "valid": true,
+            "model": "openai/gpt-3.5-turbo",
+            "messages_count": 1
+          },
+          "VAPIChatResponse": {
+            "valid": true,
+            "id": "test-123",
+            "choices_count": 1
+          }
+        }
+      },
+      "error_message": null,
+      "timestamp": "2025-08-19T19:52:13.737507"
+    },
+    {
+      "test_name": "Beartype Validation",
+      "status": "PASS",
+      "duration_ms": 18.448829650878906,
+      "details": {
+        "result": {
+          "basic_validation": {
+            "valid": true,
+            "result": "John is 30 years old"
+          },
+          "type_error_handling": {
+            "valid": true,
+            "error_type": "BeartypeCallHintParamViolation",
+            "error_message": "Function\u001b[1m\u001b[35m __main__.ComprehensiveSystemTestSuite.test_beartype_validation.test_function()\u001b[0m parameter \u001b[1m\u001b[34mage\u001b[0m=\u001b[1m\u001b[31m'thirty'\u001b[0m violates type hint \u001b[1m\u001b[32m<class 'int'>\u001b[0m, as \u001b[1m\u001b[33mstr \u001b[0m\u001b[1m\u001b[31m'thirty'\u001b[0m not instance of \u001b[1m\u001b[33mint\u001b[0m."
+          }
+        }
+      },
+      "error_message": null,
+      "timestamp": "2025-08-19T19:52:13.756248"
+    },
+    {
+      "test_name": "End-to-End Config Flow",
+      "status": "PASS",
+      "duration_ms": 1.394033432006836,
+      "details": {
+        "result": {
+          "threshold_sync": {
+            "system_config": 0.9,
+            "model_manager": 0.9,
+            "synced": true
+          },
+          "provider_sync": {
+            "system_config": "openrouter",
+            "model_settings": "openrouter",
+            "synced": true
+          },
+          "configuration_impact": {
+            "has_impact": false,
+            "details": "Configuration changes not yet affecting runtime behavior"
+          }
+        }
+      },
+      "error_message": null,
+      "timestamp": "2025-08-19T19:52:13.757972"
+    }
+  ],
+  "summary": {
+    "configuration_systems": {
+      "system_config_working": true,
+      "model_settings_working": true,
+      "env_vars_working": true,
+      "conflicts_found": true
+    },
+    "model_manager": {
+      "initialization_working": true,
+      "config_source": "ModelManager internal state"
+    },
+    "api_endpoints": {
+      "endpoints_accessible": true,
+      "chat_completions_working": true
+    },
+    "providers": {
+      "openrouter_working": true,
+      "runpod_working": true
+    },
+    "validation": {
+      "pydantic_working": true,
+      "beartype_working": true
+    },
+    "integration": {
+      "config_flow_working": true
+    }
+  }
+}

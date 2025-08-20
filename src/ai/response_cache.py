@@ -279,10 +279,28 @@ class ResponseCache:
         
         # Only return if we have a decent match
         if best_match and best_score >= 1.0:
-            logger.info(f"⚡ Cache hit: {best_match['cache_key']} (score: {best_score:.2f}, {best_match['lookup_time_ms']:.1f}ms)")
+            response_text = best_match['response']
+            response_length = len(response_text)
+            
+            logger.info(f"⚡ CACHE HIT - Using conversation similarity response")
+            logger.info(f"🔑 Cache key: {best_match['cache_key']}")
+            logger.info(f"📊 Similarity score: {best_score:.2f}")
+            logger.info(f"📏 Response length: {response_length} chars")
+            logger.info(f"📄 Response preview: {response_text[:100]}{'...' if response_length > 100 else ''}")
+            logger.info(f"⚡ Response time: {best_match['lookup_time_ms']:.1f}ms (cached)")
+            
+            # Add metadata to show this came from cache
+            best_match['response_metadata'] = {
+                'length': response_length,
+                'source': 'conversation_similarity_cache',
+                'similarity_score': best_score,
+                'cache_key': best_match['cache_key'],
+                'response_time_ms': best_match['lookup_time_ms']
+            }
+            
             return best_match
         
-        logger.debug(f"🔍 No cache match found for: {user_query[:50]}...")
+        logger.info(f"🔍 No cache match found for: {user_query[:50]}...")
         return None
     
     def add_response_to_cache(self, user_query: str, response: str, topic: str = 'general'):

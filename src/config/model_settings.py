@@ -3,13 +3,15 @@ Model Settings Manager for controlling UI visibility and preloading.
 """
 import json
 import os
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Any
 from pathlib import Path
 from loguru import logger
 from dataclasses import dataclass, asdict
 from datetime import datetime
 import sys
-from pathlib import Path
+
+# Import our app utilities for type safety and validation
+from utils.app_utilities import safe_dict_access, validate_required_fields, error_boundary
 
 # Add src to path for imports
 sys.path.insert(0, str(Path(__file__).parent.parent))
@@ -368,6 +370,24 @@ class ModelSettingsManager:
         except Exception as e:
             logger.error(f"Error updating provider settings: {e}")
             return False
+    
+    @error_boundary
+    def list_models(self) -> List[Dict[str, Any]]:
+        """List all available models with safe attribute access"""
+        models = []
+        for model_name, model_config in self.models.items():
+            model_info = {
+                "name": model_name,
+                "display_name": safe_dict_access(model_config.__dict__, 'display_name', model_name),
+                "description": safe_dict_access(model_config.__dict__, 'description', ''),
+                "type": safe_dict_access(model_config.__dict__, 'type', 'unknown'),
+                "base_model": safe_dict_access(model_config.__dict__, 'base_model', 'unknown'),
+                "status": safe_dict_access(model_config.__dict__, 'status', 'unknown'),
+                "is_jamie_model": safe_dict_access(model_config.__dict__, 'is_jamie_model', False),
+                "show_in_ui": safe_dict_access(model_config.__dict__, 'show_in_ui', False)
+            }
+            models.append(model_info)
+        return models
 
 # Global settings manager instance
 model_settings = ModelSettingsManager()

@@ -64,6 +64,32 @@ class AdminRouter:
             except Exception as e:
                 logger.error(f"Admin dashboard error: {str(e)}")
                 raise HTTPException(status_code=500, detail=str(e))
+
+        @self.router.get("/system-config", response_class=HTMLResponse)
+        async def system_config_dashboard(request: Request):
+            """System configuration dashboard page"""
+            try:
+                # Path to the system config UI
+                config_path = Path(__file__).parent.parent.parent / "frontend" / "html" / "system-config-ui.html"
+                
+                if config_path.exists():
+                    with open(config_path, 'r', encoding='utf-8') as f:
+                        return f.read()
+                else:
+                    # Fallback to a simple message if file doesn't exist
+                    return '''
+                    <!DOCTYPE html>
+                    <html><head><title>System Configuration Not Found</title></head>
+                    <body>
+                        <h1>System Configuration Not Found</h1>
+                        <p>The system configuration UI file was not found at: {}</p>
+                        <p><a href="/admin">Go to Admin Dashboard</a></p>
+                    </body></html>
+                    '''.format(config_path)
+            
+            except Exception as e:
+                logger.error(f"System config dashboard error: {str(e)}")
+                raise HTTPException(status_code=500, detail=str(e))
         
         @self.router.get("/status")
         async def system_status():

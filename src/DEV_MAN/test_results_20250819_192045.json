@@ -1,0 +1,389 @@
+{
+  "suite_name": "Comprehensive System Test Suite",
+  "start_time": "2025-08-19T19:19:51.093168",
+  "end_time": "2025-08-19T19:20:45.370535",
+  "total_tests": 13,
+  "passed_tests": 12,
+  "failed_tests": 1,
+  "error_tests": 0,
+  "skipped_tests": 0,
+  "test_results": [
+    {
+      "test_name": "System Config Loading",
+      "status": "PASS",
+      "duration_ms": 0.640869140625,
+      "details": {
+        "result": "Test passed successfully"
+      },
+      "error_message": null,
+      "timestamp": "2025-08-19T19:19:51.094091"
+    },
+    {
+      "test_name": "Model Settings Loading",
+      "status": "FAIL",
+      "duration_ms": 0.3941059112548828,
+      "details": {
+        "result": "Test failed"
+      },
+      "error_message": null,
+      "timestamp": "2025-08-19T19:19:51.094634"
+    },
+    {
+      "test_name": "Environment Variables",
+      "status": "PASS",
+      "duration_ms": 0.17499923706054688,
+      "details": {
+        "result": "Test passed successfully"
+      },
+      "error_message": null,
+      "timestamp": "2025-08-19T19:19:51.094937"
+    },
+    {
+      "test_name": "Configuration Conflicts",
+      "status": "PASS",
+      "duration_ms": 0.43201446533203125,
+      "details": {
+        "result": {
+          "conflicts_found": 0,
+          "conflicts": {},
+          "has_conflicts": false
+        }
+      },
+      "error_message": null,
+      "timestamp": "2025-08-19T19:19:51.095477"
+    },
+    {
+      "test_name": "ModelManager Initialization",
+      "status": "PASS",
+      "duration_ms": 52201.382875442505,
+      "details": {
+        "result": "Test passed successfully"
+      },
+      "error_message": null,
+      "timestamp": "2025-08-19T19:20:43.297203"
+    },
+    {
+      "test_name": "ModelManager Config Source",
+      "status": "PASS",
+      "duration_ms": 2.420186996459961,
+      "details": {
+        "result": {
+          "current_values": {
+            "similarity_threshold": 0.75,
+            "current_provider": "openrouter",
+            "base_url": "http://localhost:11434",
+            "model_name": "mistral:7b-instruct-q4_K_M",
+            "max_tokens": 4096
+          },
+          "expected_values": {
+            "system_config": {
+              "similarity_threshold": 0.75,
+              "default_provider": "openrouter",
+              "default_model": "openai/gpt-3.5-turbo"
+            },
+            "model_settings": {
+              "default_provider": "openrouter",
+              "fallback_provider": "runpod"
+            },
+            "environment": {
+              "similarity_threshold": null,
+              "ollama_host": null,
+              "max_tokens": null
+            }
+          },
+          "configuration_source": "ModelManager internal state"
+        }
+      },
+      "error_message": null,
+      "timestamp": "2025-08-19T19:20:43.299940"
+    },
+    {
+      "test_name": "API Endpoints",
+      "status": "PASS",
+      "duration_ms": 1226.7189025878906,
+      "details": {
+        "result": {
+          "/admin": {
+            "status_code": 200,
+            "content_type": "text/html; charset=utf-8",
+            "content_length": 9055,
+            "accessible": true
+          },
+          "/admin/system-config": {
+            "status_code": 200,
+            "content_type": "text/html; charset=utf-8",
+            "content_length": 16474,
+            "accessible": true
+          },
+          "/admin/status": {
+            "status_code": 200,
+            "content_type": "application/json",
+            "content_length": 584,
+            "accessible": true
+          },
+          "/admin/provider-settings": {
+            "status_code": 200,
+            "content_type": "application/json",
+            "content_length": 102,
+            "accessible": true
+          },
+          "/api/v1/chat/completions": {
+            "status_code": 404,
+            "content_type": "application/json",
+            "content_length": 22,
+            "accessible": false
+          },
+          "/api/v1/models": {
+            "status_code": 404,
+            "content_type": "application/json",
+            "content_length": 22,
+            "accessible": false
+          },
+          "/css/system-config-ui.css": {
+            "status_code": 200,
+            "content_type": "text/css; charset=utf-8",
+            "content_length": 8663,
+            "accessible": true
+          },
+          "/js/system-config-ui.js": {
+            "status_code": 200,
+            "content_type": "text/javascript; charset=utf-8",
+            "content_length": 20973,
+            "accessible": true
+          }
+        }
+      },
+      "error_message": null,
+      "timestamp": "2025-08-19T19:20:44.528423"
+    },
+    {
+      "test_name": "Chat Completions Endpoint",
+      "status": "PASS",
+      "duration_ms": 105.76391220092773,
+      "details": {
+        "result": {
+          "openai/gpt-3.5-turbo_Hello, how are you?": {
+            "model": "openai/gpt-3.5-turbo",
+            "prompt": "Hello, how are you?",
+            "status_code": 404,
+            "response_time_ms": 7.045,
+            "response_size": 22,
+            "success": false
+          },
+          "openai/gpt-3.5-turbo_What is 2+2?": {
+            "model": "openai/gpt-3.5-turbo",
+            "prompt": "What is 2+2?",
+            "status_code": 404,
+            "response_time_ms": 5.933,
+            "response_size": 22,
+            "success": false
+          },
+          "openai/gpt-3.5-turbo_Explain quantum comp": {
+            "model": "openai/gpt-3.5-turbo",
+            "prompt": "Explain quantum computing in simple terms",
+            "status_code": 404,
+            "response_time_ms": 7.9719999999999995,
+            "response_size": 22,
+            "success": false
+          },
+          "anthropic/claude-3-haiku_Hello, how are you?": {
+            "model": "anthropic/claude-3-haiku",
+            "prompt": "Hello, how are you?",
+            "status_code": 404,
+            "response_time_ms": 6.5,
+            "response_size": 22,
+            "success": false
+          },
+          "anthropic/claude-3-haiku_What is 2+2?": {
+            "model": "anthropic/claude-3-haiku",
+            "prompt": "What is 2+2?",
+            "status_code": 404,
+            "response_time_ms": 6.947,
+            "response_size": 22,
+            "success": false
+          },
+          "anthropic/claude-3-haiku_Explain quantum comp": {
+            "model": "anthropic/claude-3-haiku",
+            "prompt": "Explain quantum computing in simple terms",
+            "status_code": 404,
+            "response_time_ms": 5.7,
+            "response_size": 22,
+            "success": false
+          },
+          "llama3:latest_Hello, how are you?": {
+            "model": "llama3:latest",
+            "prompt": "Hello, how are you?",
+            "status_code": 404,
+            "response_time_ms": 4.791,
+            "response_size": 22,
+            "success": false
+          },
+          "llama3:latest_What is 2+2?": {
+            "model": "llama3:latest",
+            "prompt": "What is 2+2?",
+            "status_code": 404,
+            "response_time_ms": 5.823,
+            "response_size": 22,
+            "success": false
+          },
+          "llama3:latest_Explain quantum comp": {
+            "model": "llama3:latest",
+            "prompt": "Explain quantum computing in simple terms",
+            "status_code": 404,
+            "response_time_ms": 5.138,
+            "response_size": 22,
+            "success": false
+          },
+          "mistral:7b-instruct-q4_K_M_Hello, how are you?": {
+            "model": "mistral:7b-instruct-q4_K_M",
+            "prompt": "Hello, how are you?",
+            "status_code": 404,
+            "response_time_ms": 4.824,
+            "response_size": 22,
+            "success": false
+          },
+          "mistral:7b-instruct-q4_K_M_What is 2+2?": {
+            "model": "mistral:7b-instruct-q4_K_M",
+            "prompt": "What is 2+2?",
+            "status_code": 404,
+            "response_time_ms": 5.706,
+            "response_size": 22,
+            "success": false
+          },
+          "mistral:7b-instruct-q4_K_M_Explain quantum comp": {
+            "model": "mistral:7b-instruct-q4_K_M",
+            "prompt": "Explain quantum computing in simple terms",
+            "status_code": 404,
+            "response_time_ms": 6.0169999999999995,
+            "response_size": 22,
+            "success": false
+          }
+        }
+      },
+      "error_message": null,
+      "timestamp": "2025-08-19T19:20:44.634902"
+    },
+    {
+      "test_name": "OpenRouter Handler",
+      "status": "PASS",
+      "duration_ms": 0.9131431579589844,
+      "details": {
+        "result": {
+          "error": "'OpenRouterHandler' object has no attribute 'list_models'"
+        }
+      },
+      "error_message": null,
+      "timestamp": "2025-08-19T19:20:44.637381"
+    },
+    {
+      "test_name": "RunPod Handler",
+      "status": "PASS",
+      "duration_ms": 706.6009044647217,
+      "details": {
+        "result": {
+          "available": true,
+          "test_completion_success": true,
+          "test_result": {
+            "error": "Failed to submit job",
+            "status": "error"
+          }
+        }
+      },
+      "error_message": null,
+      "timestamp": "2025-08-19T19:20:45.345749"
+    },
+    {
+      "test_name": "Pydantic Validation",
+      "status": "PASS",
+      "duration_ms": 0.6630420684814453,
+      "details": {
+        "result": {
+          "VAPIChatRequest": {
+            "valid": true,
+            "model": "openai/gpt-3.5-turbo",
+            "messages_count": 1
+          },
+          "VAPIChatResponse": {
+            "valid": true,
+            "id": "test-123",
+            "choices_count": 1
+          }
+        }
+      },
+      "error_message": null,
+      "timestamp": "2025-08-19T19:20:45.346911"
+    },
+    {
+      "test_name": "Beartype Validation",
+      "status": "PASS",
+      "duration_ms": 20.55501937866211,
+      "details": {
+        "result": {
+          "basic_validation": {
+            "valid": true,
+            "result": "John is 30 years old"
+          },
+          "type_error_handling": {
+            "valid": true,
+            "error_type": "BeartypeCallHintParamViolation",
+            "error_message": "Function\u001b[1m\u001b[35m __main__.ComprehensiveSystemTestSuite.test_beartype_validation.test_function()\u001b[0m parameter \u001b[1m\u001b[34mage\u001b[0m=\u001b[1m\u001b[31m'thirty'\u001b[0m violates type hint \u001b[1m\u001b[32m<class 'int'>\u001b[0m, as \u001b[1m\u001b[33mstr \u001b[0m\u001b[1m\u001b[31m'thirty'\u001b[0m not instance of \u001b[1m\u001b[33mint\u001b[0m."
+          }
+        }
+      },
+      "error_message": null,
+      "timestamp": "2025-08-19T19:20:45.367818"
+    },
+    {
+      "test_name": "End-to-End Config Flow",
+      "status": "PASS",
+      "duration_ms": 1.6541481018066406,
+      "details": {
+        "result": {
+          "threshold_sync": {
+            "system_config": 0.75,
+            "model_manager": 0.75,
+            "synced": true
+          },
+          "provider_sync": {
+            "system_config": "openrouter",
+            "model_settings": "openrouter",
+            "synced": true
+          },
+          "configuration_impact": {
+            "has_impact": false,
+            "details": "Configuration changes not yet affecting runtime behavior"
+          }
+        }
+      },
+      "error_message": null,
+      "timestamp": "2025-08-19T19:20:45.370047"
+    }
+  ],
+  "summary": {
+    "configuration_systems": {
+      "system_config_working": true,
+      "model_settings_working": false,
+      "env_vars_working": true,
+      "conflicts_found": true
+    },
+    "model_manager": {
+      "initialization_working": true,
+      "config_source": "ModelManager internal state"
+    },
+    "api_endpoints": {
+      "endpoints_accessible": true,
+      "chat_completions_working": true
+    },
+    "providers": {
+      "openrouter_working": true,
+      "runpod_working": true
+    },
+    "validation": {
+      "pydantic_working": true,
+      "beartype_working": true
+    },
+    "integration": {
+      "config_flow_working": true
+    }
+  }
+}
