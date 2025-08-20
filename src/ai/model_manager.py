@@ -44,8 +44,11 @@ except ImportError:
 class ModelManager:
     """Manages AI model interactions and training"""
     
-    def __init__(self):
-        """Initialize model manager"""
+    def __init__(self, system_config_instance: object = None):
+        """Initialize model manager with optional system config instance for real-time updates"""
+        # Store system config instance for real-time updates
+        self.system_config = system_config_instance
+        
         # Ollama server configuration
         self.ollama_host = os.getenv('OLLAMA_HOST', 'localhost:11434')
         self.base_url = f"http://{self.ollama_host}"
@@ -56,11 +59,21 @@ class ModelManager:
         
         # Base and fine-tuned model names from system configuration
         try:
-            from config.system_config import system_config
-            global_settings = system_config.get_global_settings()
-            self.model_name = global_settings['ollama_model']
-            self.custom_model_name = global_settings['jamie_custom_model']
-            self.max_tokens = global_settings['max_tokens']
+            if self.system_config:
+                # Use provided instance for real-time updates
+                global_settings = self.system_config.get_global_settings()
+                self.model_name = global_settings['ollama_model']
+                self.custom_model_name = global_settings['jamie_custom_model']
+                self.max_tokens = global_settings['max_tokens']
+                print(f"✅ Loaded model settings from provided system config")
+            else:
+                # Fallback to module import
+                from src.config.system_config import system_config
+                global_settings = system_config.get_global_settings()
+                self.model_name = global_settings['ollama_model']
+                self.custom_model_name = global_settings['jamie_custom_model']
+                self.max_tokens = global_settings['max_tokens']
+                print(f"✅ Loaded model settings from module system config")
         except Exception as e:
             print(f"⚠️ Failed to load system config, using fallback: {e}")
             self.model_name = os.getenv('OLLAMA_BASE_MODEL', 'mistral:7b-instruct-q4_K_M')
@@ -74,9 +87,15 @@ class ModelManager:
         # Initialize conversation similarity analyzer for intelligent responses
         # Get similarity threshold from system configuration
         try:
-            from src.config.system_config import system_config
-            self.similarity_threshold = system_config.get_caching_config().threshold
-            print(f"✅ Loaded similarity threshold from system config: {self.similarity_threshold}")
+            if self.system_config:
+                # Use provided instance for real-time updates
+                self.similarity_threshold = self.system_config.get_caching_config().threshold
+                print(f"✅ Loaded similarity threshold from provided system config: {self.similarity_threshold}")
+            else:
+                # Fallback to module import
+                from src.config.system_config import system_config
+                self.similarity_threshold = system_config.get_caching_config().threshold
+                print(f"✅ Loaded similarity threshold from module system config: {self.similarity_threshold}")
         except Exception as e:
             print(f"⚠️ Failed to load system config, using fallback: {e}")
             self.similarity_threshold = float(os.getenv('SIMILARITY_THRESHOLD', '0.75'))
@@ -113,11 +132,17 @@ class ModelManager:
     def _get_current_provider(self) -> str:
         """Get current provider from system configuration"""
         try:
-            # Import system config to get current provider
-            from src.config.system_config import system_config
-            provider = system_config.config.default_provider
-            print(f"🔧 Current provider from system config: {provider}")
-            return provider
+            if self.system_config:
+                # Use provided instance for real-time updates
+                provider = self.system_config.config.default_provider
+                print(f"🔧 Current provider from provided system config: {provider}")
+                return provider
+            else:
+                # Fallback to module import
+                from src.config.system_config import system_config
+                provider = system_config.config.default_provider
+                print(f"🔧 Current provider from module system config: {provider}")
+                return provider
         except Exception as e:
             print(f"⚠️ Error getting current provider from system config: {e}")
             try:

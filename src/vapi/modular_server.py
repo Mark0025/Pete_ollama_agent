@@ -85,9 +85,9 @@ class ModularVAPIServer:
     def _setup_services(self):
         """Initialize core services"""
         try:
-            # Initialize Model Manager
-            self.model_manager = ModelManager()
-            logger.info("✅ Model Manager initialized")
+            # Initialize Model Manager with system config instance for real-time updates
+            self.model_manager = ModelManager(system_config_instance=self.config)
+            logger.info("✅ Model Manager initialized with system config instance")
         except Exception as e:
             logger.error(f"❌ Failed to initialize Model Manager: {e}")
             self.model_manager = None
