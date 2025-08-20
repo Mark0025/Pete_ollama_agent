@@ -22,7 +22,7 @@ except ImportError:
         """Fallback decorator when beartype is not installed"""
         return func
 
-from utils.logger import logger
+from src.utils.logger import logger
 
 # Type aliases for common patterns
 ConfigDict = Dict[str, Any]

@@ -1,0 +1,32 @@
+{
+  "mcpServers": {
+    "Project Intelligence (Docs)": {
+      "command": "uv",
+      "args": [
+        "run",
+        "src/whatsworking_platform/integration/mcp_server.py"
+      ],
+      "env": {
+        "PIS_MODE": "docs",
+        "PYTHONUNBUFFERED": "1",
+        "PYTHONPATH": "."
+      },
+      "working_directory": "/Users/markcarpenter/Desktop/pete/ollama_agent",
+      "start_on_launch": true
+    },
+    "Project Intelligence (Goals)": {
+      "command": "uv",
+      "args": [
+        "run",
+        "src/whatsworking_platform/integration/mcp_server.py"
+      ],
+      "env": {
+        "PIS_MODE": "goals",
+        "PYTHONUNBUFFERED": "1",
+        "PYTHONPATH": "."
+      },
+      "working_directory": "/Users/markcarpenter/Desktop/pete/ollama_agent",
+      "start_on_launch": true
+    }
+  }
+}

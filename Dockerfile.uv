@@ -1,0 +1,71 @@
+# PeteOllama V1 - Production Dockerfile with UV + Database
+# Optimized for fast builds and includes persistent database
+FROM python:3.11-slim as builder
+
+# Install system dependencies for building
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install uv for fast dependency management
+RUN pip install uv
+
+# Set working directory
+WORKDIR /app
+
+# Copy dependency files
+COPY pyproject.toml uv.lock ./
+
+# Install dependencies with uv (much faster than pip)
+RUN uv sync --frozen --no-dev
+
+# Production stage
+FROM python:3.11-slim
+
+# Install runtime dependencies
+RUN apt-get update && apt-get install -y \
+    curl \
+    ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create non-root user for security
+RUN useradd --create-home --shell /bin/bash jamie
+
+# Set working directory
+WORKDIR /app
+
+# Copy virtual environment from builder
+COPY --from=builder /app/.venv /app/.venv
+
+# Copy application code
+COPY --chown=jamie:jamie src/ ./src/
+COPY --chown=jamie:jamie config/ ./config/
+COPY --chown=jamie:jamie .env* ./
+
+# Copy database files (if you want persistence)
+COPY --chown=jamie:jamie pete.db ./pete.db
+COPY --chown=jamie:jamie training_data.db ./training_data.db
+COPY --chown=jamie:jamie langchain_indexed_conversations.json ./
+
+# Create necessary directories
+RUN mkdir -p /app/data /app/logs /app/models && \
+    chown -R jamie:jamie /app
+
+# Set environment variables
+ENV PYTHONPATH=/app/src \
+    PORT=8000 \
+    PATH="/app/.venv/bin:$PATH"
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
+    CMD curl -f http://localhost:${PORT}/health || exit 1
+
+# Switch to non-root user
+USER jamie
+
+# Expose port
+EXPOSE 8000
+
+# Default command
+CMD ["python", "src/main.py"]

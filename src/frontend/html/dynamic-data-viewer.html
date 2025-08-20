@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Dynamic Data Viewer - PeteOllama</title>
+    <link rel="icon" type="image/png" href="/favicon.ico">
+    <style>
+        body{font-family:Arial,Helvetica,sans-serif;margin:20px;background:#f5f5f5}
+        .container{max-width:1400px;margin:0 auto;background:white;padding:20px;border-radius:8px;box-shadow:0 2px 10px rgba(0,0,0,0.1)}
+        .section{margin-bottom:30px;padding:20px;border:1px solid #ddd;border-radius:6px;background:#fafafa}
+        .section h3{margin-top:0;color:#333;border-bottom:2px solid #007acc;padding-bottom:10px}
+        .filter-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:15px;margin:15px 0}
+        .filter-control{background:white;padding:15px;border-radius:6px;border:1px solid #ddd}
+        .filter-control label{display:block;margin-bottom:5px;font-weight:bold;color:#333}
+        .filter-control select,.filter-control input{width:100%;padding:8px;border:1px solid #ddd;border-radius:4px;font-size:14px}
+        .filter-control input[type="range"]{padding:0}
+        .range-values{display:flex;justify-content:space-between;font-size:12px;color:#666;margin-top:5px}
+        .data-table{width:100%;border-collapse:collapse;margin:15px 0;background:white}
+        .data-table th,.data-table td{padding:12px;text-align:left;border-bottom:1px solid #ddd}
+        .data-table th{background:#f8f9fa;font-weight:bold;color:#333;position:sticky;top:0}
+        .data-table tbody tr:hover{background:#f5f5f5}
+        .stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:15px;margin:15px 0}
+        .stat-card{background:white;padding:20px;border-radius:8px;border:1px solid #ddd;text-align:center;box-shadow:0 2px 4px rgba(0,0,0,0.1)}
+        .stat-value{font-size:32px;font-weight:bold;color:#007acc;margin:10px 0}
+        .stat-label{font-size:14px;color:#666;font-weight:bold}
+        .loading{text-align:center;color:#666;font-style:italic;padding:40px}
+        .error{color:#dc3545;text-align:center;padding:20px}
+        .success{color:#28a745;text-align:center;padding:20px}
+        button{padding:10px 20px;margin:5px;background:#007acc;color:white;border:none;border-radius:4px;cursor:pointer;font-size:14px}
+        button:hover{background:#0056b3}
+        .btn-success{background:#28a745}
+        .btn-warning{background:#ffc107;color:#333}
+        .btn-danger{background:#dc3545}
+        .field-info{background:#e9ecef;padding:10px;border-radius:4px;margin:5px 0;font-size:12px}
+        .field-info strong{color:#495057}
+        .pagination{display:flex;justify-content:center;align-items:center;margin:20px 0;gap:10px}
+        .pagination button{min-width:40px}
+        .current-page{font-weight:bold;color:#007acc}
+    </style>
+</head>
+<body>
+    <!-- Pete Logo Header -->
+    <div style="text-align:center;padding:15px;background:white;border-bottom:2px solid #007acc;margin-bottom:20px;">
+        <img src="/public/pete.png" alt="PeteOllama Logo" style="height:60px;"/>
+        <h2 style="margin:5px 0 0 0;color:#007acc;">Dynamic Data Viewer</h2>
+    </div>
+
+    <div class="container">
+        <div class="section">
+            <h3>🔍 Data Source Selection</h3>
+            <div style="display:flex;gap:15px;align-items:center;margin-bottom:20px;">
+                <select id="dataSource" onchange="loadDataStructure()" style="width:300px;padding:10px;">
+                    <option value="test_results">Test Results (DEV_MAN/test_results_*.json)</option>
+                    <option value="benchmark_data">Benchmark Data</option>
+                    <option value="training_data">Training Data</option>
+                    <option value="custom">Custom JSON File</option>
+                </select>
+                <button onclick="loadDataStructure()" class="btn-success">🔄 Analyze Data Structure</button>
+                <button onclick="exportFilteredData()" class="btn-warning">📤 Export Results</button>
+            </div>
+            
+            <div id="dataSourceInfo" class="loading">
+                Select a data source and click "Analyze Data Structure"
+            </div>
+        </div>
+
+        <div class="section">
+            <h3>🎛️ Dynamic Filters</h3>
+            <div id="filterControls" class="filter-grid">
+                <div class="loading">Loading filter controls...</div>
+            </div>
+            
+            <div style="margin-top:20px;text-align:center;">
+                <button onclick="applyFilters()" class="btn-success">🔍 Apply Filters</button>
+                <button onclick="clearFilters()" class="btn-warning">🧹 Clear All Filters</button>
+                <button onclick="resetToDefaults()" class="btn-danger">🔄 Reset to Defaults</button>
+            </div>
+        </div>
+
+        <div class="section">
+            <h3>📊 Data Summary</h3>
+            <div id="dataSummary" class="stats-grid">
+                <div class="loading">Data summary will appear here...</div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h3>📋 Results Table</h3>
+            <div id="resultsTable" class="loading">
+                Apply filters to see results...
+            </div>
+            
+            <div id="pagination" class="pagination" style="display:none;">
+                <button onclick="previousPage()">◀ Previous</button>
+                <span class="current-page">Page 1</span>
+                <button onclick="nextPage()">Next ▶</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentFields = {};
+        let currentData = null;
+        let currentPage = 1;
+        let itemsPerPage = 50;
+        let totalResults = 0;
+
+        // Load and analyze data structure
+        async function loadDataStructure() {
+            const dataSource = document.getElementById('dataSource').value;
+            
+            try {
+                document.getElementById('dataSourceInfo').innerHTML = '<div class="loading">Analyzing data structure...</div>';
+                
+                const response = await fetch('/admin/data/analyze');
+                const result = await response.json();
+                
+                if (result.success) {
+                    currentFields = result.fields;
+                    displayDataStructureInfo(result);
+                    generateFilterControls(result.fields);
+                    displayDataSummary(result);
+                } else {
+                    document.getElementById('dataSourceInfo').innerHTML = 
+                        `<div class="error">❌ Error: ${result.error}</div>`;
+                }
+            } catch (error) {
+                console.error('Error loading data structure:', error);
+                document.getElementById('dataSourceInfo').innerHTML = 
+                    '<div class="error">❌ Error loading data structure</div>';
+            }
+        }
+
+        // Display data structure information
+        function displayDataStructureInfo(result) {
+            const infoDiv = document.getElementById('dataSourceInfo');
+            
+            const info = `
+                <div class="success">
+                    <h4>✅ Data Structure Analyzed Successfully</h4>
+                    <p><strong>Data Source:</strong> ${result.data_source}</p>
+                    <p><strong>Fields Discovered:</strong> ${result.fields_discovered}</p>
+                    <p><strong>Analysis Complete:</strong> ${new Date().toLocaleString()}</p>
+                </div>
+            `;
+            
+            infoDiv.innerHTML = info;
+        }
+
+        // Generate dynamic filter controls
+        function generateFilterControls(fields) {
+            const filterDiv = document.getElementById('filterControls');
+            let filterHTML = '';
+            
+            for (const [fieldName, fieldInfo] of Object.entries(fields)) {
+                filterHTML += generateFilterControl(fieldName, fieldInfo);
+            }
+            
+            filterDiv.innerHTML = filterHTML;
+        }
+
+        // Generate a single filter control
+        function generateFilterControl(fieldName, fieldInfo) {
+            const fieldPath = fieldInfo.path;
+            const filterType = fieldInfo.filter_type;
+            
+            let controlHTML = `
+                <div class="filter-control">
+                    <label for="filter_${fieldName}">${fieldName}</label>
+                    <div class="field-info">
+                        <strong>Type:</strong> ${fieldInfo.type} | 
+                        <strong>Filter:</strong> ${filterType} | 
+                        <strong>Unique:</strong> ${fieldInfo.unique_count}
+                    </div>
+            `;
+            
+            switch (filterType) {
+                case 'dropdown':
+                    controlHTML += `<select id="filter_${fieldName}" data-path="${fieldPath}">`;
+                    controlHTML += '<option value="">All</option>';
+                    if (fieldInfo.sample_values) {
+                        fieldInfo.sample_values.forEach(value => {
+                            controlHTML += `<option value="${value}">${value}</option>`;
+                        });
+                    }
+                    controlHTML += '</select>';
+                    break;
+                    
+                case 'range':
+                    const min = fieldInfo.range?.min || 0;
+                    const max = fieldInfo.range?.max || 100;
+                    controlHTML += `
+                        <input type="range" id="filter_${fieldName}" data-path="${fieldPath}" 
+                               min="${min}" max="${max}" value="${min}" step="1">
+                        <div class="range-values">
+                            <span>${min}</span>
+                            <span id="range_value_${fieldName}">${min}</span>
+                            <span>${max}</span>
+                        </div>
+                    `;
+                    // Add range value display
+                    document.addEventListener('DOMContentLoaded', () => {
+                        const rangeInput = document.getElementById(`filter_${fieldName}`);
+                        const rangeValue = document.getElementById(`range_value_${fieldName}`);
+                        if (rangeInput && rangeValue) {
+                            rangeInput.addEventListener('input', (e) => {
+                                rangeValue.textContent = e.target.value;
+                            });
+                        }
+                    });
+                    break;
+                    
+                case 'text_search':
+                    controlHTML += `<input type="text" id="filter_${fieldName}" data-path="${fieldPath}" 
+                                          placeholder="Search in ${fieldName}...">`;
+                    break;
+                    
+                case 'date_range':
+                    controlHTML += `
+                        <input type="date" id="filter_${fieldName}_start" data-path="${fieldPath}" 
+                               placeholder="Start date">
+                        <input type="date" id="filter_${fieldName}_end" data-path="${fieldPath}" 
+                               placeholder="End date" style="margin-top:5px;">
+                    `;
+                    break;
+                    
+                default:
+                    controlHTML += `<input type="text" id="filter_${fieldName}" data-path="${fieldPath}" 
+                                          placeholder="Filter ${fieldName}...">`;
+            }
+            
+            controlHTML += '</div>';
+            return filterHTML;
+        }
+
+        // Apply filters to data
+        async function applyFilters() {
+            try {
+                const filterCriteria = collectFilterCriteria();
+                
+                const response = await fetch('/admin/data/filter', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        criteria: filterCriteria,
+                        data_source: document.getElementById('dataSource').value
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    currentData = result.results;
+                    totalResults = result.total_results;
+                    currentPage = 1;
+                    displayResults(result.results);
+                    updatePagination();
+                } else {
+                    document.getElementById('resultsTable').innerHTML = 
+                        `<div class="error">❌ Error: ${result.error}</div>`;
+                }
+            } catch (error) {
+                console.error('Error applying filters:', error);
+                document.getElementById('resultsTable').innerHTML = 
+                    '<div class="error">❌ Error applying filters</div>';
+            }
+        }
+
+        // Collect filter criteria from UI
+        function collectFilterCriteria() {
+            const criteria = {
+                field_filters: {},
+                text_search: '',
+                sort_by: '',
+                sort_order: 'desc',
+                limit: itemsPerPage,
+                offset: 0
+            };
+            
+            // Collect all filter values
+            const filterControls = document.querySelectorAll('[data-path]');
+            filterControls.forEach(control => {
+                const path = control.dataset.path;
+                const value = control.value;
+                
+                if (value && value !== '') {
+                    if (control.type === 'range') {
+                        criteria.field_filters[path] = { min: 0, max: parseInt(value) };
+                    } else {
+                        criteria.field_filters[path] = value;
+                    }
+                }
+            });
+            
+            return criteria;
+        }
+
+        // Display filtered results
+        function displayResults(results) {
+            if (!results || results.length === 0) {
+                document.getElementById('resultsTable').innerHTML = 
+                    '<div class="loading">No results found with current filters</div>';
+                return;
+            }
+            
+            // Generate table headers from first result
+            const firstResult = results[0];
+            const headers = Object.keys(firstResult);
+            
+            let tableHTML = '<table class="data-table">';
+            
+            // Table header
+            tableHTML += '<thead><tr>';
+            headers.forEach(header => {
+                tableHTML += `<th>${header}</th>`;
+            });
+            tableHTML += '</tr></thead>';
+            
+            // Table body
+            tableHTML += '<tbody>';
+            results.forEach(result => {
+                tableHTML += '<tr>';
+                headers.forEach(header => {
+                    const value = result[header];
+                    let displayValue = value;
+                    
+                    if (typeof value === 'object' && value !== null) {
+                        displayValue = JSON.stringify(value).substring(0, 100);
+                        if (JSON.stringify(value).length > 100) {
+                            displayValue += '...';
+                        }
+                    } else if (typeof value === 'string' && value.length > 50) {
+                        displayValue = value.substring(0, 50) + '...';
+                    }
+                    
+                    tableHTML += `<td title="${JSON.stringify(value)}">${displayValue}</td>`;
+                });
+                tableHTML += '</tr>';
+            });
+            tableHTML += '</tbody></table>';
+            
+            document.getElementById('resultsTable').innerHTML = tableHTML;
+        }
+
+        // Update pagination
+        function updatePagination() {
+            const totalPages = Math.ceil(totalResults / itemsPerPage);
+            const paginationDiv = document.getElementById('pagination');
+            
+            if (totalPages <= 1) {
+                paginationDiv.style.display = 'none';
+                return;
+            }
+            
+            paginationDiv.style.display = 'flex';
+            paginationDiv.querySelector('.current-page').textContent = `Page ${currentPage} of ${totalPages}`;
+        }
+
+        // Navigation functions
+        function previousPage() {
+            if (currentPage > 1) {
+                currentPage--;
+                applyFilters();
+            }
+        }
+
+        function nextPage() {
+            const totalPages = Math.ceil(totalResults / itemsPerPage);
+            if (currentPage < totalPages) {
+                currentPage++;
+                applyFilters();
+            }
+        }
+
+        // Utility functions
+        function clearFilters() {
+            const filterControls = document.querySelectorAll('input, select');
+            filterControls.forEach(control => {
+                if (control.type === 'range') {
+                    const min = control.min;
+                    control.value = min;
+                    const rangeValue = document.getElementById(`range_value_${control.id.replace('filter_', '')}`);
+                    if (rangeValue) rangeValue.textContent = min;
+                } else {
+                    control.value = '';
+                }
+            });
+        }
+
+        function resetToDefaults() {
+            clearFilters();
+            loadDataStructure();
+        }
+
+        function exportFilteredData() {
+            if (!currentData || currentData.length === 0) {
+                alert('No data to export. Apply filters first.');
+                return;
+            }
+            
+            const csv = convertToCSV(currentData);
+            downloadCSV(csv, 'filtered_data.csv');
+        }
+
+        function convertToCSV(data) {
+            if (data.length === 0) return '';
+            
+            const headers = Object.keys(data[0]);
+            const csvRows = [headers.join(',')];
+            
+            data.forEach(row => {
+                const values = headers.map(header => {
+                    const value = row[header];
+                    if (typeof value === 'object') {
+                        return `"${JSON.stringify(value).replace(/"/g, '""')}"`;
+                    }
+                    return `"${String(value).replace(/"/g, '""')}"`;
+                });
+                csvRows.push(values.join(','));
+            });
+            
+            return csvRows.join('\n');
+        }
+
+        function downloadCSV(csv, filename) {
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            a.click();
+            window.URL.revokeObjectURL(url);
+        }
+
+        // Display data summary
+        function displayDataSummary(result) {
+            const summaryDiv = document.getElementById('dataSummary');
+            
+            const summary = `
+                <div class="stat-card">
+                    <div class="stat-value">${result.fields_discovered}</div>
+                    <div class="stat-label">Fields Discovered</div>
+                    <div class="stat-sublabel">Auto-detected</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">${Object.values(result.fields).filter(f => f.filter_type === 'dropdown').length}</div>
+                    <div class="stat-label">Dropdown Filters</div>
+                    <div class="stat-sublabel">Categorical</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">${Object.values(result.fields).filter(f => f.filter_type === 'range').length}</div>
+                    <div class="stat-label">Range Filters</div>
+                    <div class="stat-sublabel">Numeric</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">${Object.values(result.fields).filter(f => f.filter_type === 'text_search').length}</div>
+                    <div class="stat-label">Text Filters</div>
+                    <div class="stat-sublabel">Searchable</div>
+                </div>
+            `;
+            
+            summaryDiv.innerHTML = summary;
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            loadDataStructure();
+        });
+    </script>
+</body>
+</html>

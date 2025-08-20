@@ -1,8 +1,8 @@
 {
   "global_caching": {
     "enabled": true,
-    "threshold": 1.0,
-    "max_cache_age_hours": 24,
+    "threshold": 0.9,
+    "max_cache_age_hours": 48,
     "max_responses": 1000,
     "similarity_analyzer_enabled": true,
     "fallback_cache_enabled": true
@@ -11,12 +11,16 @@
     "openrouter": {
       "name": "openrouter",
       "enabled": true,
-      "priority": 5,
+      "priority": 1,
       "caching": {
         "enabled": true,
-        "threshold": 0.95
+        "threshold": 0.8,
+        "max_cache_age_hours": 24,
+        "max_responses": 1000,
+        "similarity_analyzer_enabled": true,
+        "fallback_cache_enabled": true
       },
-      "api_key": "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",
+      "api_key": "",
       "endpoint": "",
       "timeout": 30,
       "max_retries": 3
@@ -24,19 +28,24 @@
     "runpod": {
       "name": "runpod",
       "enabled": true,
-      "priority": 5,
+      "priority": 2,
       "caching": {
-        "enabled": false
+        "enabled": false,
+        "threshold": 0.7,
+        "max_cache_age_hours": 12,
+        "max_responses": 1000,
+        "similarity_analyzer_enabled": true,
+        "fallback_cache_enabled": true
       },
-      "api_key": "",
-      "endpoint": "",
+      "api_key": "rpa_DPL09BE6U4Z1NUDSXW8TQLR9NVQVSX4UB0S258R51a0e8y",
+      "endpoint": "vk7efas3wu5vd7",
       "timeout": 60,
       "max_retries": 5
     },
     "ollama": {
       "name": "ollama",
       "enabled": true,
-      "priority": 5,
+      "priority": 3,
       "caching": {
         "enabled": true,
         "threshold": 0.75,
@@ -108,9 +117,5 @@
   "default_model": "openai/gpt-3.5-turbo",
   "environment": "development",
   "debug": false,
-  "log_level": "INFO",
-  "ollama_host": "localhost:11434",
-  "ollama_model": "qwen2.5:7b",
-  "jamie_custom_model": "peteollama:property-manager",
-  "max_tokens": 4096
+  "log_level": "INFO"
 }

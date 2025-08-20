@@ -1,5 +1,5 @@
 {
-  "timestamp": "2025-08-19T18:26:56.488394",
+  "timestamp": "2025-08-20T16:43:47.512086",
   "project": "Ollama Agent System Configuration",
   "overall_health": "healthy",
   "score": 85,
@@ -39,7 +39,7 @@
     "fallback_provider": "runpod",
     "caching": {
       "global_enabled": true,
-      "global_threshold": 0.75,
+      "global_threshold": 1.0,
       "similarity_analyzer": true
     }
   },

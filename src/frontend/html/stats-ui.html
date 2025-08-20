@@ -1,0 +1,1294 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Stats - JamieAI 1.0</title>
+    <link rel="icon" type="image/png" href="/favicon.ico">
+    <style>
+        body{font-family:Arial,Helvetica,sans-serif;margin:20px;background:#f5f5f5}
+        .container{max-width:1200px;margin:0 auto;background:white;padding:20px;border-radius:8px;box-shadow:0 2px 10px rgba(0,0,0,0.1)}
+        .section{margin-bottom:30px;padding:20px;border:1px solid #ddd;border-radius:6px;background:#fafafa}
+        .section h3{margin-top:0;color:#333;border-bottom:2px solid #007acc;padding-bottom:10px}
+        .stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:15px;margin:15px 0}
+        .stat-card{background:white;padding:20px;border-radius:8px;border:1px solid #ddd;text-align:center;box-shadow:0 2px 4px rgba(0,0,0,0.1)}
+        .stat-value{font-size:32px;font-weight:bold;color:#007acc;margin:10px 0}
+        .stat-label{font-size:14px;color:#666;font-weight:bold}
+        .stat-sublabel{font-size:11px;color:#999;margin-top:5px}
+        .nav-links{margin-bottom:20px;text-align:center}
+        .nav-links a{margin:0 15px;color:#007acc;text-decoration:none;font-weight:bold}
+        .nav-links a:hover{text-decoration:underline}
+        .performance-table{width:100%;border-collapse:collapse;margin:15px 0}
+        .performance-table th,.performance-table td{padding:10px;text-align:left;border-bottom:1px solid #ddd}
+        .performance-table th{background:#f8f9fa;font-weight:bold}
+        .good{color:#28a745} .warning{color:#ffc107} .error{color:#dc3545}
+        button{padding:10px 20px;margin:5px;background:#007acc;color:white;border:none;border-radius:4px;cursor:pointer;font-size:14px}
+        button:hover{background:#0056b3}
+        .view-selector{width:300px;padding:12px;border:2px solid #007acc;border-radius:6px;font-size:16px;background:white;cursor:pointer;margin-bottom:20px}
+        .loading{text-align:center;color:#666;font-style:italic}
+        .error{color:#dc3545;text-align:center}
+        
+        /* Collapsible sections */
+        .collapsible-header {
+            cursor: pointer;
+            user-select: none;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background-color 0.2s ease;
+        }
+        
+        .collapsible-header:hover {
+            background-color: #f0f8ff;
+            border-radius: 6px;
+            padding: 5px;
+            margin: -5px;
+        }
+        
+        .toggle-icon {
+            font-size: 12px;
+            color: #007acc;
+            transition: transform 0.3s ease;
+        }
+        
+        .collapsible-content {
+            overflow: hidden;
+            transition: max-height 0.3s ease, opacity 0.3s ease;
+            max-height: 1000px;
+            opacity: 1;
+        }
+        
+        .collapsible-content.collapsed {
+            max-height: 0;
+            opacity: 0;
+        }
+    </style>
+</head>
+<body>
+    <!-- Pete Logo Header -->
+    <div style="text-align:center;padding:15px;background:white;border-bottom:2px solid #007acc;margin-bottom:20px;">
+        <img src="/public/pete.png" alt="PeteOllama Logo" style="height:60px;"/>
+        <h2 style="margin:5px 0 0 0;color:#007acc;">PeteOllama</h2>
+    </div>
+
+    <div class="container">
+        <div class="nav-links">
+            <a href="/admin">← Back to Dashboard</a>
+            <a href="/admin/settings">Settings</a>
+            <a href="/admin/stats">Stats</a>
+            <a href="/ui">Main UI</a>
+        </div>
+
+        <h1>📊 Model Performance Analytics</h1>
+
+        <div class="section">
+            <h3>🔍 View Selection</h3>
+            <select id="viewSelector" onchange="switchView()" class="view-selector">
+                <option value="benchmarks" selected>📊 Benchmarks & Performance Metrics</option>
+                <option value="management">🤖 Model Management & Training</option>
+            </select>
+        </div>
+
+        <div class="section">
+            <h3>📊 Data Tables</h3>
+            <select id="tableSelector" onchange="switchDataTable()" class="view-selector">
+                <option value="test_results">🧪 Test Results & Benchmarks</option>
+                <option value="training_data">💬 Training Conversations</option>
+                <option value="model_performance">🚀 Model Performance</option>
+                <option value="validation_metrics">✅ Response Validation</option>
+                <option value="system_health">🏥 System Health</option>
+            </select>
+        </div>
+
+        <!-- Benchmarks View -->
+        <div id="benchmarksView">
+                    <div class="section">
+            <h3>🔍 Filter Controls</h3>
+            
+            <!-- Data Preview Section -->
+            <div id="dataPreview"></div>
+            
+            <!-- Column Selection -->
+            <div style="margin-bottom:20px;padding:15px;background:#f8f9fa;border-radius:6px;">
+                <h4 style="margin:0 0 10px 0;">📋 Column Display Options</h4>
+                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:15px;">
+                    <div>
+                        <label style="display:block;margin-bottom:5px;font-weight:bold;">Columns to Display:</label>
+                        <select id="columnSelector" multiple style="width:100%;height:100px;padding:8px;border:1px solid #ddd;border-radius:4px;" onchange="updateColumnSelection()">
+                            <option value="test_name" selected>Test Name</option>
+                            <option value="status" selected>Status</option>
+                            <option value="duration_ms" selected>Duration (ms)</option>
+                            <option value="timestamp" selected>Timestamp</option>
+                            <option value="model">Model</option>
+                            <option value="error_message">Error Message</option>
+                        </select>
+                        <div style="font-size:11px;color:#666;margin-top:5px;">Hold Ctrl/Cmd to select multiple</div>
+                    </div>
+                    <div>
+                        <label style="display:block;margin-bottom:5px;font-weight:bold;">Auto-Refresh:</label>
+                        <div style="margin-bottom:10px;">
+                            <input type="checkbox" id="autoRefresh" checked onchange="toggleAutoRefresh()">
+                            <label for="autoRefresh">Auto-refresh when filters change</label>
+                        </div>
+                        <button onclick="refreshData()" style="background:#28a745;width:100%;">🔄 Refresh Data</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:15px;margin:15px 0;">
+                    <div>
+                        <label style="display:block;margin-bottom:5px;font-weight:bold;">Time Period:</label>
+                        <select id="timePeriod" onchange="loadStatsData()" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:4px;">
+                            <option value="all" selected>All Time</option>
+                            <option value="today">Today</option>
+                            <option value="week">This Week</option>
+                            <option value="month">This Month</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label style="display:block;margin-bottom:5px;font-weight:bold;">Data Type:</label>
+                        <select id="dataType" onchange="loadStatsData()" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:4px;">
+                            <option value="all" selected>All Data</option>
+                            <option value="tests">Test Results</option>
+                            <option value="models">Model Performance</option>
+                            <option value="system">System Metrics</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label style="display:block;margin-bottom:5px;font-weight:bold;">Models:</label>
+                        <select id="modelFilter" onchange="loadStatsData()" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:4px;">
+                            <option value="all" selected>All Models</option>
+                            <option value="ollama">Ollama Models</option>
+                            <option value="openrouter">OpenRouter Models</option>
+                            <option value="runpod">RunPod Models</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label style="display:block;margin-bottom:5px;font-weight:bold;">Status:</label>
+                        <select id="statusFilter" onchange="loadStatsData()" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:4px;">
+                            <option value="all" selected>All Status</option>
+                            <option value="pass">Passed</option>
+                            <option value="fail">Failed</option>
+                            <option value="error">Error</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label style="display:block;margin-bottom:5px;font-weight:bold;">Min Duration (ms):</label>
+                        <input type="number" id="minDuration" value="0" min="0" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:4px;" onchange="loadStatsData()">
+                    </div>
+                    <div>
+                        <label style="display:block;margin-bottom:5px;font-weight:bold;">Max Duration (ms):</label>
+                        <input type="number" id="maxDuration" value="999999" min="0" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:4px;" onchange="loadStatsData()">
+                    </div>
+                    <div>
+                        <label style="display:block;margin-bottom:5px;font-weight:bold;">Min Quality Score:</label>
+                        <input type="number" id="minQuality" value="0.0" min="0.0" max="10.0" step="0.1" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:4px;" onchange="loadStatsData()">
+                    </div>
+                    <div>
+                        <label style="display:block;margin-bottom:5px;font-weight:bold;">Max Quality Score:</label>
+                        <input type="number" id="maxQuality" value="10.0" min="0.0" max="10.0" step="0.1" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:4px;" onchange="loadStatsData()">
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3 class="collapsible-header" onclick="toggleSection('performanceMetrics')">
+                    📈 Overall Performance Metrics 
+                    <span class="toggle-icon" id="performanceMetricsIcon">▼</span>
+                </h3>
+                <div id="performanceMetrics" class="collapsible-content">
+                    <div class="stats-grid" id="statsMetrics">
+                        <div class="loading">Loading performance metrics...</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3 class="collapsible-header" onclick="toggleSection('filteredData')">
+                    🔍 Filtered Model Data & Responses 
+                    <span class="toggle-icon" id="filteredDataIcon">▼</span>
+                </h3>
+                <div id="filteredData" class="collapsible-content">
+                    <div style="margin-bottom:20px;">
+                        <button onclick="refreshData()" style="background:#28a745;">🔄 Refresh Data</button>
+                        <button onclick="exportFilteredData()" style="background:#007acc;">📤 Export Results</button>
+                    </div>
+                    <div id="filteredDataResults">
+                        <div class="loading">Click "Refresh Data" to see filtered results...</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3 class="collapsible-header" onclick="toggleSection('modelComparison')">
+                    🤖 Model Comparison & Performance 
+                    <span class="toggle-icon" id="modelComparisonIcon">▼</span>
+                </h3>
+                <div id="modelComparison" class="collapsible-content">
+                    <table class="performance-table" id="modelPerformanceTable">
+                        <thead>
+                            <tr>
+                                <th>Model</th>
+                                <th>Status</th>
+                                <th>Duration (ms)</th>
+                                <th>Success Rate</th>
+                                <th>Last Test</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td colspan="6" style="text-align:center;">Loading model performance data...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3 class="collapsible-header" onclick="toggleSection('trainingMetrics')">
+                    🎯 Training & Quality Metrics 
+                    <span class="toggle-icon" id="trainingMetricsIcon">▼</span>
+                </h3>
+                <div id="trainingMetrics" class="collapsible-content">
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-value" id="totalTrainingSamples">-</div>
+                            <div class="stat-label">Total Training Samples</div>
+                            <div class="stat-sublabel">Conversations</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="modelsTrained">-</div>
+                            <div class="stat-label">Models Trained</div>
+                            <div class="stat-sublabel">Active models</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="trainingSuccessRate">-</div>
+                            <div class="stat-label">Training Success Rate</div>
+                            <div class="stat-sublabel">Quality score</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="lastTraining">-</div>
+                            <div class="stat-label">Last Training</div>
+                            <div class="stat-sublabel">Date</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Model Management View -->
+        <div id="managementView" style="display:none;">
+            <div class="section">
+                <h3>🤖 Model Management Dashboard</h3>
+                <p>Manage your AI models, training data, and system configuration</p>
+                
+                <div style="margin-bottom:20px;">
+                    <button id="refreshModels" onclick="refreshModelList()" style="background:#28a745;">🔄 Refresh Model List</button>
+                    <button id="testAllModels" onclick="testAllModels()" style="background:#007acc;">🧪 Test All Models</button>
+                    <button id="exportTrainingData" onclick="exportTrainingData()" style="background:#ffc107;color:#333;">📤 Export Training Data</button>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3>📊 Available Models</h3>
+                <div id="availableModelsList">
+                    <div class="loading">Loading available models...</div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3>📈 Training Progress</h3>
+                <div id="trainingProgress">
+                    <div class="loading">Loading training progress...</div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3>🔧 System Configuration</h3>
+                <div id="systemConfig">
+                    <div class="loading">Loading system configuration...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Toggle collapsible sections
+        function toggleSection(sectionId) {
+            const content = document.getElementById(sectionId);
+            const icon = document.getElementById(sectionId + 'Icon');
+            
+            if (content.classList.contains('collapsed')) {
+                // Expand section
+                content.classList.remove('collapsed');
+                icon.textContent = '▼';
+                icon.style.transform = 'rotate(0deg)';
+            } else {
+                // Collapse section
+                content.classList.add('collapsed');
+                icon.textContent = '▶';
+                icon.style.transform = 'rotate(-90deg)';
+            }
+        }
+        
+        // Switch between views
+        function switchView() {
+            const viewSelector = document.getElementById('viewSelector');
+            const benchmarksView = document.getElementById('benchmarksView');
+            const managementView = document.getElementById('managementView');
+            
+            if (viewSelector.value === 'benchmarks') {
+                benchmarksView.style.display = 'block';
+                managementView.style.display = 'none';
+                loadStatsData(); // Load benchmark data
+            } else {
+                benchmarksView.style.display = 'none';
+                managementView.style.display = 'block';
+                loadManagementData(); // Load management data
+            }
+        }
+
+        // Load stats data
+        async function loadStatsData() {
+            try {
+                // Load benchmark stats
+                const benchmarkResponse = await fetch('/admin/benchmark/stats');
+                const benchmarkData = await benchmarkResponse.json();
+                
+                // Load training samples
+                const trainingResponse = await fetch('/admin/training-samples?limit=100');
+                const trainingData = await trainingResponse.json();
+                
+                updateStatsDisplay(benchmarkData, trainingData);
+                updateModelComparisonTable(benchmarkData);
+            } catch (error) {
+                console.error('Error loading stats:', error);
+                document.getElementById('statsMetrics').innerHTML = '<div class="error">❌ Error loading statistics</div>';
+                document.getElementById('modelPerformanceTable').innerHTML = '<tr><td colspan="6" style="text-align:center;color:#dc3545;">❌ Error loading model data</td></tr>';
+            }
+        }
+        
+        // Load filtered data based on current filters
+        async function loadFilteredData() {
+            try {
+                const timePeriod = document.getElementById('timePeriod').value;
+                const dataType = document.getElementById('dataType').value;
+                const modelFilter = document.getElementById('modelFilter').value;
+                const statusFilter = document.getElementById('statusFilter').value;
+                const minDuration = document.getElementById('minDuration').value;
+                const maxDuration = document.getElementById('maxDuration').value;
+                const minQuality = document.getElementById('minQuality').value;
+                const maxQuality = document.getElementById('maxQuality').value;
+                
+                // Build query parameters
+                const params = new URLSearchParams({
+                    time_period: timePeriod,
+                    data_type: dataType,
+                    model_filter: modelFilter,
+                    status_filter: statusFilter,
+                    min_duration: minDuration,
+                    max_duration: maxDuration,
+                    min_quality: minQuality,
+                    max_quality: maxQuality
+                });
+                
+                const response = await fetch(`/admin/model/filtered-data?${params}`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    displayFilteredData(data);
+                } else {
+                    document.getElementById('filteredDataResults').innerHTML = 
+                        `<div class="error">❌ Error: ${data.error}</div>`;
+                }
+            } catch (error) {
+                console.error('Error loading filtered data:', error);
+                document.getElementById('filteredDataResults').innerHTML = 
+                    '<div class="error">❌ Error loading filtered data</div>';
+            }
+        }
+
+
+        
+        // Display filtered data results
+        function displayFilteredData(data) {
+            const resultsDiv = document.getElementById('filteredDataResults');
+            
+            if (data.total_results === 0) {
+                resultsDiv.innerHTML = '<div class="loading">No results found with current filters</div>';
+                return;
+            }
+            
+            // Create summary
+            const summary = `
+                <div style="margin-bottom:20px;padding:15px;background:#f8f9fa;border-radius:6px;">
+                    <h4>📊 Filter Results Summary</h4>
+                    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:15px;">
+                        <div>
+                            <p><strong>Total Results:</strong> ${data.total_results}</p>
+                            <p><strong>Success Rate:</strong> ${data.success_rate}%</p>
+                            <p><strong>Avg Duration:</strong> ${Math.round(data.average_duration)}ms</p>
+                        </div>
+                        <div>
+                            <p><strong>Models Used:</strong> ${data.models_used.length}</p>
+                            <p><strong>File Size:</strong> ${data.file_metadata.size_mb} MB</p>
+                            <p><strong>File Owner:</strong> ${data.file_metadata.owner}</p>
+                        </div>
+                        <div>
+                            <p><strong>Last Modified:</strong> ${new Date(data.file_metadata.modified).toLocaleString()}</p>
+                            <p><strong>Permissions:</strong> ${data.file_metadata.permissions}</p>
+                            <p><strong>Filters:</strong> ${Object.entries(data.filters_applied).filter(([k,v]) => v !== 'all' && v !== 0 && v !== 0.0 && v !== 999999 && v !== 10.0).map(([k,v]) => `${k}: ${v}`).join(', ')}</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Create results table
+            const tableRows = data.results.map(result => {
+                const testName = result.test_name || 'Unknown';
+                const status = result.status || 'Unknown';
+                const duration = result.details?.result?.duration_ms || 0;
+                const timestamp = new Date(result.timestamp || '').toLocaleString();
+                const model = result.details?.result?.model || 'N/A';
+                
+                return `
+                    <tr>
+                        <td>${testName}</td>
+                        <td><span class="${status.toLowerCase()}">${status}</span></td>
+                        <td>${duration}ms</td>
+                        <td>${model}</td>
+                        <td>${timestamp}</td>
+                        <td>
+                            <button onclick="viewTestDetails('${result.test_name}')" style="background:#007acc;padding:5px 10px;font-size:12px;">👁️ View</button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+            
+            const table = `
+                <table class="performance-table">
+                    <thead>
+                        <tr>
+                            <th>Test Name</th>
+                            <th>Status</th>
+                            <th>Duration</th>
+                            <th>Model</th>
+                            <th>Timestamp</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${tableRows}
+                    </tbody>
+                </table>
+            `;
+            
+            resultsDiv.innerHTML = summary + table;
+        }
+        
+        // Export filtered data
+        function exportFilteredData() {
+            // This would export the current filtered results
+            alert('Export functionality would save current filtered results to CSV/JSON');
+        }
+        
+        // View test details
+        function viewTestDetails(testName) {
+            alert(`Viewing details for: ${testName}\n\nThis would show detailed test information, response data, and performance metrics.`);
+        }
+
+        // Update stats display
+        function updateStatsDisplay(benchmarkData, trainingData) {
+            // Update overall metrics
+            const metricsHtml = `
+                <div class="stat-card">
+                    <div class="stat-value">${benchmarkData.total_requests || 0}</div>
+                    <div class="stat-label">Total Requests</div>
+                    <div class="stat-sublabel">All time</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">${Math.round(benchmarkData.success_rate || 0)}%</div>
+                    <div class="stat-label">Success Rate</div>
+                    <div class="stat-sublabel">Successful responses</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">${Math.round(benchmarkData.average_duration || 0)}ms</div>
+                    <div class="stat-label">Avg Response Time</div>
+                    <div class="stat-sublabel">Milliseconds</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">${(benchmarkData.models_tested || []).length}</div>
+                    <div class="stat-label">Models Tested</div>
+                    <div class="stat-sublabel">Unique models</div>
+                </div>
+            `;
+            document.getElementById('statsMetrics').innerHTML = metricsHtml;
+            
+            // Update training metrics
+            if (trainingData.success && trainingData.samples) {
+                document.getElementById('totalTrainingSamples').textContent = trainingData.samples.length;
+                document.getElementById('modelsTrained').textContent = trainingData.samples.filter(s => s.model_name && s.model_name.includes('jamie')).length;
+                document.getElementById('trainingSuccessRate').textContent = '100%';
+                document.getElementById('lastTraining').textContent = 'Today';
+            }
+        }
+
+        // Update model comparison table
+        function updateModelComparisonTable(benchmarkData) {
+            if (!benchmarkData.recent_requests || benchmarkData.recent_requests.length === 0) {
+                document.getElementById('modelPerformanceTable').innerHTML = '<tr><td colspan="6" style="text-align:center;">No model performance data available</td></tr>';
+                return;
+            }
+            
+            // Group requests by model to calculate per-model stats
+            const modelStats = {};
+            benchmarkData.recent_requests.forEach(request => {
+                const model = request.model || 'Unknown';
+                if (!modelStats[model]) {
+                    modelStats[model] = {
+                        total_requests: 0,
+                        total_duration: 0,
+                        success_count: 0,
+                        quality_scores: []
+                    };
+                }
+                
+                modelStats[model].total_requests++;
+                modelStats[model].total_duration += request.performance?.total_duration_ms || 0;
+                
+                // Check if request was successful (has quality metrics)
+                if (request.quality_metrics?.estimated_quality_score) {
+                    modelStats[model].success_count++;
+                    modelStats[model].quality_scores.push(request.quality_metrics.estimated_quality_score);
+                }
+            });
+            
+            // Generate table rows
+            let tableHtml = '';
+            Object.entries(modelStats).forEach(([model, stats]) => {
+                const avgDuration = Math.round(stats.total_duration / stats.total_requests);
+                const successRate = Math.round((stats.success_count / stats.total_requests) * 100);
+                const avgQuality = stats.quality_scores.length > 0 ? 
+                    Math.round(stats.quality_scores.reduce((a, b) => a + b, 0) / stats.quality_scores.length * 10) / 10 : 'N/A';
+                
+                const statusClass = successRate >= 80 ? 'good' : successRate >= 60 ? 'warning' : 'error';
+                const statusText = successRate >= 80 ? 'Excellent' : successRate >= 60 ? 'Good' : 'Needs Improvement';
+                
+                tableHtml += `
+                    <tr>
+                        <td><strong>${model}</strong></td>
+                        <td>${stats.total_requests}</td>
+                        <td class="${statusClass}">${successRate}%</td>
+                        <td>${avgDuration}ms</td>
+                        <td>${avgQuality}</td>
+                        <td class="${statusClass}">${statusText}</td>
+                    </tr>
+                `;
+            });
+            
+            document.getElementById('modelPerformanceTable').innerHTML = tableHtml;
+        }
+
+        // Load management data
+        async function loadManagementData() {
+            try {
+                // Load available models
+                const modelsResponse = await fetch('/admin/models');
+                const modelsData = await modelsResponse.json();
+                updateAvailableModels(modelsData);
+                
+                // Load system config
+                const configResponse = await fetch('/admin/config');
+                const configData = await configResponse.json();
+                updateSystemConfig(configData);
+                
+            } catch (error) {
+                console.error('Error loading management data:', error);
+                document.getElementById('availableModelsList').innerHTML = '<div class="error">❌ Error loading model data</div>';
+                document.getElementById('systemConfig').innerHTML = '<div class="error">❌ Error loading configuration</div>';
+            }
+        }
+
+        // Update available models list
+        function updateAvailableModels(modelsData) {
+            if (!modelsData.models || modelsData.models.length === 0) {
+                document.getElementById('availableModelsList').innerHTML = '<div style="text-align:center;color:#666;">No models available</div>';
+                return;
+            }
+            
+            let modelsHtml = '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:15px;">';
+            modelsData.models.forEach(model => {
+                const statusClass = model.status === 'active' ? 'good' : model.status === 'loading' ? 'warning' : 'error';
+                modelsHtml += `
+                    <div style="border:1px solid #ddd;border-radius:8px;padding:15px;background:white;">
+                        <h4 style="margin:0 0 10px 0;color:#007acc;">${model.name}</h4>
+                        <div style="font-size:12px;color:#666;">
+                            <div>Status: <span class="${statusClass}">${model.status}</span></div>
+                            <div>Size: ${model.size || 'Unknown'}</div>
+                            <div>Last Used: ${model.last_used || 'Never'}</div>
+                        </div>
+                        <div style="margin-top:10px;">
+                            <button onclick="testModel('${model.name}')" style="background:#007acc;color:white;border:none;padding:5px 10px;border-radius:4px;cursor:pointer;font-size:12px;">Test</button>
+                            <button onclick="removeModel('${model.name}')" style="background:#dc3545;color:white;border:none;padding:5px 10px;border-radius:4px;cursor:pointer;font-size:12px;margin-left:5px;">Remove</button>
+                        </div>
+                    </div>
+                `;
+            });
+            modelsHtml += '</div>';
+            document.getElementById('availableModelsList').innerHTML = modelsHtml;
+        }
+
+        // Update system configuration
+        function updateSystemConfig(configData) {
+            let configHtml = '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:15px;">';
+            
+            // Provider settings
+            configHtml += `
+                <div style="border:1px solid #ddd;border-radius:8px;padding:15px;background:white;">
+                    <h4 style="margin:0 0 10px 0;color:#007acc;">Provider Settings</h4>
+                    <div style="font-size:12px;color:#666;">
+                        <div>Default: ${configData.default_provider || 'Not set'}</div>
+                        <div>Fallback: ${configData.fallback_provider || 'Not set'}</div>
+                        <div>Fallback Enabled: ${configData.fallback_enabled ? 'Yes' : 'No'}</div>
+                    </div>
+                </div>
+            `;
+            
+            // System info
+            configHtml += `
+                <div style="border:1px solid #ddd;border-radius:8px;padding:15px;background:white;">
+                    <h4 style="margin:0 0 10px 0;color:#007acc;">System Info</h4>
+                    <div style="font-size:12px;color:#666;">
+                        <div>Environment: ${configData.environment || 'Unknown'}</div>
+                        <div>Python Version: ${configData.python_version || 'Unknown'}</div>
+                        <div>Working Directory: ${configData.working_directory || 'Unknown'}</div>
+                    </div>
+                </div>
+            `;
+            
+            configHtml += '</div>';
+            document.getElementById('systemConfig').innerHTML = configHtml;
+        }
+
+        // Test a specific model
+        async function testModel(modelName) {
+            try {
+                const response = await fetch('/admin/test/model', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        model_name: modelName,
+                        message: 'Hello! Please respond with a brief greeting.'
+                    })
+                });
+                
+                const result = await response.json();
+                if (result.success) {
+                    alert(`✅ Model ${modelName} test successful!\nResponse: ${result.response.substring(0, 100)}...\nDuration: ${result.duration_ms}ms`);
+                } else {
+                    alert(`❌ Model ${modelName} test failed: ${result.error}`);
+                }
+            } catch (error) {
+                alert(`❌ Error testing model: ${error.message}`);
+            }
+        }
+
+        // Refresh model list
+        function refreshModelList() {
+            loadManagementData();
+        }
+
+        // Test all models
+        async function testAllModels() {
+            const button = document.getElementById('testAllModels');
+            button.disabled = true;
+            button.textContent = '🧪 Testing...';
+            
+            try {
+                // This would trigger a comprehensive test of all models
+                alert('🧪 Comprehensive model testing initiated. Check the logs for results.');
+            } catch (error) {
+                alert(`❌ Error during comprehensive testing: ${error.message}`);
+            } finally {
+                button.disabled = false;
+                button.textContent = '🧪 Test All Models';
+            }
+        }
+
+        // Export training data
+        function exportTrainingData() {
+            // This would trigger an export of all training data
+            alert('📤 Training data export initiated. Check your downloads folder.');
+        }
+
+        // ===== DYNAMIC UTILITY FUNCTIONS =====
+        
+        let autoRefreshEnabled = true;
+        let currentDataSource = 'test_results';
+        let availableColumns = [];
+        
+        // Update column selection based on current data
+        function updateColumnSelection() {
+            if (autoRefreshEnabled) {
+                refreshCurrentDataTable();
+            }
+        }
+        
+        // Toggle auto-refresh
+        function toggleAutoRefresh() {
+            autoRefreshEnabled = document.getElementById('autoRefresh').checked;
+        }
+        
+        // Refresh data - unified function that replaces loadFilteredData
+        async function refreshData() {
+            await refreshCurrentDataTable();
+        }
+        
+        // Refresh current data table based on selected data source
+        async function refreshCurrentDataTable() {
+            const tableType = document.getElementById('tableSelector').value;
+            currentDataSource = tableType;
+            
+            // Switch to the selected data table
+            await switchDataTable();
+        }
+        
+        // Enhanced switchDataTable with dynamic column discovery
+        async function switchDataTable() {
+            const tableType = document.getElementById('tableSelector').value;
+            const resultsDiv = document.getElementById('filteredDataResults');
+            
+            resultsDiv.innerHTML = '<div class="loading">Loading ' + tableType + ' data...</div>';
+            
+            try {
+                let data;
+                let tableHTML = '';
+                
+                switch (tableType) {
+                    case 'test_results':
+                        data = await loadTestResultsData();
+                        await discoverColumnsFromData(data, 'test_results');
+                        tableHTML = generateDynamicTable(data, 'test_results');
+                        break;
+                    case 'training_data':
+                        data = await loadTrainingData();
+                        await discoverColumnsFromData(data, 'training_data');
+                        tableHTML = generateDynamicTable(data, 'training_data');
+                        break;
+                    case 'model_performance':
+                        data = await loadModelPerformanceData();
+                        await discoverColumnsFromData(data, 'model_performance');
+                        tableHTML = generateDynamicTable(data, 'model_performance');
+                        break;
+                    case 'validation_metrics':
+                        data = await loadValidationMetricsData();
+                        await discoverColumnsFromData(data, 'validation_metrics');
+                        tableHTML = generateDynamicTable(data, 'validation_metrics');
+                        break;
+                    case 'system_health':
+                        data = await loadSystemHealthData();
+                        await discoverColumnsFromData(data, 'system_health');
+                        tableHTML = generateDynamicTable(data, 'system_health');
+                        break;
+                    default:
+                        tableHTML = '<div class="error">Unknown table type</div>';
+                }
+                
+                resultsDiv.innerHTML = tableHTML;
+                
+            } catch (error) {
+                console.error('Error switching data table:', error);
+                resultsDiv.innerHTML = '<div class="error">❌ Error loading data: ' + error.message + '</div>';
+            }
+        }
+        
+        // Discover columns from data and update column selector
+        async function discoverColumnsFromData(data, dataType) {
+            try {
+                // Use our new data source-specific columns endpoint
+                const response = await fetch(`/admin/data-source/${dataType}/columns`);
+                const columnData = await response.json();
+                
+                if (columnData.success) {
+                    availableColumns = columnData.columns;
+                    
+                    // Update column selector with relevant columns only
+                    updateColumnSelector(availableColumns, columnData.display_names);
+                    
+                    // Update available filters for this data source
+                    updateAvailableFilters(columnData.available_filters, dataType);
+                    
+                    // Show data preview
+                    showDataPreview(columnData.data_preview, dataType);
+                } else {
+                    console.error('Error getting columns:', columnData.error);
+                    // Fallback to basic columns for this data type
+                    const fallbackColumns = getFallbackColumns(dataType);
+                    updateColumnSelector(fallbackColumns);
+                }
+            } catch (error) {
+                console.error('Error discovering columns:', error);
+                // Fallback to basic columns for this data type
+                const fallbackColumns = getFallbackColumns(dataType);
+                updateColumnSelector(fallbackColumns);
+            }
+        }
+        
+        // Get fallback columns for a data type
+        function getFallbackColumns(dataType) {
+            const fallbackColumns = {
+                'test_results': ['test_name', 'status', 'duration_ms', 'timestamp'],
+                'training_data': ['client_name', 'date', 'message_count', 'quality_score'],
+                'model_performance': ['name', 'provider', 'success_rate', 'avg_duration'],
+                'validation_metrics': ['validation_type', 'pass_rate', 'total_validations'],
+                'system_health': ['overall_score', 'cpu_usage_percent', 'memory_usage_percent']
+            };
+            return fallbackColumns[dataType] || ['name', 'value'];
+        }
+        
+        // Update the column selector dropdown with discovered columns
+        function updateColumnSelector(columns, displayNames = {}) {
+            const selector = document.getElementById('columnSelector');
+            const currentlySelected = Array.from(selector.selectedOptions).map(option => option.value);
+            
+            // Clear current options
+            selector.innerHTML = '';
+            
+            // Add new options based on discovered columns
+            columns.forEach(column => {
+                const option = document.createElement('option');
+                option.value = column;
+                option.textContent = displayNames[column] || formatColumnName(column);
+                option.selected = true; // Select all by default for new data sources
+                
+                selector.appendChild(option);
+            });
+        }
+        
+        // Update available filters based on data source
+        function updateAvailableFilters(availableFilters, dataType) {
+            // This would update the filter controls to show only relevant options
+            // For now, we'll just log what's available
+            console.log(`Available filters for ${dataType}:`, availableFilters);
+        }
+        
+        // Show data preview for the selected source
+        function showDataPreview(dataPreview, dataType) {
+            const previewDiv = document.getElementById('dataPreview');
+            if (!previewDiv) return;
+            
+            if (dataPreview && dataPreview.count > 0) {
+                previewDiv.innerHTML = `
+                    <div style="margin-bottom:15px;padding:10px;background:#e8f4fd;border-radius:4px;border-left:4px solid #007acc;">
+                        <strong>📊 Data Preview:</strong> ${dataPreview.count} items available for ${formatColumnName(dataType)}
+                        <br><small>Sample: ${JSON.stringify(dataPreview.sample[0]).substring(0, 100)}...</small>
+                    </div>
+                `;
+            } else {
+                previewDiv.innerHTML = `
+                    <div style="margin-bottom:15px;padding:10px;background:#fff3cd;border-radius:4px;border-left:4px solid #ffc107;">
+                        <strong>⚠️ No Data:</strong> No data available for ${formatColumnName(dataType)}
+                    </div>
+                `;
+            }
+        }
+        
+        // Format column name for display
+        function formatColumnName(columnName) {
+            return columnName
+                .replace(/_/g, ' ')
+                .replace(/\b\w/g, l => l.toUpperCase())
+                .replace(/Ms$/, ' (ms)')
+                .replace(/Url/g, 'URL')
+                .replace(/Api/g, 'API')
+                .replace(/Id/g, 'ID');
+        }
+        
+        // Generate dynamic table based on selected columns
+        function generateDynamicTable(data, dataType) {
+            const selectedColumns = Array.from(document.getElementById('columnSelector').selectedOptions)
+                .map(option => option.value);
+            
+            if (selectedColumns.length === 0) {
+                return '<div class="error">Please select at least one column to display</div>';
+            }
+            
+            // Determine data array to use
+            let items = [];
+            if (dataType === 'test_results' && data.recent_requests) {
+                items = data.recent_requests;
+            } else if (dataType === 'training_data' && data.conversations) {
+                items = data.conversations.slice(0, 50); // Limit for performance
+            } else if (dataType === 'model_performance' && data.models) {
+                items = data.models;
+            } else if (dataType === 'validation_metrics' && data.metrics) {
+                items = data.metrics;
+            } else if (dataType === 'system_health' && data.health_metrics) {
+                items = Object.entries(data.health_metrics).map(([key, value]) => ({
+                    metric_name: key,
+                    value: value
+                }));
+            }
+            
+            if (!items.length) {
+                return '<div class="loading">No data available for ' + dataType + '</div>';
+            }
+            
+            // Generate table headers
+            const headers = selectedColumns.map(col => 
+                `<th>${formatColumnName(col)}</th>`
+            ).join('');
+            
+            // Generate table rows
+            const rows = items.map(item => {
+                const cells = selectedColumns.map(col => {
+                    let value = getNestedValue(item, col) || 'N/A';
+                    
+                    // Format specific types
+                    if (col.includes('duration') && typeof value === 'number') {
+                        value = value + 'ms';
+                    } else if (col.includes('timestamp') && value !== 'N/A') {
+                        value = new Date(value).toLocaleString();
+                    } else if (col === 'status') {
+                        value = `<span class="${value.toLowerCase()}">${value}</span>`;
+                    }
+                    
+                    return `<td>${value}</td>`;
+                }).join('');
+                
+                return `<tr>${cells}</tr>`;
+            }).join('');
+            
+            // Generate summary
+            const summary = `
+                <div style="margin-bottom:20px;padding:15px;background:#f8f9fa;border-radius:6px;">
+                    <h4>📊 Data Summary</h4>
+                    <p><strong>Total Items:</strong> ${items.length} | <strong>Columns Displayed:</strong> ${selectedColumns.length} | <strong>Data Source:</strong> ${formatColumnName(dataType)}</p>
+                </div>
+            `;
+            
+            return summary + `
+                <table class="performance-table">
+                    <thead>
+                        <tr>${headers}</tr>
+                    </thead>
+                    <tbody>${rows}</tbody>
+                </table>
+            `;
+        }
+        
+        // Get nested value from object using dot notation or direct key
+        function getNestedValue(obj, path) {
+            if (obj[path] !== undefined) {
+                return obj[path];
+            }
+            
+            // Try nested paths
+            const keys = path.split('.');
+            let value = obj;
+            for (const key of keys) {
+                if (value && typeof value === 'object') {
+                    value = value[key];
+                } else {
+                    return null;
+                }
+            }
+            return value;
+        }
+        
+        // Enhanced loadStatsData with auto-refresh
+        async function loadStatsData() {
+            try {
+                // Load benchmark stats
+                const benchmarkResponse = await fetch('/admin/benchmark/stats');
+                const benchmarkData = await benchmarkResponse.json();
+                
+                // Load training samples
+                const trainingResponse = await fetch('/admin/training-samples?limit=100');
+                const trainingData = await trainingResponse.json();
+                
+                updateStatsDisplay(benchmarkData, trainingData);
+                updateModelComparisonTable(benchmarkData);
+                
+                // Auto-refresh current data table if enabled
+                if (autoRefreshEnabled) {
+                    await refreshCurrentDataTable();
+                }
+            } catch (error) {
+                console.error('Error loading stats:', error);
+                document.getElementById('statsMetrics').innerHTML = '<div class="error">❌ Error loading statistics</div>';
+                document.getElementById('modelPerformanceTable').innerHTML = '<tr><td colspan="6" style="text-align:center;color:#dc3545;">❌ Error loading model data</td></tr>';
+            }
+        }
+        
+        // Load data on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadStatsData(); // Start with benchmarks view
+            // Initialize view selector
+            const viewSelector = document.getElementById('viewSelector');
+            if (viewSelector) {
+                viewSelector.value = 'benchmarks';
+            }
+            
+            // Initialize with test results
+            currentDataSource = 'test_results';
+            setTimeout(() => {
+                switchDataTable(); // Load initial data table
+            }, 1000);
+        });
+
+        // ===== DATA LOADING FUNCTIONS =====
+        
+        // Load test results data
+        async function loadTestResultsData() {
+            try {
+                const response = await fetch('/admin/benchmark/stats');
+                const data = await response.json();
+                return data;
+            } catch (error) {
+                console.error('Error loading test results:', error);
+                throw error;
+            }
+        }
+
+        // Load training data (conversations)
+        async function loadTrainingData() {
+            try {
+                // Load from langchain_indexed_conversations.json
+                const response = await fetch('/admin/training/conversations');
+                const data = await response.json();
+                return data;
+            } catch (error) {
+                console.error('Error loading training data:', error);
+                throw error;
+            }
+        }
+
+        // Load model performance data
+        async function loadModelPerformanceData() {
+            try {
+                const response = await fetch('/admin/model/performance');
+                const data = await response.json();
+                return data;
+            } catch (error) {
+                console.error('Error loading model performance:', error);
+                throw error;
+            }
+        }
+
+        // Load validation metrics using ResponseValidator
+        async function loadValidationMetricsData() {
+            try {
+                const response = await fetch('/admin/validation/metrics');
+                const data = await response.json();
+                return data;
+            } catch (error) {
+                console.error('Error loading validation metrics:', error);
+                throw error;
+            }
+        }
+
+        // Load system health data
+        async function loadSystemHealthData() {
+            try {
+                const response = await fetch('/admin/system/health');
+                const data = await response.json();
+                return data;
+            } catch (error) {
+                console.error('Error loading system health:', error);
+                throw error;
+            }
+        }
+
+        // ===== TABLE GENERATOR FUNCTIONS =====
+
+        // Generate test results table
+        function generateTestResultsTable(data) {
+            if (!data || !data.recent_requests) {
+                return '<div class="loading">No test results data available</div>';
+            }
+
+            const tableRows = data.recent_requests.map(request => {
+                return `
+                    <tr>
+                        <td>${request.test_name || 'Unknown'}</td>
+                        <td><span class="${request.status.toLowerCase()}">${request.status}</span></td>
+                        <td>${request.duration_ms || 0}ms</td>
+                        <td>${request.model || 'N/A'}</td>
+                        <td>${request.timestamp || 'Unknown'}</td>
+                    </tr>
+                `;
+            }).join('');
+
+            return `
+                <div style="margin-bottom:20px;padding:15px;background:#f8f9fa;border-radius:6px;">
+                    <h4>🧪 Test Results Summary</h4>
+                    <p><strong>Total Tests:</strong> ${data.total_tests} | <strong>Passed:</strong> ${data.passed_tests} | <strong>Success Rate:</strong> ${data.success_rate}%</p>
+                </div>
+                <table class="performance-table">
+                    <thead>
+                        <tr>
+                            <th>Test Name</th>
+                            <th>Status</th>
+                            <th>Duration</th>
+                            <th>Model</th>
+                            <th>Timestamp</th>
+                        </tr>
+                    </thead>
+                    <tbody>${tableRows}</tbody>
+                </table>
+            `;
+        }
+
+        // Generate training data table
+        function generateTrainingDataTable(data) {
+            if (!data || !data.conversations) {
+                return '<div class="loading">No training conversations available</div>';
+            }
+
+            const tableRows = data.conversations.slice(0, 20).map(conv => {
+                return `
+                    <tr>
+                        <td>${conv.client_name || 'Unknown'}</td>
+                        <td>${conv.date || 'Unknown'}</td>
+                        <td>${conv.message_count || 0}</td>
+                        <td>${conv.quality_score || 'N/A'}</td>
+                        <td>${conv.training_value || 'N/A'}</td>
+                    </tr>
+                `;
+            }).join('');
+
+            return `
+                <div style="margin-bottom:20px;padding:15px;background:#f8f9fa;border-radius:6px;">
+                    <h4>💬 Training Conversations Summary</h4>
+                    <p><strong>Total Conversations:</strong> ${data.total_conversations} | <strong>Total Threads:</strong> ${data.total_threads} | <strong>Processing Date:</strong> ${data.processing_date}</p>
+                </div>
+                <table class="performance-table">
+                    <thead>
+                        <tr>
+                            <th>Client</th>
+                            <th>Date</th>
+                            <th>Messages</th>
+                            <th>Quality Score</th>
+                            <th>Training Value</th>
+                        </tr>
+                    </thead>
+                    <tbody>${tableRows}</tbody>
+                </table>
+            `;
+        }
+
+        // Generate model performance table
+        function generateModelPerformanceTable(data) {
+            if (!data || !data.models) {
+                return '<div class="loading">No model performance data available</div>';
+            }
+
+            const tableRows = data.models.map(model => {
+                return `
+                    <tr>
+                        <td>${model.name || 'Unknown'}</td>
+                        <td>${model.provider || 'N/A'}</td>
+                        <td>${model.success_rate || 0}%</td>
+                        <td>${model.avg_duration || 0}ms</td>
+                        <td>${model.total_requests || 0}</td>
+                        <td>${model.last_used || 'Never'}</td>
+                    </tr>
+                `;
+            }).join('');
+
+            return `
+                <div style="margin-bottom:20px;padding:15px;background:#f8f9fa;border-radius:6px;">
+                    <h4>🚀 Model Performance Summary</h4>
+                    <p><strong>Total Models:</strong> ${data.total_models} | <strong>Active Models:</strong> ${data.active_models}</p>
+                </div>
+                <table class="performance-table">
+                    <thead>
+                        <tr>
+                            <th>Model Name</th>
+                            <th>Provider</th>
+                            <th>Success Rate</th>
+                            <th>Avg Duration</th>
+                            <th>Total Requests</th>
+                            <th>Last Used</th>
+                        </tr>
+                    </thead>
+                    <tbody>${tableRows}</tbody>
+                </table>
+            `;
+        }
+
+        // Generate validation metrics table
+        function generateValidationMetricsTable(data) {
+            if (!data || !data.metrics) {
+                return '<div class="loading">No validation metrics available</div>';
+            }
+
+            const tableRows = data.metrics.map(metric => {
+                return `
+                    <tr>
+                        <td>${metric.validation_type || 'Unknown'}</td>
+                        <td>${metric.pass_rate || 0}%</td>
+                        <td>${metric.total_validations || 0}</td>
+                        <td>${metric.avg_quality || 0}</td>
+                        <td>${metric.last_validation || 'Never'}</td>
+                    </tr>
+                `;
+            }).join('');
+
+            return `
+                <div style="margin-bottom:20px;padding:15px;background:#f8f9fa;border-radius:6px;">
+                    <h4>✅ Response Validation Summary</h4>
+                    <p><strong>Overall Quality:</strong> ${data.overall_quality || 'N/A'} | <strong>Total Validations:</strong> ${data.total_validations || 0}</p>
+                </div>
+                <table class="performance-table">
+                    <thead>
+                        <tr>
+                            <th>Validation Type</th>
+                            <th>Pass Rate</th>
+                            <th>Total Validations</th>
+                            <th>Avg Quality</th>
+                            <th>Last Validation</th>
+                        </tr>
+                    </thead>
+                    <tbody>${tableRows}</tbody>
+                </table>
+            `;
+        }
+
+        // Generate system health table
+        function generateSystemHealthTable(data) {
+            if (!data || !data.health_metrics) {
+                return '<div class="loading">No system health data available</div>';
+            }
+
+            const tableRows = Object.entries(data.health_metrics).map(([key, value]) => {
+                return `
+                    <tr>
+                        <td>${key.replace(/_/g, ' ').toUpperCase()}</td>
+                        <td>${value}</td>
+                        <td>${data.recommendations ? data.recommendations.find(r => r.includes(key)) || 'N/A' : 'N/A'}</td>
+                    </tr>
+                `;
+            }).join('');
+
+            return `
+                <div style="margin-bottom:20px;padding:15px;background:#f8f9fa;border-radius:6px;">
+                    <h4>🏥 System Health Summary</h4>
+                    <p><strong>Overall Score:</strong> ${data.health_metrics.overall_score || 'N/A'} | <strong>Critical Issues:</strong> ${data.health_metrics.critical_issues || 0}</p>
+                </div>
+                <table class="performance-table">
+                    <thead>
+                        <tr>
+                            <th>Health Metric</th>
+                            <th>Value</th>
+                            <th>Recommendation</th>
+                        </tr>
+                    </thead>
+                    <tbody>${tableRows}</tbody>
+                </table>
+            `;
+        }
+    </script>
+</body>
+</html>

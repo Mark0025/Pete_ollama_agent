@@ -70,7 +70,7 @@ class WhatsWorkingEngine:
         self._setup_project_intelligence()
         
         # Update methodology compliance after loading state
-        asyncio.create_task(self._update_methodology_compliance())
+        # Note: This will be called when needed, not in constructor
     
     def _load_state(self):
         """Load project state from persistent storage"""

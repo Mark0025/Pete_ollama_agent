@@ -1,0 +1,83 @@
+# PeteOllama V1 - Reliable Production Dockerfile
+# Hybrid approach: UV when available, pip fallback, includes database
+FROM python:3.11-slim as builder
+
+# Install system dependencies for building
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Try to install UV, but don't fail if it doesn't work
+RUN pip install uv || echo "UV installation failed, will use pip"
+
+# Set working directory
+WORKDIR /app
+
+# Copy dependency files
+COPY requirements.txt ./
+COPY pyproject.toml uv.lock ./
+
+# Install dependencies - try UV first, fallback to pip
+RUN if command -v uv >/dev/null 2>&1; then \
+        echo "Using UV for dependency installation..." && \
+        uv sync --frozen --no-dev; \
+    else \
+        echo "UV not available, using pip..." && \
+        pip install --no-cache-dir -r requirements.txt; \
+    fi
+
+# Production stage
+FROM python:3.11-slim
+
+# Install runtime dependencies
+RUN apt-get update && apt-get install -y \
+    curl \
+    ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create non-root user for security
+RUN useradd --create-home --shell /bin/bash jamie
+
+# Set working directory
+WORKDIR /app
+
+# Copy virtual environment from builder (if UV worked) or use system packages
+COPY --from=builder /app/.venv /app/.venv 2>/dev/null || echo "No .venv found, using system packages"
+
+# Copy application code
+COPY --chown=jamie:jamie src/ ./src/
+COPY --chown=jamie:jamie config/ ./config/
+COPY --chown=jamie:jamie .env* ./
+
+# Copy database files
+COPY --chown=jamie:jamie pete.db ./pete.db
+COPY --chown=jamie:jamie training_data.db ./training_data.db
+COPY --chown=jamie:jamie langchain_indexed_conversations.json ./
+
+# Create necessary directories
+RUN mkdir -p /app/data /app/logs /app/models && \
+    chown -R jamie:jamie /app
+
+# Set environment variables
+ENV PYTHONPATH=/app/src \
+    PORT=8000
+
+# Set PATH to include virtual environment if it exists
+RUN if [ -d "/app/.venv" ]; then \
+        echo "export PATH=/app/.venv/bin:\$PATH" >> /etc/profile && \
+        echo "export PATH=/app/.venv/bin:\$PATH" >> /root/.bashrc; \
+    fi
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
+    CMD curl -f http://localhost:${PORT}/health || exit 1
+
+# Switch to non-root user
+USER jamie
+
+# Expose port
+EXPOSE 8000
+
+# Default command
+CMD ["python", "src/main.py"]

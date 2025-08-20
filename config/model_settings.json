@@ -17,7 +17,7 @@
       "include_model_info": false,
       "response_style": "concise",
       "created_at": "2025-08-08T20:50:48.000000",
-      "last_updated": "2025-08-19T16:23:06.808765"
+      "last_updated": "2025-08-20T11:49:15.982129"
     },
     "llama3:latest": {
       "name": "llama3:latest",
@@ -36,7 +36,7 @@
       "include_model_info": false,
       "response_style": "concise",
       "created_at": "2025-08-06T15:43:41.809581",
-      "last_updated": "2025-08-19T16:23:07.861297"
+      "last_updated": "2025-08-20T11:54:23.739902"
     },
     "qwen3:30b": {
       "name": "qwen3:30b",
@@ -55,7 +55,7 @@
       "include_model_info": false,
       "response_style": "concise",
       "created_at": "2025-08-06T18:30:00.000000",
-      "last_updated": "2025-08-19T16:23:06.808815"
+      "last_updated": "2025-08-20T11:49:15.982158"
     },
     "peteollama:jamie-fixed": {
       "name": "peteollama:jamie-fixed",
@@ -74,7 +74,7 @@
       "include_model_info": false,
       "response_style": "concise",
       "created_at": "2025-08-18T11:13:36.938370",
-      "last_updated": "2025-08-19T16:23:07.861223"
+      "last_updated": "2025-08-20T11:54:23.739766"
     },
     "peteollama:jamie-voice-complete": {
       "name": "peteollama:jamie-voice-complete",
@@ -93,7 +93,7 @@
       "include_model_info": false,
       "response_style": "concise",
       "created_at": "2025-08-18T11:13:36.938385",
-      "last_updated": "2025-08-19T16:23:07.861264"
+      "last_updated": "2025-08-20T11:54:23.739871"
     },
     "peteollama:jamie-simple": {
       "name": "peteollama:jamie-simple",
@@ -112,7 +112,7 @@
       "include_model_info": false,
       "response_style": "concise",
       "created_at": "2025-08-18T11:13:36.938393",
-      "last_updated": "2025-08-19T16:23:07.861271"
+      "last_updated": "2025-08-20T11:54:23.739880"
     },
     "peteollama:jamie-working-working_20250806": {
       "name": "peteollama:jamie-working-working_20250806",
@@ -131,7 +131,7 @@
       "include_model_info": false,
       "response_style": "concise",
       "created_at": "2025-08-18T11:13:36.938433",
-      "last_updated": "2025-08-19T16:23:07.861230"
+      "last_updated": "2025-08-20T11:54:23.739774"
     },
     "gemma3:4b": {
       "name": "gemma3:4b",
@@ -150,7 +150,7 @@
       "include_model_info": false,
       "response_style": "concise",
       "created_at": "3.3 GB 2 days ago",
-      "last_updated": "2025-08-19T16:23:07.861139"
+      "last_updated": "2025-08-20T11:54:23.739729"
     },
     "markcarpenter-localhousebuyers:jamie-fixed": {
       "name": "markcarpenter-localhousebuyers:jamie-fixed",
@@ -169,7 +169,7 @@
       "include_model_info": false,
       "response_style": "concise",
       "created_at": "4.7 GB 3 days ago",
-      "last_updated": "2025-08-19T16:23:07.861149"
+      "last_updated": "2025-08-20T11:54:23.739743"
     },
     "markcarpenter-test:jamie-fixed": {
       "name": "markcarpenter-test:jamie-fixed",
@@ -188,7 +188,7 @@
       "include_model_info": false,
       "response_style": "concise",
       "created_at": "4.7 GB 3 days ago",
-      "last_updated": "2025-08-19T16:23:07.861209"
+      "last_updated": "2025-08-20T11:54:23.739750"
     },
     "markcarpenter:jamie-fixed": {
       "name": "markcarpenter:jamie-fixed",
@@ -207,7 +207,7 @@
       "include_model_info": false,
       "response_style": "concise",
       "created_at": "4.7 GB 3 days ago",
-      "last_updated": "2025-08-19T16:23:07.861216"
+      "last_updated": "2025-08-20T11:54:23.739758"
     },
     "peteollama:property-manager-enhanced-20250806_102528": {
       "name": "peteollama:property-manager-enhanced-20250806_102528",
@@ -226,7 +226,7 @@
       "include_model_info": false,
       "response_style": "concise",
       "created_at": "4.7 GB 12 days ago",
-      "last_updated": "2025-08-19T16:23:07.861278"
+      "last_updated": "2025-08-20T11:54:23.739887"
     },
     "peteollama:property-manager": {
       "name": "peteollama:property-manager",
@@ -245,7 +245,7 @@
       "include_model_info": false,
       "response_style": "concise",
       "created_at": "4.7 GB 12 days ago",
-      "last_updated": "2025-08-19T16:23:07.861286"
+      "last_updated": "2025-08-20T11:54:23.739893"
     },
     "codellama:7b": {
       "name": "codellama:7b",
@@ -264,7 +264,7 @@
       "include_model_info": false,
       "response_style": "concise",
       "created_at": "3.8 GB 2 months ago",
-      "last_updated": "2025-08-19T16:23:07.861312"
+      "last_updated": "2025-08-20T11:54:23.739912"
     },
     "phi3:latest": {
       "name": "phi3:latest",
@@ -283,7 +283,7 @@
       "include_model_info": false,
       "response_style": "concise",
       "created_at": "2.2 GB 2 months ago",
-      "last_updated": "2025-08-19T16:23:07.861323"
+      "last_updated": "2025-08-20T11:54:23.739919"
     },
     "nextjs15:latest": {
       "name": "nextjs15:latest",
@@ -302,7 +302,7 @@
       "include_model_info": false,
       "response_style": "concise",
       "created_at": "4.7 GB 6 months ago",
-      "last_updated": "2025-08-19T16:23:07.861330"
+      "last_updated": "2025-08-20T11:54:23.739931"
     },
     "deepseek-r1:7b": {
       "name": "deepseek-r1:7b",
@@ -321,8 +321,8 @@
       "include_model_info": false,
       "response_style": "concise",
       "created_at": "4.7 GB 6 months ago",
-      "last_updated": "2025-08-19T16:23:07.861340"
+      "last_updated": "2025-08-20T11:54:23.739938"
     }
   },
-  "last_updated": "2025-08-19T16:23:07.861581"
+  "last_updated": "2025-08-20T11:54:23.740164"
 }

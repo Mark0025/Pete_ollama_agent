@@ -1,0 +1,70 @@
+# Optimized .dockerignore for UV + Database builds
+# Excludes development files but keeps essential data
+
+# Development artifacts (these are HUGE and not needed)
+concatenated_output.txt
+*.log
+logs/
+
+# Git and version control
+.git
+.gitignore
+
+# Python virtual environments (we'll create our own with UV)
+.venv/
+venv/
+env/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Development and testing
+.pytest_cache/
+.coverage
+htmlcov/
+tests/
+
+# Documentation (not needed in production)
+README.md
+docs/
+DEV_MAN/
+
+# Deprecated code
+_deprecated/
+
+# Large analysis files (not needed for core functionality)
+question_analysis_v1.json
+question_analysis.json
+openrouter_model_analysis.json
+performance_test_suite_v1.json
+test_cases_v1.json
+test_cases.json
+
+# Model files (unless specifically needed)
+models/
+*.model
+*.tar
+
+# Keep these files (they're needed):
+# - src/ (application code)
+# - config/ (configuration)
+# - pete.db (database)
+# - training_data.db (training data)
+# - langchain_indexed_conversations.json (conversation cache)
+# - .env* (environment variables)
+# - pyproject.toml (UV dependencies)
+# - uv.lock (UV lock file)

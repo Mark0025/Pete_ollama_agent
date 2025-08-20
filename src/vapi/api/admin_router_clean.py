@@ -23,10 +23,9 @@ logger = logging.getLogger(__name__)
 class AdminRouter:
     """Admin router with proper structure and no hardcoded values"""
     
-    def __init__(self, model_manager=None, runpod_api_key=None):
+    def __init__(self, model_manager=None):
         self.router = APIRouter(prefix="/admin", tags=["admin"])
         self.model_manager = model_manager
-        self.runpod_api_key = runpod_api_key
         self.project_root = Path(__file__).parent.parent.parent.parent
         
         # Initialize utilities
@@ -361,7 +360,7 @@ class AdminRouter:
                 logger.error(f"Error getting config: {str(e)}")
                 return {"success": False, "error": str(e)}
 
-def create_admin_router(model_manager=None, runpod_api_key=None) -> APIRouter:
+def create_admin_router(model_manager=None) -> APIRouter:
     """Factory function to create admin router"""
-    admin_router = AdminRouter(model_manager, runpod_api_key)
+    admin_router = AdminRouter(model_manager)
     return admin_router.router
