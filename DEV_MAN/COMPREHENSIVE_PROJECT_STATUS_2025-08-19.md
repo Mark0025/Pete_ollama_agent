@@ -236,7 +236,7 @@ RUNPOD_API_KEY=rp_***                    # ❌ Currently missing
 RUNPOD_SERVERLESS_ENDPOINT=vk7efas3wu5vd7 # ❌ Currently missing
 
 # OpenRouter Configuration  
-OPENROUTER_API_KEY=sk-or-***             # ✅ Configured
+OPENROUTER_API_KEY=***REDACTED***             # ✅ Configured
 
 # Server Configuration
 PORT=8000                                # ✅ Default set

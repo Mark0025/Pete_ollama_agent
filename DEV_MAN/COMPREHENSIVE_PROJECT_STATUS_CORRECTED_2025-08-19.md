@@ -43,11 +43,11 @@ PeteOllama has evolved into a production-ready multi-provider AI phone system fe
 
 ```bash
 # RunPod Configuration
-RUNPOD_API_KEY=rpa_DPL09BE6U4Z1NUDSXW8TQLR9MUQVSX4UB0S258R51a0e8y  # ✅ SET
-RUNPOD_SERVERLESS_ENDPOINT=vk7efas3wu5vd7                              # ✅ SET
+RUNPOD_API_KEY=***REDACTED***  # ✅ SET
+RUNPOD_SERVERLESS_ENDPOINT=***REDACTED***                              # ✅ SET
 
 # OpenRouter Configuration  
-OPENROUTER_API_KEY=sk-or-v1-1bb63b1e621d2bb05252b3e4906aaea63c1d2de7... # ✅ SET
+OPENROUTER_API_KEY=***REDACTED*** # ✅ SET
 
 # Database Configuration
 PROD_DB_HOST=prod-ihbsql.database.windows.net                          # ✅ SET
@@ -149,7 +149,7 @@ python-dotenv==1.1.1          # ✅ Environment management
 ```python
 # Verified Configuration
 endpoint_id: "vk7efas3wu5vd7"           # ✅ Reachable
-api_key: "rpa_DPL09BE..."               # ✅ Valid
+api_key: "***REDACTED***"               # ✅ Valid
 base_url: "https://api.runpod.ai/v2/vk7efas3wu5vd7/openai/v1"
 compatibility: OpenAI v1 API            # ✅ Full compatibility
 status: ✅ Connected and ready
