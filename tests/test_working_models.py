@@ -13,7 +13,7 @@ import time
 def test_model_accessibility():
     """Test which models are actually accessible"""
     
-    api_key = "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"
+    api_key = "***REDACTED***"
     url = "https://openrouter.ai/api/v1/chat/completions"
     
     headers = {

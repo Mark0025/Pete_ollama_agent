@@ -20,7 +20,7 @@
         "similarity_analyzer_enabled": true,
         "fallback_cache_enabled": true
       },
-      "api_key": "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",
+      "api_key": "***REDACTED***",
       "endpoint": "",
       "timeout": 30,
       "max_retries": 3
