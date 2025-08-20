@@ -74,8 +74,9 @@ class ModelManager:
         # Initialize conversation similarity analyzer for intelligent responses
         # Get similarity threshold from system configuration
         try:
-            from config.system_config import system_config
+            from src.config.system_config import system_config
             self.similarity_threshold = system_config.get_caching_config().threshold
+            print(f"✅ Loaded similarity threshold from system config: {self.similarity_threshold}")
         except Exception as e:
             print(f"⚠️ Failed to load system config, using fallback: {e}")
             self.similarity_threshold = float(os.getenv('SIMILARITY_THRESHOLD', '0.75'))
@@ -113,18 +114,18 @@ class ModelManager:
         """Get current provider from system configuration"""
         try:
             # Import system config to get current provider
-            from config.system_config import system_config
+            from src.config.system_config import system_config
             provider = system_config.config.default_provider
-            print(f"🔧 Current provider: {provider}")
+            print(f"🔧 Current provider from system config: {provider}")
             return provider
         except Exception as e:
             print(f"⚠️ Error getting current provider from system config: {e}")
             try:
                 # Fallback to old model settings
-                from config.model_settings import model_settings
+                from src.config.model_settings import model_settings
                 settings = model_settings.get_provider_settings()
                 provider = settings.get('default_provider', 'ollama')
-                print(f"🔧 Fallback provider: {provider}")
+                print(f"🔧 Fallback provider from model settings: {provider}")
                 return provider
             except Exception as e2:
                 print(f"⚠️ Fallback failed: {e2}, defaulting to ollama")

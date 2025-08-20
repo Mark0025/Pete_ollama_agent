@@ -13,8 +13,8 @@ import json
 from pathlib import Path
 from typing import Dict, Any, Optional, Union
 from dataclasses import dataclass, asdict
-from utils.logger import logger
-from utils.type_validation import beartype, validate_and_log_types, validate_config_structure, TypeValidationError
+from src.utils.logger import logger
+from src.utils.type_validation import beartype, validate_and_log_types, validate_config_structure, TypeValidationError
 
 @dataclass
 class CachingConfig:
