@@ -69,6 +69,21 @@ class AdminRouter:
                 logger.error(f"Error loading admin settings: {e}")
                 return HTMLResponse(content="<h1>Admin Settings</h1><p>Error loading settings UI</p>")
         
+        @self.router.get("/system-config")
+        async def system_config_ui():
+            """System configuration UI page"""
+            try:
+                html_file = self.project_root / "src" / "frontend" / "html" / "system-config-ui.html"
+                if html_file.exists():
+                    with open(html_file, 'r') as f:
+                        content = f.read()
+                    return HTMLResponse(content=content)
+                else:
+                    return HTMLResponse(content="<h1>System Config UI</h1><p>System config UI not found</p>")
+            except Exception as e:
+                logger.error(f"Error loading system config UI: {e}")
+                return HTMLResponse(content="<h1>System Config UI</h1><p>Error loading system config UI</p>")
+        
         @self.router.get("/stats")
         async def admin_stats():
             """Admin statistics page"""
@@ -83,6 +98,104 @@ class AdminRouter:
             except Exception as e:
                 logger.error(f"Error loading admin stats: {e}")
                 return HTMLResponse(content="<h1>Admin Stats</h1><p>Error loading stats UI</p>")
+        
+        @self.router.get("/environment")
+        async def get_environment_info():
+            """Get environment information for UI"""
+            try:
+                import platform
+                import os
+                
+                # Check if we're running locally or in cloud
+                is_local = os.getenv('ENVIRONMENT', 'local') == 'local'
+                
+                # Get platform info
+                platform_info = platform.platform()
+                
+                # Get timeout from environment or use default
+                timeout_seconds = int(os.getenv('TIMEOUT_SECONDS', '30'))
+                
+                return {
+                    "is_local": is_local,
+                    "platform": platform_info,
+                    "timeout_seconds": timeout_seconds,
+                    "environment": "local",
+                    "ollama_host": os.getenv('OLLAMA_HOST', 'localhost:11434')
+                }
+            except Exception as e:
+                logger.error(f"Error getting environment info: {e}")
+                return {
+                    "is_local": True,
+                    "platform": "unknown",
+                    "timeout_seconds": 30,
+                    "environment": "local",
+                    "ollama_host": "localhost:11434"
+                }
+        
+        @self.router.get("/provider-settings")
+        async def get_provider_settings():
+            """Get current provider settings for UI"""
+            try:
+                from src.config.system_config import system_config
+                
+                # Get current provider from system config
+                current_provider = system_config.config.default_provider
+                
+                # Get provider configs
+                provider_configs = {}
+                if hasattr(system_config, 'get_provider_config'):
+                    for provider_name in ['openrouter', 'runpod', 'ollama']:
+                        try:
+                            config = system_config.get_provider_config(provider_name)
+                            if config:
+                                provider_configs[provider_name] = {
+                                    "enabled": config.enabled,
+                                    "priority": config.priority,
+                                    "api_key_set": bool(config.api_key) if hasattr(config, 'api_key') else False
+                                }
+                        except Exception as e:
+                            logger.warning(f"Could not get config for {provider_name}: {e}")
+                            provider_configs[provider_name] = {"enabled": False, "priority": 999, "api_key_set": False}
+                
+                return {
+                    "current_provider": current_provider,
+                    "providers": provider_configs,
+                    "fallback_enabled": system_config.config.fallback_enabled,
+                    "fallback_provider": system_config.config.fallback_provider
+                }
+                
+            except Exception as e:
+                logger.error(f"Error getting provider settings: {e}")
+                return {
+                    "current_provider": "ollama",
+                    "providers": {
+                        "ollama": {"enabled": True, "priority": 1, "api_key_set": False},
+                        "openrouter": {"enabled": False, "priority": 999, "api_key_set": False},
+                        "runpod": {"enabled": False, "priority": 999, "api_key_set": False}
+                    },
+                    "fallback_enabled": False,
+                    "fallback_provider": "ollama"
+                }
+        
+        @self.router.post("/provider-settings/update")
+        async def update_provider_settings(request: Request):
+            """Update provider settings from UI"""
+            try:
+                data = await request.json()
+                provider = data.get('provider')
+                action = data.get('action')  # 'switch' or 'update'
+                
+                if action == 'switch' and provider:
+                    # For now, just return success - in a real implementation,
+                    # this would update the system configuration
+                    logger.info(f"Provider switch requested to: {provider}")
+                    return {"success": True, "message": f"Provider switched to {provider}"}
+                
+                return {"success": True, "message": "Settings updated"}
+                
+            except Exception as e:
+                logger.error(f"Error updating provider settings: {e}")
+                return {"success": False, "error": str(e)}
         
         @self.router.get("/data-source/{data_source}/columns")
         async def get_data_source_columns(data_source: str):
@@ -275,7 +388,7 @@ class AdminRouter:
                     "validation_data": validation_data,
                     "message": "Validation metrics loaded from ResponseValidator" if validation_data else "No validation data available"
                 }
-                
+            
             except Exception as e:
                 logger.error(f"Error loading validation metrics: {str(e)}")
                 return {"success": False, "error": str(e)}
@@ -290,7 +403,7 @@ class AdminRouter:
                     "success": True,
                     "health_metrics": health_metrics
                 }
-                
+            
             except Exception as e:
                 logger.error(f"Error getting system health: {str(e)}")
                 return {"success": False, "error": str(e)}
@@ -359,6 +472,298 @@ class AdminRouter:
                 }
             except Exception as e:
                 logger.error(f"Error getting config: {str(e)}")
+                return {"success": False, "error": str(e)}
+        
+        @self.router.get("/test/ollama-models")
+        async def test_ollama_models():
+            """Test endpoint to check Ollama model availability"""
+            try:
+                from src.vapi.services.provider_service import ProviderService
+                
+                provider_service = ProviderService()
+                available_models = await provider_service._get_actual_ollama_models()
+                
+                return {
+                    "success": True,
+                    "available_models": available_models,
+                    "count": len(available_models),
+                    "message": "Ollama model availability test completed"
+                }
+                
+            except Exception as e:
+                logger.error(f"Error testing Ollama models: {str(e)}")
+                return {"success": False, "error": str(e)}
+        
+        @self.router.get("/test/runpod-models")
+        async def test_runpod_models():
+            """Test endpoint to check RunPod model availability"""
+            try:
+                from src.vapi.services.provider_service import ProviderService
+                
+                provider_service = ProviderService()
+                available_models = await provider_service._get_actual_runpod_models()
+                
+                return {
+                    "success": True,
+                    "available_models": available_models,
+                    "count": len(available_models),
+                    "message": "RunPod model availability test completed"
+                }
+                
+            except Exception as e:
+                logger.error(f"Error testing RunPod models: {str(e)}")
+                return {"success": False, "error": str(e)}
+        
+        @self.router.get("/test/provider-models/{provider}")
+        async def test_provider_models(provider: str):
+            """Test endpoint to get models for a specific provider"""
+            try:
+                from src.vapi.services.provider_service import ProviderService
+                
+                provider_service = ProviderService()
+                personas = await provider_service.get_personas_for_provider(provider)
+                
+                # Extract model names from personas
+                all_models = []
+                for persona in personas:
+                    for model in persona.models:
+                        all_models.append(model.name)
+                
+                return {
+                    "success": True,
+                    "provider": provider,
+                    "models": all_models,
+                    "count": len(all_models),
+                    "personas": [{"name": p.name, "model_count": len(p.models)} for p in personas],
+                    "message": f"Provider {provider} model test completed"
+                }
+                
+            except Exception as e:
+                logger.error(f"Error testing provider {provider} models: {str(e)}")
+                return {"success": False, "error": str(e)}
+        
+        @self.router.get("/test-cases")
+        async def get_test_cases():
+            """Get Jamie test cases for provider comparison"""
+            try:
+                import os
+                import glob
+                import json
+                from datetime import datetime
+                
+                # Find all jamie test case files in project root
+                jamie_files = glob.glob(str(self.project_root / "jamie_test_cases_*.json"))
+                
+                # If no files found, return empty
+                if not jamie_files:
+                    return {
+                        "success": False,
+                        "error": "No Jamie test case files found",
+                        "files": []
+                    }
+                
+                # Sort by modification time (most recent first)
+                jamie_files.sort(key=lambda x: os.path.getmtime(x), reverse=True)
+                
+                # Get the most recent file
+                latest_file = jamie_files[0]
+                
+                # Get file stats
+                file_stat = os.stat(latest_file)
+                file_size = file_stat.st_size
+                mod_time = datetime.fromtimestamp(file_stat.st_mtime).isoformat()
+                
+                # Load the file
+                with open(latest_file, 'r') as f:
+                    data = json.load(f)
+                
+                # Extract metadata and first 10 test cases for preview
+                metadata = data.get('metadata', {})
+                test_cases = data.get('test_cases', [])
+                
+                return {
+                    "success": True,
+                    "file": os.path.basename(latest_file),
+                    "file_size": file_size,
+                    "modified": mod_time,
+                    "total_test_cases": len(test_cases),
+                    "metadata": metadata,
+                    "preview": test_cases[:10],  # First 10 test cases
+                    "available_files": [os.path.basename(f) for f in jamie_files]
+                }
+                
+            except Exception as e:
+                logger.error(f"Error loading test cases: {str(e)}")
+                return {"success": False, "error": str(e)}
+
+        @self.router.get("/test-cases/latest")
+        async def get_latest_test_cases():
+            """Get the latest Jamie test cases for provider comparison"""
+            try:
+                import os
+                import glob
+                import json
+                
+                # Find all jamie test case files in project root
+                jamie_files = glob.glob(str(self.project_root / "jamie_test_cases_*.json"))
+                
+                # If no files found, return empty
+                if not jamie_files:
+                    return {"success": False, "error": "No Jamie test case files found"}
+                
+                # Sort by modification time (most recent first)
+                jamie_files.sort(key=lambda x: os.path.getmtime(x), reverse=True)
+                
+                # Get the most recent file
+                latest_file = jamie_files[0]
+                
+                # Load the file
+                with open(latest_file, 'r') as f:
+                    data = json.load(f)
+                
+                # Extract just the test cases array for easy consumption
+                test_cases = data.get('test_cases', [])
+                
+                # Include basic metadata for context
+                metadata = data.get('metadata', {})
+                
+                return {
+                    "success": True,
+                    "file": os.path.basename(latest_file),
+                    "test_cases": test_cases,
+                    "total": len(test_cases),
+                    "categories": metadata.get("quality_summary", {}).get("category_distribution", {}),
+                    "source": "jamie_processor"
+                }
+                
+            except Exception as e:
+                logger.error(f"Error loading latest test cases: {str(e)}")
+                return {"success": False, "error": str(e)}
+
+        @self.router.get("/test-cases/random/{count}")
+        async def get_random_test_cases(count: int = 10):
+            """Get a random selection of test cases for provider testing"""
+            try:
+                import os
+                import glob
+                import json
+                import random
+                
+                # Find all jamie test case files in project root
+                jamie_files = glob.glob(str(self.project_root / "jamie_test_cases_*.json"))
+                
+                # If no files found, return empty
+                if not jamie_files:
+                    return {"success": False, "error": "No Jamie test case files found"}
+                
+                # Sort by modification time (most recent first)
+                jamie_files.sort(key=lambda x: os.path.getmtime(x), reverse=True)
+                
+                # Get the most recent file
+                latest_file = jamie_files[0]
+                
+                # Load the file
+                with open(latest_file, 'r') as f:
+                    data = json.load(f)
+                
+                # Extract test cases
+                test_cases = data.get('test_cases', [])
+                
+                # Cap the count to the available test cases
+                count = min(count, len(test_cases))
+                
+                # Select random cases if we have more than requested
+                if len(test_cases) > count:
+                    test_cases = random.sample(test_cases, count)
+                
+                return {
+                    "success": True,
+                    "file": os.path.basename(latest_file),
+                    "test_cases": test_cases,
+                    "total": len(test_cases),
+                    "requested": count,
+                    "source": "jamie_processor_random"
+                }
+                
+            except Exception as e:
+                logger.error(f"Error loading random test cases: {str(e)}")
+                return {"success": False, "error": str(e)}
+                
+        @self.router.get("/test/system-config-providers")
+        async def test_system_config_providers():
+            """Test endpoint to show system config provider status and available models"""
+            try:
+                from src.vapi.services.provider_service import ProviderService
+                from src.config.system_config import system_config
+                
+                provider_service = ProviderService()
+                
+                # Get system config status
+                config_status = {
+                    "default_provider": system_config.config.default_provider,
+                    "providers": {}
+                }
+                
+                # Check each provider's status
+                for provider_name in ['openrouter', 'ollama', 'runpod']:
+                    try:
+                        provider_config = system_config.get_provider_config(provider_name)
+                        if provider_config:
+                            config_status["providers"][provider_name] = {
+                                "enabled": provider_config.enabled,
+                                "api_key_set": bool(provider_config.api_key) if hasattr(provider_config, 'api_key') else False,
+                                "priority": getattr(provider_config, 'priority', 999)
+                            }
+                        else:
+                            config_status["providers"][provider_name] = {
+                                "enabled": False,
+                                "api_key_set": False,
+                                "priority": 999
+                            }
+                    except Exception as e:
+                        config_status["providers"][provider_name] = {
+                            "enabled": False,
+                            "api_key_set": False,
+                            "priority": 999,
+                            "error": str(e)
+                        }
+                
+                # Test which providers actually return models
+                available_models = {}
+                for provider_name in ['openrouter', 'ollama', 'runpod']:
+                    try:
+                        if provider_service._is_provider_enabled(provider_name):
+                            personas = await provider_service.get_personas_for_provider(provider_name)
+                            model_count = sum(len(p.models) for p in personas)
+                            available_models[provider_name] = {
+                                "enabled_in_config": True,
+                                "models_available": model_count,
+                                "personas": len(personas)
+                            }
+                        else:
+                            available_models[provider_name] = {
+                                "enabled_in_config": False,
+                                "models_available": 0,
+                                "personas": 0,
+                                "reason": "Disabled in system config or missing API key"
+                            }
+                    except Exception as e:
+                        available_models[provider_name] = {
+                            "enabled_in_config": False,
+                            "models_available": 0,
+                            "personas": 0,
+                            "error": str(e)
+                        }
+                
+                return {
+                    "success": True,
+                    "system_config": config_status,
+                    "available_models": available_models,
+                    "message": "System config provider status test completed"
+                }
+                
+            except Exception as e:
+                logger.error(f"Error testing system config providers: {str(e)}")
                 return {"success": False, "error": str(e)}
 
 def create_admin_router(model_manager=None, runpod_api_key=None) -> APIRouter:

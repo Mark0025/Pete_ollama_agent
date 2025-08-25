@@ -72,21 +72,32 @@ class UIRouter:
         
         @self.router.get("/personas")
         async def get_personas():
-            """Get personas for the current provider (for UI)"""
+            """Get personas for the current provider (for UI) - NOW PROVIDER-AWARE!"""
             try:
-                # Get current provider to determine which models to show
+                # Get current provider from system configuration (authoritative source)
                 try:
-                    provider_settings = model_settings.get_provider_settings()
-                    current_provider = provider_settings.get('default_provider', 'ollama')
+                    from src.config.system_config import system_config
+                    current_provider = system_config.config.default_provider
+                    logger.info(f"📋 UI: Using provider from system_config: {current_provider}")
                 except Exception as e:
-                    logger.warning(f"Failed to get provider settings: {e}, defaulting to ollama")
-                    current_provider = 'ollama'
+                    logger.warning(f"Failed to get provider from system_config: {e}, falling back to model_settings")
+                    try:
+                        provider_settings = model_settings.get_provider_settings()
+                        current_provider = provider_settings.get('default_provider', 'ollama')
+                    except Exception as e2:
+                        logger.warning(f"Fallback also failed: {e2}, defaulting to ollama")
+                        current_provider = 'ollama'
                 
                 logger.info(f"📋 UI: Serving models for provider: {current_provider}")
                 
-                # Use provider service to get personas
+                # Use provider service to get personas - NOW RESPECTS PROVIDER FILTERING!
                 personas = await self.provider_service.get_personas_for_provider(current_provider)
                 
+                if not personas:
+                    logger.warning(f"⚠️ No personas available for provider {current_provider}, using fallback")
+                    return self.provider_service._get_fallback_personas()
+                
+                logger.info(f"✅ UI: Served {len(personas)} personas for provider {current_provider}")
                 return personas
                 
             except Exception as e:
@@ -96,29 +107,59 @@ class UIRouter:
         
         @self.router.get("/models")
         async def get_models():
-            """Get available models for UI dropdowns"""
+            """Get available models for UI dropdowns - NOW PROVIDER-AWARE!"""
             try:
-                # Get UI models from settings
-                ui_models = model_settings.get_ui_models()
+                # Get current provider from system configuration (authoritative source)
+                try:
+                    from src.config.system_config import system_config
+                    current_provider = system_config.config.default_provider
+                    logger.info(f"📋 UI Models: Using provider from system_config: {current_provider}")
+                except Exception as e:
+                    logger.warning(f"Failed to get provider from system_config: {e}, falling back to model_settings")
+                    try:
+                        provider_settings = model_settings.get_provider_settings()
+                        current_provider = provider_settings.get('default_provider', 'ollama')
+                    except Exception as e2:
+                        logger.warning(f"Fallback also failed: {e2}, defaulting to ollama")
+                        current_provider = 'ollama'
+                
+                # Get provider-specific models instead of all UI models
+                try:
+                    provider_personas = await self.provider_service.get_personas_for_provider(current_provider)
+                    
+                    # Extract models from provider-specific personas
+                    provider_models = []
+                    for persona in provider_personas:
+                        for model in persona.models:
+                            provider_models.append(model)
+                    
+                    logger.info(f"📋 UI Models: Found {len(provider_models)} models for provider {current_provider}")
+                    
+                except Exception as e:
+                    logger.warning(f"Failed to get provider models: {e}, falling back to UI models")
+                    provider_models = model_settings.get_ui_models()
                 
                 # Get current model info
                 current_model = self.model_manager.model_name
                 custom_model = getattr(self.model_manager, 'custom_model_name', None)
                 
-                # Get provider info
-                try:
-                    provider_settings = model_settings.get_provider_settings()
-                    current_provider = provider_settings.get('default_provider', 'ollama')
-                except Exception as e:
-                    current_provider = 'ollama'
+                # Filter jamie models based on current provider
+                if current_provider == 'ollama':
+                    # Only show jamie models for Ollama (local custom models)
+                    jamie_models = [model.dict() for model in provider_models if 'jamie' in model.name.lower()]
+                    regular_models = [model.dict() for model in provider_models if 'jamie' not in model.name.lower()]
+                else:
+                    # For cloud providers (OpenRouter, RunPod), no jamie models
+                    jamie_models = []
+                    regular_models = [model.dict() for model in provider_models]
                 
                 return {
-                    "models": [model.dict() for model in ui_models],
+                    "models": [model.dict() for model in provider_models],
                     "current_model": current_model,
                     "custom_model": custom_model,
                     "current_provider": current_provider,
-                    "jamie_models": [model.dict() for model in ui_models if model.is_jamie_model],
-                    "regular_models": [model.dict() for model in ui_models if not model.is_jamie_model]
+                    "jamie_models": jamie_models,
+                    "regular_models": regular_models
                 }
             
             except Exception as e:

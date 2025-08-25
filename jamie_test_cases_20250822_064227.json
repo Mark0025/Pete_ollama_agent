@@ -1,0 +1,147 @@
+{
+  "metadata": {
+    "generated_at": "2025-08-22T06:42:27.379671",
+    "total_test_cases": 5,
+    "processing_statistics": {
+      "total_processed": 20,
+      "quality_conversations": 14,
+      "test_cases_generated": 5,
+      "jamie_responses_extracted": 7,
+      "processing_errors": 0
+    },
+    "quality_summary": {
+      "category_distribution": {
+        "general": 4,
+        "maintenance": 1
+      },
+      "average_quality_score": 0.4552380952380952,
+      "quality_distribution": {
+        "high_quality": 0,
+        "medium_quality": 0,
+        "low_quality": 5
+      }
+    }
+  },
+  "test_cases": [
+    {
+      "input_scenario": "Client says: Well, that's the main one",
+      "expected_response": "And what I could do is replace that sheet of drywall that's right above the shower enclosure",
+      "conversation_context": {
+        "client_name": "Jamie",
+        "conversation_position": 23,
+        "total_segments": 53,
+        "conversation_quality": 0.95502,
+        "timestamp": "2025-08-22T06:42:27.362486"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0,
+        "relevance": 0.8,
+        "completeness": 0.4
+      },
+      "issue_category": "general",
+      "client_info": {
+        "name": "Jamie",
+        "phone": "Unknown",
+        "key": "Jamie_Unknown"
+      },
+      "source_conversation": "conv_0_2025-08-05_19-28-02"
+    },
+    {
+      "input_scenario": "Client says: So you'll get the rest of it",
+      "expected_response": "Yeah, well, I will start the repairs on the shower wall today, and then I'll come back Friday to finish it",
+      "conversation_context": {
+        "client_name": "Jamie",
+        "conversation_position": 43,
+        "total_segments": 53,
+        "conversation_quality": 0.95502,
+        "timestamp": "2025-08-22T06:42:27.362616"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.2,
+        "relevance": 0.5714285714285714,
+        "completeness": 0.4
+      },
+      "issue_category": "general",
+      "client_info": {
+        "name": "Jamie",
+        "phone": "Unknown",
+        "key": "Jamie_Unknown"
+      },
+      "source_conversation": "conv_0_2025-08-05_19-28-02"
+    },
+    {
+      "input_scenario": "Client says: Well, you'll make those repairs and I have to go back later on this week",
+      "expected_response": "Yeah, well, I will start the repairs on the shower wall today, and then I'll come back Friday to finish it",
+      "conversation_context": {
+        "client_name": "Jamie",
+        "conversation_position": 44,
+        "total_segments": 53,
+        "conversation_quality": 0.95502,
+        "timestamp": "2025-08-22T06:42:27.362729"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.2,
+        "relevance": 0.9333333333333333,
+        "completeness": 0.4
+      },
+      "issue_category": "maintenance",
+      "client_info": {
+        "name": "Jamie",
+        "phone": "Unknown",
+        "key": "Jamie_Unknown"
+      },
+      "source_conversation": "conv_0_2025-08-05_19-28-02"
+    },
+    {
+      "input_scenario": "Client says: Of course, of course",
+      "expected_response": "That's what I figured",
+      "conversation_context": {
+        "client_name": "Like",
+        "conversation_position": 30,
+        "total_segments": 74,
+        "conversation_quality": 0.84835,
+        "timestamp": "2025-08-22T06:42:27.368991"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0,
+        "relevance": 0.0,
+        "completeness": 0.4
+      },
+      "issue_category": "general",
+      "client_info": {
+        "name": "Like",
+        "phone": "Unknown",
+        "key": "Like_Unknown"
+      },
+      "source_conversation": "conv_6_2025-08-01_19-15-23"
+    },
+    {
+      "input_scenario": "Client says: So I'm assuming there might be now birdies in there",
+      "expected_response": "I'll call him",
+      "conversation_context": {
+        "client_name": "Like",
+        "conversation_position": 56,
+        "total_segments": 74,
+        "conversation_quality": 0.84835,
+        "timestamp": "2025-08-22T06:42:27.369054"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.4,
+        "relevance": 0.0,
+        "completeness": 0.4
+      },
+      "issue_category": "general",
+      "client_info": {
+        "name": "Like",
+        "phone": "Unknown",
+        "key": "Like_Unknown"
+      },
+      "source_conversation": "conv_6_2025-08-01_19-15-23"
+    }
+  ]
+}

@@ -20,9 +20,10 @@ else
     echo "✅ No existing server found on port 8000"
 fi
 
-# Set environment variables
-export RUNPOD_API_KEY="rpa_DPL09BE6U4Z1NUDSXW8TQLR9NVQVSX8TQLR9NVQVSX8TQLR9NVQVSX8TQLR9NVQVSX8TQLR9NVQVSX4UB0S258R51a0e8y"
-export RUNPOD_SERVERLESS_ENDPOINT="vk7efas3wu5vd7"
+# Load environment variables from .env file
+set -a  # Export all variables
+source .env
+set +a  # Stop exporting
 
 # Change to src directory
 cd src

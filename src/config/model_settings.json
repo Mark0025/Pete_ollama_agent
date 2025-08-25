@@ -17,7 +17,7 @@
       "include_model_info": false,
       "response_style": "concise",
       "created_at": "2025-08-12T18:37:48.980335",
-      "last_updated": "2025-08-19T15:35:48.863226"
+      "last_updated": "2025-08-22T11:16:32.277460"
     },
     "peteollama:jamie-voice-complete": {
       "name": "peteollama:jamie-voice-complete",
@@ -36,7 +36,7 @@
       "include_model_info": false,
       "response_style": "concise",
       "created_at": "2025-08-12T18:37:48.980353",
-      "last_updated": "2025-08-19T15:35:48.863262"
+      "last_updated": "2025-08-22T11:16:32.277649"
     },
     "peteollama:jamie-simple": {
       "name": "peteollama:jamie-simple",
@@ -55,7 +55,7 @@
       "include_model_info": false,
       "response_style": "concise",
       "created_at": "2025-08-12T18:37:48.980361",
-      "last_updated": "2025-08-19T15:35:48.863268"
+      "last_updated": "2025-08-22T11:16:32.277655"
     },
     "peteollama:jamie-working-working_20250806": {
       "name": "peteollama:jamie-working-working_20250806",
@@ -74,7 +74,7 @@
       "include_model_info": false,
       "response_style": "concise",
       "created_at": "2025-08-12T18:37:48.980367",
-      "last_updated": "2025-08-19T15:35:48.863233"
+      "last_updated": "2025-08-22T11:16:32.277467"
     },
     "llama3:latest": {
       "name": "llama3:latest",
@@ -93,7 +93,7 @@
       "include_model_info": false,
       "response_style": "concise",
       "created_at": "2025-08-12T18:37:48.980374",
-      "last_updated": "2025-08-19T15:35:48.863286"
+      "last_updated": "2025-08-22T11:16:32.277672"
     },
     "gemma3:4b": {
       "name": "gemma3:4b",
@@ -112,7 +112,7 @@
       "include_model_info": false,
       "response_style": "concise",
       "created_at": "3.3 GB 3 days ago",
-      "last_updated": "2025-08-19T15:35:48.863200"
+      "last_updated": "2025-08-22T11:16:32.277438"
     },
     "markcarpenter-localhousebuyers:jamie-fixed": {
       "name": "markcarpenter-localhousebuyers:jamie-fixed",
@@ -131,7 +131,7 @@
       "include_model_info": false,
       "response_style": "concise",
       "created_at": "4.7 GB 4 days ago",
-      "last_updated": "2025-08-19T15:35:48.863208"
+      "last_updated": "2025-08-22T11:16:32.277445"
     },
     "markcarpenter-test:jamie-fixed": {
       "name": "markcarpenter-test:jamie-fixed",
@@ -150,7 +150,7 @@
       "include_model_info": false,
       "response_style": "concise",
       "created_at": "4.7 GB 4 days ago",
-      "last_updated": "2025-08-19T15:35:48.863214"
+      "last_updated": "2025-08-22T11:16:32.277450"
     },
     "markcarpenter:jamie-fixed": {
       "name": "markcarpenter:jamie-fixed",
@@ -169,7 +169,7 @@
       "include_model_info": false,
       "response_style": "concise",
       "created_at": "4.7 GB 4 days ago",
-      "last_updated": "2025-08-19T15:35:48.863220"
+      "last_updated": "2025-08-22T11:16:32.277455"
     },
     "peteollama:property-manager-enhanced-20250806_102528": {
       "name": "peteollama:property-manager-enhanced-20250806_102528",
@@ -188,7 +188,7 @@
       "include_model_info": false,
       "response_style": "concise",
       "created_at": "4.7 GB 13 days ago",
-      "last_updated": "2025-08-19T15:35:48.863274"
+      "last_updated": "2025-08-22T11:16:32.277660"
     },
     "peteollama:property-manager": {
       "name": "peteollama:property-manager",
@@ -207,7 +207,7 @@
       "include_model_info": false,
       "response_style": "concise",
       "created_at": "4.7 GB 13 days ago",
-      "last_updated": "2025-08-19T15:35:48.863279"
+      "last_updated": "2025-08-22T11:16:32.277665"
     },
     "codellama:7b": {
       "name": "codellama:7b",
@@ -226,7 +226,7 @@
       "include_model_info": false,
       "response_style": "concise",
       "created_at": "3.8 GB 2 months ago",
-      "last_updated": "2025-08-19T15:35:48.863293"
+      "last_updated": "2025-08-22T11:16:32.277678"
     },
     "phi3:latest": {
       "name": "phi3:latest",
@@ -245,7 +245,7 @@
       "include_model_info": false,
       "response_style": "concise",
       "created_at": "2.2 GB 2 months ago",
-      "last_updated": "2025-08-19T15:35:48.863299"
+      "last_updated": "2025-08-22T11:16:32.277684"
     },
     "nextjs15:latest": {
       "name": "nextjs15:latest",
@@ -264,7 +264,7 @@
       "include_model_info": false,
       "response_style": "concise",
       "created_at": "4.7 GB 6 months ago",
-      "last_updated": "2025-08-19T15:35:48.863305"
+      "last_updated": "2025-08-22T11:16:32.277689"
     },
     "deepseek-r1:7b": {
       "name": "deepseek-r1:7b",
@@ -283,13 +283,46 @@
       "include_model_info": false,
       "response_style": "concise",
       "created_at": "4.7 GB 6 months ago",
-      "last_updated": "2025-08-19T15:35:48.863311"
+      "last_updated": "2025-08-22T11:16:32.277697"
+    },
+    "llama2:7b": {
+      "name": "llama2:7b",
+      "display_name": "Llama2 - 7B",
+      "description": "AI model based on unknown",
+      "show_in_ui": false,
+      "auto_preload": false,
+      "is_jamie_model": false,
+      "base_model": "unknown",
+      "type": "other",
+      "size": "78e26419b446",
+      "status": "available",
+      "conversational_mode": true,
+      "max_response_length": 200,
+      "include_thinking": false,
+      "include_model_info": false,
+      "response_style": "concise",
+      "created_at": "3.8 GB About a minute ago",
+      "last_updated": "2025-08-22T11:16:32.277419"
+    },
+    "vapipmv1:latest": {
+      "name": "vapipmv1:latest",
+      "display_name": "Vapipmv1 - Latest",
+      "description": "Professional property management assistant for Nolen Properties, handles tenant inquiries, maintenance requests, and complaints",
+      "show_in_ui": false,
+      "auto_preload": false,
+      "is_jamie_model": false,
+      "base_model": "llama2:7b",
+      "type": "vapi-pm",
+      "size": "851b883d6248",
+      "status": "available",
+      "conversational_mode": true,
+      "max_response_length": 200,
+      "include_thinking": false,
+      "include_model_info": false,
+      "response_style": "concise",
+      "created_at": "3.8 GB About a minute ago",
+      "last_updated": "2025-08-22T11:16:32.277431"
     }
   },
-  "last_updated": "2025-08-19T15:35:48.863509",
-  "provider_settings": {
-    "default_provider": "openrouter",
-    "fallback_enabled": false,
-    "last_updated": "2025-08-19T17:18:55.706255"
-  }
+  "last_updated": "2025-08-22T11:16:32.277987"
 }

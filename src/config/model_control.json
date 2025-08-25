@@ -1,0 +1,83 @@
+{
+  "model_control": {
+    "enabled": true,
+    "auto_discovery": false,
+    "manual_override": true
+  },
+  "models": {
+    "vapipmv1:latest": {
+      "name": "vapipmv1:latest",
+      "display_name": "VAPI PM Assistant",
+      "description": "Professional property management assistant for Nolen Properties, handles tenant inquiries, maintenance requests, and complaints",
+      "show_in_ui": true,
+      "auto_preload": true,
+      "is_jamie_model": false,
+      "base_model": "llama2:7b",
+      "type": "vapi-pm",
+      "size": "851b883d6248",
+      "status": "available",
+      "conversational_mode": true,
+      "max_response_length": 200,
+      "include_thinking": false,
+      "include_model_info": false,
+      "response_style": "conversational",
+      "created_at": "2025-01-27T00:00:00.000000",
+      "last_updated": "2025-01-27T00:00:00.000000",
+      "force_visible": true,
+      "priority": 1
+    },
+    "peteollama:jamie-fixed": {
+      "name": "peteollama:jamie-fixed",
+      "display_name": "Jamie Property Manager",
+      "description": "AI property manager trained on real conversations, based on unknown",
+      "show_in_ui": true,
+      "auto_preload": true,
+      "is_jamie_model": true,
+      "base_model": "unknown",
+      "type": "jamie",
+      "size": "dd5c21ced201",
+      "status": "available",
+      "conversational_mode": true,
+      "max_response_length": 200,
+      "include_thinking": false,
+      "include_model_info": false,
+      "response_style": "concise",
+      "created_at": "2025-08-12T18:37:48.980335",
+      "last_updated": "2025-08-22T11:06:39.728748",
+      "force_visible": true,
+      "priority": 2
+    },
+    "llama3:latest": {
+      "name": "llama3:latest",
+      "display_name": "Llama 3 (Base Model)",
+      "description": "Meta's Llama 3 base model for AI applications",
+      "show_in_ui": false,
+      "auto_preload": false,
+      "is_jamie_model": false,
+      "base_model": "llama3:latest",
+      "type": "llama3",
+      "size": "365c0bd3c000",
+      "status": "available",
+      "conversational_mode": true,
+      "max_response_length": 200,
+      "include_thinking": false,
+      "include_model_info": false,
+      "response_style": "concise",
+      "created_at": "2025-08-12T18:37:48.980374",
+      "last_updated": "2025-08-22T11:06:39.728934",
+      "force_visible": false,
+      "priority": 10
+    }
+  },
+  "ui_settings": {
+    "default_model": "vapipmv1:latest",
+    "show_model_info": false,
+    "allow_model_switching": true,
+    "model_categories": {
+      "primary": ["vapipmv1:latest", "peteollama:jamie-fixed"],
+      "secondary": ["llama3:latest"],
+      "hidden": []
+    }
+  },
+  "last_updated": "2025-01-27T00:00:00.000000"
+}

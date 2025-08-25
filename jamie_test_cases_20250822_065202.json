@@ -1,0 +1,4542 @@
+{
+  "metadata": {
+    "generated_at": "2025-08-22T06:52:02.157145",
+    "total_test_cases": 188,
+    "processing_statistics": {
+      "total_processed": 500,
+      "quality_conversations": 356,
+      "test_cases_generated": 189,
+      "jamie_responses_extracted": 175,
+      "processing_errors": 0
+    },
+    "quality_summary": {
+      "category_distribution": {
+        "general": 138,
+        "maintenance": 30,
+        "payment": 9,
+        "move": 9,
+        "emergency": 2
+      },
+      "average_quality_score": 0.4422749963858659,
+      "quality_distribution": {
+        "high_quality": 0,
+        "medium_quality": 15,
+        "low_quality": 173
+      }
+    }
+  },
+  "test_cases": [
+    {
+      "input_scenario": "Client says: Well, that's the main one",
+      "expected_response": "And what I could do is replace that sheet of drywall that's right above the shower enclosure",
+      "conversation_context": {
+        "client_name": "Jamie",
+        "conversation_position": 23,
+        "total_segments": 53,
+        "conversation_quality": 0.95502,
+        "timestamp": "2025-08-22T06:52:01.737922"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0,
+        "relevance": 0.8,
+        "completeness": 0.4
+      },
+      "issue_category": "general",
+      "client_info": {
+        "name": "Jamie",
+        "phone": "Unknown",
+        "key": "Jamie_Unknown"
+      },
+      "source_conversation": "conv_0_2025-08-05_19-28-02"
+    },
+    {
+      "input_scenario": "Client says: So you'll get the rest of it",
+      "expected_response": "Yeah, well, I will start the repairs on the shower wall today, and then I'll come back Friday to finish it",
+      "conversation_context": {
+        "client_name": "Jamie",
+        "conversation_position": 43,
+        "total_segments": 53,
+        "conversation_quality": 0.95502,
+        "timestamp": "2025-08-22T06:52:01.738025"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.2,
+        "relevance": 0.5714285714285714,
+        "completeness": 0.4
+      },
+      "issue_category": "general",
+      "client_info": {
+        "name": "Jamie",
+        "phone": "Unknown",
+        "key": "Jamie_Unknown"
+      },
+      "source_conversation": "conv_0_2025-08-05_19-28-02"
+    },
+    {
+      "input_scenario": "Client says: Well, you'll make those repairs and I have to go back later on this week",
+      "expected_response": "Yeah, well, I will start the repairs on the shower wall today, and then I'll come back Friday to finish it",
+      "conversation_context": {
+        "client_name": "Jamie",
+        "conversation_position": 44,
+        "total_segments": 53,
+        "conversation_quality": 0.95502,
+        "timestamp": "2025-08-22T06:52:01.738082"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.2,
+        "relevance": 0.9333333333333333,
+        "completeness": 0.4
+      },
+      "issue_category": "maintenance",
+      "client_info": {
+        "name": "Jamie",
+        "phone": "Unknown",
+        "key": "Jamie_Unknown"
+      },
+      "source_conversation": "conv_0_2025-08-05_19-28-02"
+    },
+    {
+      "input_scenario": "Client says: Of course, of course",
+      "expected_response": "That's what I figured",
+      "conversation_context": {
+        "client_name": "Like",
+        "conversation_position": 30,
+        "total_segments": 74,
+        "conversation_quality": 0.84835,
+        "timestamp": "2025-08-22T06:52:01.742318"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0,
+        "relevance": 0.0,
+        "completeness": 0.4
+      },
+      "issue_category": "general",
+      "client_info": {
+        "name": "Like",
+        "phone": "Unknown",
+        "key": "Like_Unknown"
+      },
+      "source_conversation": "conv_6_2025-08-01_19-15-23"
+    },
+    {
+      "input_scenario": "Client says: So I'm assuming there might be now birdies in there",
+      "expected_response": "I'll call him",
+      "conversation_context": {
+        "client_name": "Like",
+        "conversation_position": 56,
+        "total_segments": 74,
+        "conversation_quality": 0.84835,
+        "timestamp": "2025-08-22T06:52:01.742368"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.4,
+        "relevance": 0.0,
+        "completeness": 0.4
+      },
+      "issue_category": "general",
+      "client_info": {
+        "name": "Like",
+        "phone": "Unknown",
+        "key": "Like_Unknown"
+      },
+      "source_conversation": "conv_6_2025-08-01_19-15-23"
+    },
+    {
+      "input_scenario": "Client says: What e-mail did I submit that under? Was it Press E",
+      "expected_response": "I'll check that over and I'll get it back to you",
+      "conversation_context": {
+        "client_name": "Jamie",
+        "conversation_position": 12,
+        "total_segments": 18,
+        "conversation_quality": 0.9125,
+        "timestamp": "2025-08-22T06:52:01.757740"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.2,
+        "relevance": 0.36363636363636365,
+        "completeness": 0.4
+      },
+      "issue_category": "general",
+      "client_info": {
+        "name": "Jamie",
+        "phone": "Unknown",
+        "key": "Jamie_Unknown"
+      },
+      "source_conversation": "conv_26_2025-07-15_19-33-02"
+    },
+    {
+      "input_scenario": "Client says: And you said number 6",
+      "expected_response": "As soon as we have it open for tours, I'll call you and we can go ahead and get something on the schedule for that",
+      "conversation_context": {
+        "client_name": "Jamie",
+        "conversation_position": 15,
+        "total_segments": 35,
+        "conversation_quality": 0.9275,
+        "timestamp": "2025-08-22T06:52:01.759550"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.6000000000000001,
+        "relevance": 0.8,
+        "completeness": 0.4
+      },
+      "issue_category": "general",
+      "client_info": {
+        "name": "Jamie",
+        "phone": "405-512-3230",
+        "key": "Jamie_405-512-3230"
+      },
+      "source_conversation": "conv_28_2025-07-10_18-52-02"
+    },
+    {
+      "input_scenario": "Client says: This is the main",
+      "expected_response": "Okay, yeah, I can do this cross-references to waive that deposit, okay, based on this account",
+      "conversation_context": {
+        "client_name": "Jamie",
+        "conversation_position": 69,
+        "total_segments": 115,
+        "conversation_quality": 0.8275,
+        "timestamp": "2025-08-22T06:52:01.763654"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.2,
+        "relevance": 0.5,
+        "completeness": 0.4
+      },
+      "issue_category": "general",
+      "client_info": {
+        "name": "Jamie",
+        "phone": "405-367-6318",
+        "key": "Jamie_405-367-6318"
+      },
+      "source_conversation": "conv_32_2025-07-09_19-56-47"
+    },
+    {
+      "input_scenario": "Client says: Did the plumber ever reach you about the dishwasher? You guys all good on that one? Nobody's reached to us about the dishwasher or anything",
+      "expected_response": "Well, then I will keep that open and then I'll give them a call and see if I can find out what's going on with it",
+      "conversation_context": {
+        "client_name": "Jamie",
+        "conversation_position": 19,
+        "total_segments": 25,
+        "conversation_quality": 0.865,
+        "timestamp": "2025-08-22T06:52:01.765491"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.6000000000000001,
+        "relevance": 0.19047619047619047,
+        "completeness": 0.4
+      },
+      "issue_category": "maintenance",
+      "client_info": {
+        "name": "Jamie",
+        "phone": "Unknown",
+        "key": "Jamie_Unknown"
+      },
+      "source_conversation": "conv_35_2025-07-09_18-10-09"
+    },
+    {
+      "input_scenario": "Client says: you could prorate taking off rent because we weren't, we didn't have hot water for that week that you were out of the office and then now we haven't been staying at the house for the past five days because it's sitting 85 in here and I can't sit here in 85 degree weather",
+      "expected_response": "When I bring up the quote for the repairs, I'll bring that up at the same time and see if we can give you a little bit of a credit on there",
+      "conversation_context": {
+        "client_name": "Jamie",
+        "conversation_position": 25,
+        "total_segments": 73,
+        "conversation_quality": 0.8525,
+        "timestamp": "2025-08-22T06:52:01.768197"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.5,
+        "response_quality": 0.2,
+        "relevance": 0.4186046511627907,
+        "completeness": 0.4
+      },
+      "issue_category": "payment",
+      "client_info": {
+        "name": "Jamie",
+        "phone": "Unknown",
+        "key": "Jamie_Unknown"
+      },
+      "source_conversation": "conv_39_2025-07-07_19-35-48"
+    },
+    {
+      "input_scenario": "Client says: Well, I reached out and he said that he was able to finally reach you",
+      "expected_response": "I guess he had been calling, but I explained him the phone, so I told him I have to just try and text her",
+      "conversation_context": {
+        "client_name": "Not",
+        "conversation_position": 3,
+        "total_segments": 19,
+        "conversation_quality": 0.805,
+        "timestamp": "2025-08-22T06:52:01.768928"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.2,
+        "relevance": 0.5714285714285714,
+        "completeness": 0.4
+      },
+      "issue_category": "maintenance",
+      "client_info": {
+        "name": "Not",
+        "phone": "Unknown",
+        "key": "Not_Unknown"
+      },
+      "source_conversation": "conv_40_2025-07-03_19-19-38"
+    },
+    {
+      "input_scenario": "Client says: I am calling because I, sorry, this is Vanessa Carr",
+      "expected_response": "All right, then let me give him a call really quick and see what's happening and I'll call you right back",
+      "conversation_context": {
+        "client_name": "Jamie",
+        "conversation_position": 1,
+        "total_segments": 5,
+        "conversation_quality": 0.82,
+        "timestamp": "2025-08-22T06:52:01.769462"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.6000000000000001,
+        "relevance": 0.0,
+        "completeness": 0.4
+      },
+      "issue_category": "general",
+      "client_info": {
+        "name": "Jamie",
+        "phone": "Unknown",
+        "key": "Jamie_Unknown"
+      },
+      "source_conversation": "conv_41_2025-07-03_19-02-53"
+    },
+    {
+      "input_scenario": "Client says: Well, whatever you can do would be very much appreciated",
+      "expected_response": "Okay, okay, yeah, I will let",
+      "conversation_context": {
+        "client_name": "Jamie",
+        "conversation_position": 73,
+        "total_segments": 87,
+        "conversation_quality": 0.875,
+        "timestamp": "2025-08-22T06:52:01.772465"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0,
+        "relevance": 0.0,
+        "completeness": 0.4
+      },
+      "issue_category": "general",
+      "client_info": {
+        "name": "Jamie",
+        "phone": "Unknown",
+        "key": "Jamie_Unknown"
+      },
+      "source_conversation": "conv_43_2025-07-03_14-45-32"
+    },
+    {
+      "input_scenario": "Client says: I will see if he can even just maybe shoot you a text to schedule just so you can go ahead and see that",
+      "expected_response": "So I will, I'll, okay",
+      "conversation_context": {
+        "client_name": "Jamie",
+        "conversation_position": 9,
+        "total_segments": 18,
+        "conversation_quality": 0.925,
+        "timestamp": "2025-08-22T06:52:01.777099"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.2,
+        "relevance": 0.2,
+        "completeness": 0.4
+      },
+      "issue_category": "general",
+      "client_info": {
+        "name": "Jamie",
+        "phone": "Unknown",
+        "key": "Jamie_Unknown"
+      },
+      "source_conversation": "conv_48_2025-07-01_19-18-13"
+    },
+    {
+      "input_scenario": "Client says: Or I can you can give me his number and I can call or whatever",
+      "expected_response": "Okay, yeah, yeah, well, I'll have him text you first and reach out and just to kind of see where we're at and so he can get something on the schedule for you",
+      "conversation_context": {
+        "client_name": "Jamie",
+        "conversation_position": 11,
+        "total_segments": 18,
+        "conversation_quality": 0.925,
+        "timestamp": "2025-08-22T06:52:01.777170"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.4,
+        "relevance": 0.5454545454545454,
+        "completeness": 0.4
+      },
+      "issue_category": "general",
+      "client_info": {
+        "name": "Jamie",
+        "phone": "Unknown",
+        "key": "Jamie_Unknown"
+      },
+      "source_conversation": "conv_48_2025-07-01_19-18-13"
+    },
+    {
+      "input_scenario": "Client says: Once they, oh, sorry, they're both upstairs units",
+      "expected_response": "Okay, so I can, I'll give you a call back when I have an update",
+      "conversation_context": {
+        "client_name": "Jamie",
+        "conversation_position": 6,
+        "total_segments": 20,
+        "conversation_quality": 0.83,
+        "timestamp": "2025-08-22T06:52:01.777956"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.6000000000000001,
+        "relevance": 0.0,
+        "completeness": 0.4
+      },
+      "issue_category": "general",
+      "client_info": {
+        "name": "Jamie",
+        "phone": "Unknown",
+        "key": "Jamie_Unknown"
+      },
+      "source_conversation": "conv_49_2025-07-01_18-52-42"
+    },
+    {
+      "input_scenario": "Client says: I believe the one you were originally looking at was a downstairs unit",
+      "expected_response": "Okay, so I can, I'll give you a call back when I have an update",
+      "conversation_context": {
+        "client_name": "Jamie",
+        "conversation_position": 7,
+        "total_segments": 20,
+        "conversation_quality": 0.83,
+        "timestamp": "2025-08-22T06:52:01.778015"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.6000000000000001,
+        "relevance": 0.46153846153846156,
+        "completeness": 0.4
+      },
+      "issue_category": "general",
+      "client_info": {
+        "name": "Jamie",
+        "phone": "Unknown",
+        "key": "Jamie_Unknown"
+      },
+      "source_conversation": "conv_49_2025-07-01_18-52-42"
+    },
+    {
+      "input_scenario": "Client says: Okay, on the 18th, the upstairs unit, do you want to, so it's not available, the tenant is moving out",
+      "expected_response": "Yeah, okay, awesome",
+      "conversation_context": {
+        "client_name": "Jamie",
+        "conversation_position": 10,
+        "total_segments": 20,
+        "conversation_quality": 0.83,
+        "timestamp": "2025-08-22T06:52:01.778124"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0,
+        "relevance": 0.1111111111111111,
+        "completeness": 0.4
+      },
+      "issue_category": "general",
+      "client_info": {
+        "name": "Jamie",
+        "phone": "Unknown",
+        "key": "Jamie_Unknown"
+      },
+      "source_conversation": "conv_49_2025-07-01_18-52-42"
+    },
+    {
+      "input_scenario": "Client says: Do you want me to, do you want to go look at it after she goes out first before you sign paperwork? Yes, we can do that",
+      "expected_response": "Yeah, okay, awesome",
+      "conversation_context": {
+        "client_name": "Jamie",
+        "conversation_position": 11,
+        "total_segments": 20,
+        "conversation_quality": 0.83,
+        "timestamp": "2025-08-22T06:52:01.778185"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0,
+        "relevance": 0.0,
+        "completeness": 0.4
+      },
+      "issue_category": "general",
+      "client_info": {
+        "name": "Jamie",
+        "phone": "Unknown",
+        "key": "Jamie_Unknown"
+      },
+      "source_conversation": "conv_49_2025-07-01_18-52-42"
+    },
+    {
+      "input_scenario": "Client says: I am going to put you in here as a pending move out",
+      "expected_response": "I'll send you a new lease starting the 15th of July for 11",
+      "conversation_context": {
+        "client_name": "Jamie",
+        "conversation_position": 27,
+        "total_segments": 70,
+        "conversation_quality": 0.86374,
+        "timestamp": "2025-08-22T06:52:01.780581"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.2,
+        "relevance": 0.2857142857142857,
+        "completeness": 0.4
+      },
+      "issue_category": "move",
+      "client_info": {
+        "name": "Jamie",
+        "phone": "Unknown",
+        "key": "Jamie_Unknown"
+      },
+      "source_conversation": "conv_51_2025-07-01_18-21-05"
+    },
+    {
+      "input_scenario": "Client says: even if we tried to explain to them, they would throw it away, so",
+      "expected_response": "Awesome, okay, yeah, for sure",
+      "conversation_context": {
+        "client_name": "Jamie",
+        "conversation_position": 60,
+        "total_segments": 70,
+        "conversation_quality": 0.86374,
+        "timestamp": "2025-08-22T06:52:01.780640"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0,
+        "relevance": 0.0,
+        "completeness": 0.4
+      },
+      "issue_category": "general",
+      "client_info": {
+        "name": "Jamie",
+        "phone": "Unknown",
+        "key": "Jamie_Unknown"
+      },
+      "source_conversation": "conv_51_2025-07-01_18-21-05"
+    },
+    {
+      "input_scenario": "Client says: I appreciate that",
+      "expected_response": "Awesome, okay, yeah, for sure",
+      "conversation_context": {
+        "client_name": "Jamie",
+        "conversation_position": 61,
+        "total_segments": 70,
+        "conversation_quality": 0.86374,
+        "timestamp": "2025-08-22T06:52:01.780675"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0,
+        "relevance": 0.0,
+        "completeness": 0.4
+      },
+      "issue_category": "general",
+      "client_info": {
+        "name": "Jamie",
+        "phone": "Unknown",
+        "key": "Jamie_Unknown"
+      },
+      "source_conversation": "conv_51_2025-07-01_18-21-05"
+    },
+    {
+      "input_scenario": "Client says: I'm sorry, who is this? Hello",
+      "expected_response": "Yeah, hello, who is this? Hi, this is Jamie",
+      "conversation_context": {
+        "client_name": "Jamie",
+        "conversation_position": 1,
+        "total_segments": 23,
+        "conversation_quality": 0.925,
+        "timestamp": "2025-08-22T06:52:01.781844"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0,
+        "relevance": 1.0,
+        "completeness": 0.4
+      },
+      "issue_category": "general",
+      "client_info": {
+        "name": "Jamie",
+        "phone": "Unknown",
+        "key": "Jamie_Unknown"
+      },
+      "source_conversation": "conv_53_2025-06-30_18-17-30"
+    },
+    {
+      "input_scenario": "Client says: That's going to have to be something that's taken care of soon",
+      "expected_response": "Okay, I'll call him today and follow up and see if he has any sort of update because he was supposed to reach out to schedule and I give him your number and also your partner's number",
+      "conversation_context": {
+        "client_name": "Jamie",
+        "conversation_position": 7,
+        "total_segments": 23,
+        "conversation_quality": 0.925,
+        "timestamp": "2025-08-22T06:52:01.781911"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.6000000000000001,
+        "relevance": 0.4,
+        "completeness": 0.4
+      },
+      "issue_category": "general",
+      "client_info": {
+        "name": "Jamie",
+        "phone": "Unknown",
+        "key": "Jamie_Unknown"
+      },
+      "source_conversation": "conv_53_2025-06-30_18-17-30"
+    },
+    {
+      "input_scenario": "Client says: Have you, so you haven't heard from anybody about scheduling? No",
+      "expected_response": "Okay, I'll call him today and follow up and see if he has any sort of update because he was supposed to reach out to schedule and I give him your number and also your partner's number",
+      "conversation_context": {
+        "client_name": "Jamie",
+        "conversation_position": 8,
+        "total_segments": 23,
+        "conversation_quality": 0.925,
+        "timestamp": "2025-08-22T06:52:01.781977"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.6000000000000001,
+        "relevance": 0.0,
+        "completeness": 0.4
+      },
+      "issue_category": "general",
+      "client_info": {
+        "name": "Jamie",
+        "phone": "Unknown",
+        "key": "Jamie_Unknown"
+      },
+      "source_conversation": "conv_53_2025-06-30_18-17-30"
+    },
+    {
+      "input_scenario": "Client says: But I think that's pretty much all we left",
+      "expected_response": "Okay, well, just have Taylor give me a call and I can shoot him over that code for the door",
+      "conversation_context": {
+        "client_name": "Jamie",
+        "conversation_position": 11,
+        "total_segments": 25,
+        "conversation_quality": 0.805,
+        "timestamp": "2025-08-22T06:52:01.782689"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.4,
+        "relevance": 0.2222222222222222,
+        "completeness": 0.4
+      },
+      "issue_category": "general",
+      "client_info": {
+        "name": "Jamie",
+        "phone": "Unknown",
+        "key": "Jamie_Unknown"
+      },
+      "source_conversation": "conv_54_2025-06-30_17-52-02"
+    },
+    {
+      "input_scenario": "Client says: I think there's some water hoses and stuff in the backyard, but",
+      "expected_response": "Okay, well, just have Taylor give me a call and I can shoot him over that code for the door",
+      "conversation_context": {
+        "client_name": "Jamie",
+        "conversation_position": 12,
+        "total_segments": 25,
+        "conversation_quality": 0.805,
+        "timestamp": "2025-08-22T06:52:01.782747"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.4,
+        "relevance": 0.5,
+        "completeness": 0.4
+      },
+      "issue_category": "maintenance",
+      "client_info": {
+        "name": "Jamie",
+        "phone": "Unknown",
+        "key": "Jamie_Unknown"
+      },
+      "source_conversation": "conv_54_2025-06-30_17-52-02"
+    },
+    {
+      "input_scenario": "Client says: Did you get my voicemail by chance? Yes, I saw it, yes",
+      "expected_response": "Yeah, just wanted to let you guys know, you and was it Alexandria? Is that right? Okay, awesome",
+      "conversation_context": {
+        "client_name": "Jamie",
+        "conversation_position": 5,
+        "total_segments": 56,
+        "conversation_quality": 0.95998,
+        "timestamp": "2025-08-22T06:52:01.783719"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0,
+        "relevance": 0.16666666666666666,
+        "completeness": 0.4
+      },
+      "issue_category": "general",
+      "client_info": {
+        "name": "Jamie",
+        "phone": "Unknown",
+        "key": "Jamie_Unknown"
+      },
+      "source_conversation": "conv_55_2025-06-27_17-08-13"
+    },
+    {
+      "input_scenario": "Client says: So Okay, cool",
+      "expected_response": "Do I send it? Do I send the text to this number? Yeah, yep, you can text me back at this number and just let me know , hey, this is the date we want to move forward and I'll get the paperwork over",
+      "conversation_context": {
+        "client_name": "Jamie",
+        "conversation_position": 47,
+        "total_segments": 56,
+        "conversation_quality": 0.95998,
+        "timestamp": "2025-08-22T06:52:01.783792"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.4,
+        "relevance": 0.0,
+        "completeness": 0.4
+      },
+      "issue_category": "general",
+      "client_info": {
+        "name": "Jamie",
+        "phone": "Unknown",
+        "key": "Jamie_Unknown"
+      },
+      "source_conversation": "conv_55_2025-06-27_17-08-13"
+    },
+    {
+      "input_scenario": "Client says: This is Inspector Gordon",
+      "expected_response": "Hey, this is Jamie with Nolan Investments, returning your call about 18th Street",
+      "conversation_context": {
+        "client_name": "Inspector",
+        "conversation_position": 0,
+        "total_segments": 23,
+        "conversation_quality": 0.745,
+        "timestamp": "2025-08-22T06:52:01.791199"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.2,
+        "relevance": 1.0,
+        "completeness": 0.4
+      },
+      "issue_category": "general",
+      "client_info": {
+        "name": "Inspector",
+        "phone": "Unknown",
+        "key": "Inspector_Unknown"
+      },
+      "source_conversation": "conv_62_2025-06-26_16-44-52"
+    },
+    {
+      "input_scenario": "Hello, Jamie",
+      "expected_response": "Yes, this is Jamie",
+      "conversation_context": {
+        "client_name": "Jamie",
+        "conversation_position": 1,
+        "total_segments": 139,
+        "conversation_quality": 0.8875,
+        "timestamp": "2025-08-22T06:52:01.799293"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0,
+        "relevance": 1.0,
+        "completeness": 0.4
+      },
+      "issue_category": "general",
+      "client_info": {
+        "name": "Jamie",
+        "phone": "Unknown",
+        "key": "Jamie_Unknown"
+      },
+      "source_conversation": "conv_70_2025-06-24_17-32-38"
+    },
+    {
+      "input_scenario": "Client says: And Hundred first Conde CONDE",
+      "expected_response": "Let me get that pulled up, and I'll see if I can find some information on it",
+      "conversation_context": {
+        "client_name": "Jamie",
+        "conversation_position": 6,
+        "total_segments": 47,
+        "conversation_quality": 0.9125,
+        "timestamp": "2025-08-22T06:52:01.801540"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.6000000000000001,
+        "relevance": 0.5,
+        "completeness": 0.4
+      },
+      "issue_category": "general",
+      "client_info": {
+        "name": "Jamie",
+        "phone": "Unknown",
+        "key": "Jamie_Unknown"
+      },
+      "source_conversation": "conv_73_2025-06-24_15-58-59"
+    },
+    {
+      "input_scenario": "Client says: So the fence, the stockade fence is going to have to be put back in there",
+      "expected_response": "Okay, I will make that note here, and I will let them, I'll let whoever needs to call and give them a call on our end",
+      "conversation_context": {
+        "client_name": "Jamie",
+        "conversation_position": 34,
+        "total_segments": 67,
+        "conversation_quality": 0.79406,
+        "timestamp": "2025-08-22T06:52:01.820104"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.4,
+        "relevance": 0.14285714285714285,
+        "completeness": 0.4
+      },
+      "issue_category": "maintenance",
+      "client_info": {
+        "name": "Jamie",
+        "phone": "405-371-1247",
+        "key": "Jamie_405-371-1247"
+      },
+      "source_conversation": "conv_93_2025-06-13_15-52-57"
+    },
+    {
+      "input_scenario": "Client says: But before somebody comes and tries, it needs to take the gates that are from my old house down to put the stock eight fence back up to give that excess of that yard back",
+      "expected_response": "Okay, I will make that note here, and I will let them, I'll let whoever needs to call and give them a call on our end",
+      "conversation_context": {
+        "client_name": "Jamie",
+        "conversation_position": 35,
+        "total_segments": 67,
+        "conversation_quality": 0.79406,
+        "timestamp": "2025-08-22T06:52:01.820190"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.4,
+        "relevance": 0.3448275862068966,
+        "completeness": 0.4
+      },
+      "issue_category": "maintenance",
+      "client_info": {
+        "name": "Jamie",
+        "phone": "405-371-1247",
+        "key": "Jamie_405-371-1247"
+      },
+      "source_conversation": "conv_93_2025-06-13_15-52-57"
+    },
+    {
+      "input_scenario": "Client says: Well, if you think of anything else, you're free to give me a call here",
+      "expected_response": "Okay? Yeah, sounds good",
+      "conversation_context": {
+        "client_name": "Jamie",
+        "conversation_position": 60,
+        "total_segments": 67,
+        "conversation_quality": 0.79406,
+        "timestamp": "2025-08-22T06:52:01.820252"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0,
+        "relevance": 0.0,
+        "completeness": 0.4
+      },
+      "issue_category": "general",
+      "client_info": {
+        "name": "Jamie",
+        "phone": "405-371-1247",
+        "key": "Jamie_405-371-1247"
+      },
+      "source_conversation": "conv_93_2025-06-13_15-52-57"
+    },
+    {
+      "input_scenario": "Client says: I just wondered if there's any chance to waive that fee since the other payment was made literally within 5 minutes",
+      "expected_response": "I will, yeah, I'll go ahead",
+      "conversation_context": {
+        "client_name": "Jamie",
+        "conversation_position": 9,
+        "total_segments": 28,
+        "conversation_quality": 0.865,
+        "timestamp": "2025-08-22T06:52:01.827073"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.2,
+        "relevance": 0.09523809523809523,
+        "completeness": 0.4
+      },
+      "issue_category": "payment",
+      "client_info": {
+        "name": "Jamie",
+        "phone": "Unknown",
+        "key": "Jamie_Unknown"
+      },
+      "source_conversation": "conv_100_2025-06-04_19-23-39"
+    },
+    {
+      "input_scenario": "Client says: That's cool",
+      "expected_response": "So I'll wait through Friday and I'll call you around this time, around 2 o'clock, Ms",
+      "conversation_context": {
+        "client_name": "James",
+        "conversation_position": 90,
+        "total_segments": 97,
+        "conversation_quality": 0.8275,
+        "timestamp": "2025-08-22T06:52:01.830111"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.4,
+        "relevance": 0.0,
+        "completeness": 0.4
+      },
+      "issue_category": "general",
+      "client_info": {
+        "name": "James",
+        "phone": "405-367-6318",
+        "key": "James_405-367-6318"
+      },
+      "source_conversation": "conv_104_2025-06-04_15-25-06"
+    },
+    {
+      "input_scenario": "Client says: I didn't get the e-mail, because I think we had gave you my son's because my phone was messed up",
+      "expected_response": "Okay, yeah, let me get it pulled up",
+      "conversation_context": {
+        "client_name": "Jamie",
+        "conversation_position": 4,
+        "total_segments": 25,
+        "conversation_quality": 0.925,
+        "timestamp": "2025-08-22T06:52:01.831269"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.2,
+        "relevance": 0.23529411764705882,
+        "completeness": 0.4
+      },
+      "issue_category": "general",
+      "client_info": {
+        "name": "Jamie",
+        "phone": "Unknown",
+        "key": "Jamie_Unknown"
+      },
+      "source_conversation": "conv_106_2025-06-04_15-06-43"
+    },
+    {
+      "input_scenario": "Client says: So I wanted to go ahead and pay it with the same card and stuff",
+      "expected_response": "Okay, yeah, let me get it pulled up",
+      "conversation_context": {
+        "client_name": "Jamie",
+        "conversation_position": 5,
+        "total_segments": 25,
+        "conversation_quality": 0.925,
+        "timestamp": "2025-08-22T06:52:01.831319"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.2,
+        "relevance": 0.14285714285714285,
+        "completeness": 0.4
+      },
+      "issue_category": "general",
+      "client_info": {
+        "name": "Jamie",
+        "phone": "Unknown",
+        "key": "Jamie_Unknown"
+      },
+      "source_conversation": "conv_106_2025-06-04_15-06-43"
+    },
+    {
+      "input_scenario": "Client says: But anyway, I'm just going to call you to make sure",
+      "expected_response": "Okay, yep, I'll see if I can update this again and push it through and see if you can get an e-mail",
+      "conversation_context": {
+        "client_name": "Jamie",
+        "conversation_position": 21,
+        "total_segments": 25,
+        "conversation_quality": 0.925,
+        "timestamp": "2025-08-22T06:52:01.831369"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.4,
+        "relevance": 0.2,
+        "completeness": 0.4
+      },
+      "issue_category": "general",
+      "client_info": {
+        "name": "Jamie",
+        "phone": "Unknown",
+        "key": "Jamie_Unknown"
+      },
+      "source_conversation": "conv_106_2025-06-04_15-06-43"
+    },
+    {
+      "input_scenario": "Client says: Okay, it's so LG is the brand and the model number is WM3488HW",
+      "expected_response": "Would you be around? , I'm not, but I can leave the door unlocked for him or leave a key form or something",
+      "conversation_context": {
+        "client_name": "Jamie",
+        "conversation_position": 13,
+        "total_segments": 24,
+        "conversation_quality": 0.8525,
+        "timestamp": "2025-08-22T06:52:01.832504"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.2,
+        "relevance": 0.18181818181818182,
+        "completeness": 0.4
+      },
+      "issue_category": "general",
+      "client_info": {
+        "name": "Jamie",
+        "phone": "Unknown",
+        "key": "Jamie_Unknown"
+      },
+      "source_conversation": "conv_108_2025-06-03_20-02-37"
+    },
+    {
+      "input_scenario": "Client says: And he said, depending on how easy it is for him to get this pump, he may have some availability tomorrow",
+      "expected_response": "Would you be around? , I'm not, but I can leave the door unlocked for him or leave a key form or something",
+      "conversation_context": {
+        "client_name": "Jamie",
+        "conversation_position": 14,
+        "total_segments": 24,
+        "conversation_quality": 0.8525,
+        "timestamp": "2025-08-22T06:52:01.832568"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.2,
+        "relevance": 0.2,
+        "completeness": 0.4
+      },
+      "issue_category": "general",
+      "client_info": {
+        "name": "Jamie",
+        "phone": "Unknown",
+        "key": "Jamie_Unknown"
+      },
+      "source_conversation": "conv_108_2025-06-03_20-02-37"
+    },
+    {
+      "input_scenario": "Client says: I don't know if she did or not",
+      "expected_response": "Okay, yeah, I'll talk to her",
+      "conversation_context": {
+        "client_name": "Jamie",
+        "conversation_position": 31,
+        "total_segments": 42,
+        "conversation_quality": 0.84705,
+        "timestamp": "2025-08-22T06:52:01.834041"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.2,
+        "relevance": 0.0,
+        "completeness": 0.4
+      },
+      "issue_category": "general",
+      "client_info": {
+        "name": "Jamie",
+        "phone": "Unknown",
+        "key": "Jamie_Unknown"
+      },
+      "source_conversation": "conv_110_2025-05-29_18-08-34"
+    },
+    {
+      "input_scenario": "Client says: So that's why I'm saying that",
+      "expected_response": "Okay, yeah, I'll talk to her",
+      "conversation_context": {
+        "client_name": "Jamie",
+        "conversation_position": 32,
+        "total_segments": 42,
+        "conversation_quality": 0.84705,
+        "timestamp": "2025-08-22T06:52:01.834082"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.2,
+        "relevance": 0.0,
+        "completeness": 0.4
+      },
+      "issue_category": "general",
+      "client_info": {
+        "name": "Jamie",
+        "phone": "Unknown",
+        "key": "Jamie_Unknown"
+      },
+      "source_conversation": "conv_110_2025-05-29_18-08-34"
+    },
+    {
+      "input_scenario": "Client says: So I'll have to find someone who hadn't necessarily worked with before",
+      "expected_response": "So I will see who I can find and then I'll give them Joy's information for scheduling",
+      "conversation_context": {
+        "client_name": "Jamie",
+        "conversation_position": 37,
+        "total_segments": 42,
+        "conversation_quality": 0.84705,
+        "timestamp": "2025-08-22T06:52:01.834128"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.4,
+        "relevance": 0.6666666666666666,
+        "completeness": 0.4
+      },
+      "issue_category": "general",
+      "client_info": {
+        "name": "Jamie",
+        "phone": "Unknown",
+        "key": "Jamie_Unknown"
+      },
+      "source_conversation": "conv_110_2025-05-29_18-08-34"
+    },
+    {
+      "input_scenario": "Client says: Do you guys have a forwarding address already? the new address? Yeah, just so we can mail your security deposit check to your new address",
+      "expected_response": "Okay, let me get your account pulled up and I'll make a note of that",
+      "conversation_context": {
+        "client_name": "Jamie",
+        "conversation_position": 29,
+        "total_segments": 59,
+        "conversation_quality": 0.95,
+        "timestamp": "2025-08-22T06:52:01.835596"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.4,
+        "relevance": 0.17391304347826086,
+        "completeness": 0.4
+      },
+      "issue_category": "payment",
+      "client_info": {
+        "name": "Jamie",
+        "phone": "Unknown",
+        "key": "Jamie_Unknown"
+      },
+      "source_conversation": "conv_112_2025-05-28_17-02-11"
+    },
+    {
+      "input_scenario": "Client says: So that's where we're going to start",
+      "expected_response": "Okay, well, I said, I'll call her really quick and see if she'll answer for me and have her call you back, because it shouldn't be an issue, but okay, well, thank you",
+      "conversation_context": {
+        "client_name": "Sure",
+        "conversation_position": 29,
+        "total_segments": 34,
+        "conversation_quality": 0.805,
+        "timestamp": "2025-08-22T06:52:01.841977"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.4,
+        "relevance": 0.0,
+        "completeness": 0.4
+      },
+      "issue_category": "general",
+      "client_info": {
+        "name": "Sure",
+        "phone": "Unknown",
+        "key": "Sure_Unknown"
+      },
+      "source_conversation": "conv_121_2025-05-27_15-09-03"
+    },
+    {
+      "input_scenario": "Client says: And is there a certain budget you were hoping to stay within? Just anything below 900",
+      "expected_response": "Okay, I will, I'll definitely make a note",
+      "conversation_context": {
+        "client_name": "Jamie",
+        "conversation_position": 25,
+        "total_segments": 31,
+        "conversation_quality": 0.9375,
+        "timestamp": "2025-08-22T06:52:01.844612"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.2,
+        "relevance": 0.125,
+        "completeness": 0.4
+      },
+      "issue_category": "general",
+      "client_info": {
+        "name": "Jamie",
+        "phone": "Unknown",
+        "key": "Jamie_Unknown"
+      },
+      "source_conversation": "conv_125_2025-05-21_18-50-26"
+    },
+    {
+      "input_scenario": "Client says: I'm going to go ahead and make sure I have a good e-mail for you",
+      "expected_response": "So I'll send you an e-mail",
+      "conversation_context": {
+        "client_name": "Jamie",
+        "conversation_position": 41,
+        "total_segments": 65,
+        "conversation_quality": 0.93558,
+        "timestamp": "2025-08-22T06:52:01.846112"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.2,
+        "relevance": 0.26666666666666666,
+        "completeness": 0.4
+      },
+      "issue_category": "general",
+      "client_info": {
+        "name": "Jamie",
+        "phone": "Unknown",
+        "key": "Jamie_Unknown"
+      },
+      "source_conversation": "conv_126_2025-05-21_15-07-27"
+    },
+    {
+      "input_scenario": "Client says: Yeah so it is it is not for sale does need some work on it but if you were looking for a fixer-upper if you're interested we could send you some information",
+      "expected_response": "Okay, you said if I was interested in a property that you might have a list? Oh, no, sorry, I could send you information on this one if you're interested in a fixer-up or if you're interested in doing work yourself",
+      "conversation_context": {
+        "client_name": "Jamie",
+        "conversation_position": 23,
+        "total_segments": 38,
+        "conversation_quality": 0.8775,
+        "timestamp": "2025-08-22T06:52:01.848064"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0,
+        "relevance": 0.7407407407407407,
+        "completeness": 0.4
+      },
+      "issue_category": "maintenance",
+      "client_info": {
+        "name": "Jamie",
+        "phone": "Unknown",
+        "key": "Jamie_Unknown"
+      },
+      "source_conversation": "conv_128_2025-05-19_16-09-54"
+    },
+    {
+      "input_scenario": "Client says: dot Arzola and that's A",
+      "expected_response": "Okay, well I'll send you some information on this and you can just let me know if you're interested or not",
+      "conversation_context": {
+        "client_name": "Jamie",
+        "conversation_position": 29,
+        "total_segments": 38,
+        "conversation_quality": 0.8775,
+        "timestamp": "2025-08-22T06:52:01.848143"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.4,
+        "relevance": 0.4,
+        "completeness": 0.4
+      },
+      "issue_category": "general",
+      "client_info": {
+        "name": "Jamie",
+        "phone": "Unknown",
+        "key": "Jamie_Unknown"
+      },
+      "source_conversation": "conv_128_2025-05-19_16-09-54"
+    },
+    {
+      "input_scenario": "Client says: So I'll put a note here to do that first thing in the morning",
+      "expected_response": "So I'll send you a code for the lockbox on the door",
+      "conversation_context": {
+        "client_name": "Jamie",
+        "conversation_position": 15,
+        "total_segments": 24,
+        "conversation_quality": 0.9125,
+        "timestamp": "2025-08-22T06:52:01.852570"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.2,
+        "relevance": 0.5714285714285714,
+        "completeness": 0.4
+      },
+      "issue_category": "general",
+      "client_info": {
+        "name": "Jamie",
+        "phone": "Unknown",
+        "key": "Jamie_Unknown"
+      },
+      "source_conversation": "conv_131_2025-05-14_19-28-27"
+    },
+    {
+      "input_scenario": "Client says: I was , oh, I forgot about the dishwasher",
+      "expected_response": "So I will, I'll call them and we may just need to schedule another appointment for that",
+      "conversation_context": {
+        "client_name": "Jamie",
+        "conversation_position": 9,
+        "total_segments": 49,
+        "conversation_quality": 0.9375,
+        "timestamp": "2025-08-22T06:52:01.854994"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.6000000000000001,
+        "relevance": 0.25,
+        "completeness": 0.4
+      },
+      "issue_category": "general",
+      "client_info": {
+        "name": "Jamie",
+        "phone": "580-799-8211",
+        "key": "Jamie_580-799-8211"
+      },
+      "source_conversation": "conv_133_2025-05-14_18-53-34"
+    },
+    {
+      "input_scenario": "Client says: They just told me that would be an appliance guy that would come and fix that",
+      "expected_response": "Well, we do have an appliance guy, so I will see if they go out to SARE, and if not, I'll see if I can find someone in the area then",
+      "conversation_context": {
+        "client_name": "Jamie",
+        "conversation_position": 25,
+        "total_segments": 49,
+        "conversation_quality": 0.9375,
+        "timestamp": "2025-08-22T06:52:01.855179"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.4,
+        "relevance": 0.6153846153846154,
+        "completeness": 0.4
+      },
+      "issue_category": "maintenance",
+      "client_info": {
+        "name": "Jamie",
+        "phone": "580-799-8211",
+        "key": "Jamie_580-799-8211"
+      },
+      "source_conversation": "conv_133_2025-05-14_18-53-34"
+    },
+    {
+      "input_scenario": "Client says: And so I was , it would be nice if we could just get rid of the carpet altogether and do linoleum",
+      "expected_response": "Okay, yeah, well, let me ask them and then I'll get back with you and let what they say",
+      "conversation_context": {
+        "client_name": "Jamie",
+        "conversation_position": 22,
+        "total_segments": 37,
+        "conversation_quality": 0.9332400000000001,
+        "timestamp": "2025-08-22T06:52:01.857411"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.4,
+        "relevance": 0.19047619047619047,
+        "completeness": 0.4
+      },
+      "issue_category": "general",
+      "client_info": {
+        "name": "Jamie",
+        "phone": "Unknown",
+        "key": "Jamie_Unknown"
+      },
+      "source_conversation": "conv_134_2025-05-13_20-24-42"
+    },
+    {
+      "input_scenario": "Client says: But if that's not possible, that's fine",
+      "expected_response": "Okay, yeah, well, let me ask them and then I'll get back with you and let what they say",
+      "conversation_context": {
+        "client_name": "Jamie",
+        "conversation_position": 23,
+        "total_segments": 37,
+        "conversation_quality": 0.9332400000000001,
+        "timestamp": "2025-08-22T06:52:01.857502"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.4,
+        "relevance": 0.0,
+        "completeness": 0.4
+      },
+      "issue_category": "general",
+      "client_info": {
+        "name": "Jamie",
+        "phone": "Unknown",
+        "key": "Jamie_Unknown"
+      },
+      "source_conversation": "conv_134_2025-05-13_20-24-42"
+    },
+    {
+      "input_scenario": "Client says: So are they, do you think they're going to be willing to reimburse us for anything that we have to replace? I am not sure",
+      "expected_response": "Just say , hey, due to the flooding, we had to replace this and this and send that over to me and include any pictures that you might have just so I can have those documents to share with them",
+      "conversation_context": {
+        "client_name": "Jamie",
+        "conversation_position": 19,
+        "total_segments": 56,
+        "conversation_quality": 0.8525,
+        "timestamp": "2025-08-22T06:52:01.862935"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.2,
+        "relevance": 0.6086956521739131,
+        "completeness": 0.4
+      },
+      "issue_category": "maintenance",
+      "client_info": {
+        "name": "Jamie",
+        "phone": "Unknown",
+        "key": "Jamie_Unknown"
+      },
+      "source_conversation": "conv_141_2025-05-13_14-19-58"
+    },
+    {
+      "input_scenario": "Client says: So if you have those costs, I would definitely e-mail those over to me",
+      "expected_response": "Just say , hey, due to the flooding, we had to replace this and this and send that over to me and include any pictures that you might have just so I can have those documents to share with them",
+      "conversation_context": {
+        "client_name": "Jamie",
+        "conversation_position": 20,
+        "total_segments": 56,
+        "conversation_quality": 0.8525,
+        "timestamp": "2025-08-22T06:52:01.863041"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.2,
+        "relevance": 1.0,
+        "completeness": 0.4
+      },
+      "issue_category": "general",
+      "client_info": {
+        "name": "Jamie",
+        "phone": "Unknown",
+        "key": "Jamie_Unknown"
+      },
+      "source_conversation": "conv_141_2025-05-13_14-19-58"
+    },
+    {
+      "input_scenario": "Client says: And then I said, they got a big, it's a 7 to 10 foot radius, big circle they've got dotted out with spray paint that they're going to dig up",
+      "expected_response": "I'll send you some pictures once they start getting into it",
+      "conversation_context": {
+        "client_name": "Good",
+        "conversation_position": 70,
+        "total_segments": 85,
+        "conversation_quality": 0.8025,
+        "timestamp": "2025-08-22T06:52:01.864845"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.2,
+        "relevance": 0.07142857142857142,
+        "completeness": 0.4
+      },
+      "issue_category": "general",
+      "client_info": {
+        "name": "Good",
+        "phone": "Unknown",
+        "key": "Good_Unknown"
+      },
+      "source_conversation": "conv_142_2025-05-12_17-20-33"
+    },
+    {
+      "input_scenario": "Client says: So we'll see what comes",
+      "expected_response": "I'll send you some pictures once they start getting into it",
+      "conversation_context": {
+        "client_name": "Good",
+        "conversation_position": 71,
+        "total_segments": 85,
+        "conversation_quality": 0.8025,
+        "timestamp": "2025-08-22T06:52:01.864914"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.2,
+        "relevance": 0.0,
+        "completeness": 0.4
+      },
+      "issue_category": "general",
+      "client_info": {
+        "name": "Good",
+        "phone": "Unknown",
+        "key": "Good_Unknown"
+      },
+      "source_conversation": "conv_142_2025-05-12_17-20-33"
+    },
+    {
+      "input_scenario": "Client says: Yes, if you e-mail that to me",
+      "expected_response": "So I will get it and I'll sign it and I'll send it directly over to her",
+      "conversation_context": {
+        "client_name": "So",
+        "conversation_position": 43,
+        "total_segments": 83,
+        "conversation_quality": 0.91425,
+        "timestamp": "2025-08-22T06:52:01.866462"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.2,
+        "relevance": 0.2857142857142857,
+        "completeness": 0.4
+      },
+      "issue_category": "general",
+      "client_info": {
+        "name": "So",
+        "phone": "Unknown",
+        "key": "So_Unknown"
+      },
+      "source_conversation": "conv_143_2025-05-12_17-10-18"
+    },
+    {
+      "input_scenario": "Client says: I actually I have her e-mail because we've worked with her a few times",
+      "expected_response": "So I will get it and I'll sign it and I'll send it directly over to her",
+      "conversation_context": {
+        "client_name": "So",
+        "conversation_position": 44,
+        "total_segments": 83,
+        "conversation_quality": 0.91425,
+        "timestamp": "2025-08-22T06:52:01.866531"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.2,
+        "relevance": 0.3333333333333333,
+        "completeness": 0.4
+      },
+      "issue_category": "maintenance",
+      "client_info": {
+        "name": "So",
+        "phone": "Unknown",
+        "key": "So_Unknown"
+      },
+      "source_conversation": "conv_143_2025-05-12_17-10-18"
+    },
+    {
+      "input_scenario": "Client says: And you guys have not, you guys don't have anyone in town, right? So you guys haven't looked at the unit yet? No, no, unfortunately not",
+      "expected_response": "Okay sounds good I just sent that over if you have any other questions let me know if you'll just let me know as soon as you get that in so I can go ahead and get that with your application",
+      "conversation_context": {
+        "client_name": "Jamie",
+        "conversation_position": 35,
+        "total_segments": 40,
+        "conversation_quality": 0.865,
+        "timestamp": "2025-08-22T06:52:01.867715"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.4,
+        "relevance": 0.5,
+        "completeness": 0.4
+      },
+      "issue_category": "general",
+      "client_info": {
+        "name": "Jamie",
+        "phone": "Unknown",
+        "key": "Jamie_Unknown"
+      },
+      "source_conversation": "conv_144_2025-05-12_17-05-10"
+    },
+    {
+      "input_scenario": "Client says: Yeah well and I've seen if that happens military you can always make that work so no problem at all I'll just make a note on that",
+      "expected_response": "Okay sounds good I just sent that over if you have any other questions let me know if you'll just let me know as soon as you get that in so I can go ahead and get that with your application",
+      "conversation_context": {
+        "client_name": "Jamie",
+        "conversation_position": 36,
+        "total_segments": 40,
+        "conversation_quality": 0.865,
+        "timestamp": "2025-08-22T06:52:01.867829"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.4,
+        "relevance": 0.5925925925925926,
+        "completeness": 0.4
+      },
+      "issue_category": "general",
+      "client_info": {
+        "name": "Jamie",
+        "phone": "Unknown",
+        "key": "Jamie_Unknown"
+      },
+      "source_conversation": "conv_144_2025-05-12_17-05-10"
+    },
+    {
+      "input_scenario": "Client says: We really need to get a signature on this verification as it is due tomorrow",
+      "expected_response": "Okay, I will message him now and make sure that he gets that signed and to you today was the was the payment it was also due today is that right? Yeah, and we do also have to have the payment before we can file it",
+      "conversation_context": {
+        "client_name": "Jamie",
+        "conversation_position": 3,
+        "total_segments": 12,
+        "conversation_quality": 0.7925,
+        "timestamp": "2025-08-22T06:52:01.870574"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0,
+        "relevance": 0.6666666666666666,
+        "completeness": 0.4
+      },
+      "issue_category": "general",
+      "client_info": {
+        "name": "Jamie",
+        "phone": "Unknown",
+        "key": "Jamie_Unknown"
+      },
+      "source_conversation": "conv_147_2025-05-06_14-10-56"
+    },
+    {
+      "input_scenario": "Client says: So I will get started on this",
+      "expected_response": "I'll send you an e-mail as well, because we'll make pay stubs to verify your income",
+      "conversation_context": {
+        "client_name": "Jamie",
+        "conversation_position": 26,
+        "total_segments": 31,
+        "conversation_quality": 0.9375,
+        "timestamp": "2025-08-22T06:52:01.884303"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.2,
+        "relevance": 0.0,
+        "completeness": 0.4
+      },
+      "issue_category": "general",
+      "client_info": {
+        "name": "Jamie",
+        "phone": "Unknown",
+        "key": "Jamie_Unknown"
+      },
+      "source_conversation": "conv_160_2025-04-28_16-25-46"
+    },
+    {
+      "input_scenario": "Client says: Well, let me send a message to my contractor and see if he is able to get over there",
+      "expected_response": "And then I will, I'll send you a message and let what he says",
+      "conversation_context": {
+        "client_name": "Unknown",
+        "conversation_position": 14,
+        "total_segments": 20,
+        "conversation_quality": 0.865,
+        "timestamp": "2025-08-22T06:52:01.885779"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.2,
+        "relevance": 0.6666666666666666,
+        "completeness": 0.4
+      },
+      "issue_category": "maintenance",
+      "client_info": {
+        "name": "Unknown",
+        "phone": "Unknown",
+        "key": "Unknown_Unknown"
+      },
+      "source_conversation": "conv_162_2025-04-25_15-24-52"
+    },
+    {
+      "input_scenario": "Client says: Yes, ma'am, this is Kimberly Pratt",
+      "expected_response": "Oh yeah, this is Jamie with non-properties",
+      "conversation_context": {
+        "client_name": "Jamie",
+        "conversation_position": 1,
+        "total_segments": 30,
+        "conversation_quality": 0.925,
+        "timestamp": "2025-08-22T06:52:01.888774"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0,
+        "relevance": 0.6666666666666666,
+        "completeness": 0.4
+      },
+      "issue_category": "general",
+      "client_info": {
+        "name": "Jamie",
+        "phone": "Unknown",
+        "key": "Jamie_Unknown"
+      },
+      "source_conversation": "conv_164_2025-04-24_18-55-08"
+    },
+    {
+      "input_scenario": "Client says: So you're eager to go, so you are interested in expecting renewal",
+      "expected_response": "Okay, just, yes, yeah, if it's easier, I can just reply to that e-mail too",
+      "conversation_context": {
+        "client_name": "Jamie",
+        "conversation_position": 10,
+        "total_segments": 20,
+        "conversation_quality": 0.8175,
+        "timestamp": "2025-08-22T06:52:01.896021"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.2,
+        "relevance": 0.18181818181818182,
+        "completeness": 0.4
+      },
+      "issue_category": "general",
+      "client_info": {
+        "name": "Jamie",
+        "phone": "Unknown",
+        "key": "Jamie_Unknown"
+      },
+      "source_conversation": "conv_172_2025-04-23_13-32-57"
+    },
+    {
+      "input_scenario": "Client says: I just got a call from the plumber and they said that they are there now",
+      "expected_response": "Yeah, I'll send her over there right now",
+      "conversation_context": {
+        "client_name": "Unknown",
+        "conversation_position": 1,
+        "total_segments": 10,
+        "conversation_quality": 0.6875,
+        "timestamp": "2025-08-22T06:52:01.897443"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.2,
+        "relevance": 0.26666666666666666,
+        "completeness": 0.4
+      },
+      "issue_category": "general",
+      "client_info": {
+        "name": "Unknown",
+        "phone": "Unknown",
+        "key": "Unknown_Unknown"
+      },
+      "source_conversation": "conv_174_2025-04-22_18-13-07"
+    },
+    {
+      "input_scenario": "Client says: I was wondering if you could get a hold of your daughter and let her know",
+      "expected_response": "Yeah, I'll send her over there right now",
+      "conversation_context": {
+        "client_name": "Unknown",
+        "conversation_position": 2,
+        "total_segments": 10,
+        "conversation_quality": 0.6875,
+        "timestamp": "2025-08-22T06:52:01.897510"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.2,
+        "relevance": 0.125,
+        "completeness": 0.4
+      },
+      "issue_category": "general",
+      "client_info": {
+        "name": "Unknown",
+        "phone": "Unknown",
+        "key": "Unknown_Unknown"
+      },
+      "source_conversation": "conv_174_2025-04-22_18-13-07"
+    },
+    {
+      "input_scenario": "Client says: He's right here",
+      "expected_response": "He has it, so I'll call him right now",
+      "conversation_context": {
+        "client_name": "Jamie",
+        "conversation_position": 17,
+        "total_segments": 21,
+        "conversation_quality": 0.7925,
+        "timestamp": "2025-08-22T06:52:01.898321"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.4,
+        "relevance": 0.6666666666666666,
+        "completeness": 0.4
+      },
+      "issue_category": "general",
+      "client_info": {
+        "name": "Jamie",
+        "phone": "Unknown",
+        "key": "Jamie_Unknown"
+      },
+      "source_conversation": "conv_175_2025-04-18_16-22-03"
+    },
+    {
+      "input_scenario": "Client says: Because right now for the rain, the wall is hot, is bad",
+      "expected_response": "Can I bring you somebody coming out from the house to check it out or help me, please? Okay, yeah, well, I will, I'll follow up with him and I'll let what he said and see when he's able to get back out there",
+      "conversation_context": {
+        "client_name": "Jamie",
+        "conversation_position": 11,
+        "total_segments": 18,
+        "conversation_quality": 0.8175,
+        "timestamp": "2025-08-22T06:52:01.900508"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.2,
+        "relevance": 0.2,
+        "completeness": 0.4
+      },
+      "issue_category": "general",
+      "client_info": {
+        "name": "Jamie",
+        "phone": "Unknown",
+        "key": "Jamie_Unknown"
+      },
+      "source_conversation": "conv_177_2025-04-17_19-34-53"
+    },
+    {
+      "input_scenario": "Client says: So would Rick still be our lawyer or we would just need to retain him or would we need to find someone else? No, we totally can help you with it",
+      "expected_response": "Okay, let me, I'm driving so I'll just",
+      "conversation_context": {
+        "client_name": "Calling",
+        "conversation_position": 26,
+        "total_segments": 61,
+        "conversation_quality": 0.82978,
+        "timestamp": "2025-08-22T06:52:01.903341"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.4,
+        "relevance": 0.16,
+        "completeness": 0.4
+      },
+      "issue_category": "emergency",
+      "client_info": {
+        "name": "Calling",
+        "phone": "Unknown",
+        "key": "Calling_Unknown"
+      },
+      "source_conversation": "conv_179_2025-04-16_21-24-49"
+    },
+    {
+      "input_scenario": "Client says: I was just letting it would go from, , an eviction fee to a retainer fee, which it's a $5,000 retainer fee",
+      "expected_response": "Okay, let me, I'm driving so I'll just",
+      "conversation_context": {
+        "client_name": "Calling",
+        "conversation_position": 27,
+        "total_segments": 61,
+        "conversation_quality": 0.82978,
+        "timestamp": "2025-08-22T06:52:01.903418"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.4,
+        "relevance": 0.09523809523809523,
+        "completeness": 0.4
+      },
+      "issue_category": "general",
+      "client_info": {
+        "name": "Calling",
+        "phone": "Unknown",
+        "key": "Calling_Unknown"
+      },
+      "source_conversation": "conv_179_2025-04-16_21-24-49"
+    },
+    {
+      "input_scenario": "Client says: If he does not pay the transfer fee, the CJ case would get dismissed, and then we would get possession back in the small claims case",
+      "expected_response": "Well then I will just, I'll keep an eye out, but that'll show up on OSDN, right? Yeah, and I can let after court, when Ray gets back, what happened",
+      "conversation_context": {
+        "client_name": "Calling",
+        "conversation_position": 51,
+        "total_segments": 61,
+        "conversation_quality": 0.82978,
+        "timestamp": "2025-08-22T06:52:01.903514"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.4,
+        "relevance": 0.19047619047619047,
+        "completeness": 0.4
+      },
+      "issue_category": "maintenance",
+      "client_info": {
+        "name": "Calling",
+        "phone": "Unknown",
+        "key": "Calling_Unknown"
+      },
+      "source_conversation": "conv_179_2025-04-16_21-24-49"
+    },
+    {
+      "input_scenario": "Client says: So that would, does that 20 days start now or tomorrow? It should start tomorrow after they file that affidavit",
+      "expected_response": "Well then I will just, I'll keep an eye out, but that'll show up on OSDN, right? Yeah, and I can let after court, when Ray gets back, what happened",
+      "conversation_context": {
+        "client_name": "Calling",
+        "conversation_position": 52,
+        "total_segments": 61,
+        "conversation_quality": 0.82978,
+        "timestamp": "2025-08-22T06:52:01.903599"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.4,
+        "relevance": 0.11764705882352941,
+        "completeness": 0.4
+      },
+      "issue_category": "general",
+      "client_info": {
+        "name": "Calling",
+        "phone": "Unknown",
+        "key": "Calling_Unknown"
+      },
+      "source_conversation": "conv_179_2025-04-16_21-24-49"
+    },
+    {
+      "input_scenario": "Client says: I've got my delivery guy ready to deliver the order that you guys ordered, and I just need to collect payment over the phone if you're ready to do that",
+      "expected_response": "Okay, yeah, can I give you, so this is actually, this is Jamie",
+      "conversation_context": {
+        "client_name": "Jamie",
+        "conversation_position": 3,
+        "total_segments": 19,
+        "conversation_quality": 0.865,
+        "timestamp": "2025-08-22T06:52:01.904483"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0,
+        "relevance": 0.08,
+        "completeness": 0.4
+      },
+      "issue_category": "payment",
+      "client_info": {
+        "name": "Jamie",
+        "phone": "405-990-6737",
+        "key": "Jamie_405-990-6737"
+      },
+      "source_conversation": "conv_180_2025-04-16_15-34-47"
+    },
+    {
+      "input_scenario": "Client says: So I have something",
+      "expected_response": "I'll save this and I'll send it to you and then I'll send you our purchase documents",
+      "conversation_context": {
+        "client_name": "Jamie",
+        "conversation_position": 42,
+        "total_segments": 280,
+        "conversation_quality": 0.8875,
+        "timestamp": "2025-08-22T06:52:01.910704"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.2,
+        "relevance": 0.0,
+        "completeness": 0.4
+      },
+      "issue_category": "general",
+      "client_info": {
+        "name": "Jamie",
+        "phone": "Unknown",
+        "key": "Jamie_Unknown"
+      },
+      "source_conversation": "conv_182_2025-04-15_17-44-26"
+    },
+    {
+      "input_scenario": "Client says: It's a joint tenancy quitclaim deed from 2012 between Lois and Karen",
+      "expected_response": "I'll save this and I'll send it to you and then I'll send you our purchase documents",
+      "conversation_context": {
+        "client_name": "Jamie",
+        "conversation_position": 43,
+        "total_segments": 280,
+        "conversation_quality": 0.8875,
+        "timestamp": "2025-08-22T06:52:01.910779"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.2,
+        "relevance": 0.16666666666666666,
+        "completeness": 0.4
+      },
+      "issue_category": "general",
+      "client_info": {
+        "name": "Jamie",
+        "phone": "Unknown",
+        "key": "Jamie_Unknown"
+      },
+      "source_conversation": "conv_182_2025-04-15_17-44-26"
+    },
+    {
+      "input_scenario": "Client says: I am clicking on every bookmark page",
+      "expected_response": "Well, I'll send you the quick claim that I have a copy of and then I will send you our closing documents",
+      "conversation_context": {
+        "client_name": "Jamie",
+        "conversation_position": 59,
+        "total_segments": 280,
+        "conversation_quality": 0.8875,
+        "timestamp": "2025-08-22T06:52:01.910858"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.2,
+        "relevance": 0.2857142857142857,
+        "completeness": 0.4
+      },
+      "issue_category": "general",
+      "client_info": {
+        "name": "Jamie",
+        "phone": "Unknown",
+        "key": "Jamie_Unknown"
+      },
+      "source_conversation": "conv_182_2025-04-15_17-44-26"
+    },
+    {
+      "input_scenario": "Client says: So I'm looking for the closing documents",
+      "expected_response": "Now that doesn't mean it was who actually sold it to us, but the purchase contract shows Ian, not even Davidson, but let me see if I can find the If I can find the actual closing documents, I'm not sure if I have them right this second, so I'll have to grab those and then send those over",
+      "conversation_context": {
+        "client_name": "Jamie",
+        "conversation_position": 71,
+        "total_segments": 280,
+        "conversation_quality": 0.8875,
+        "timestamp": "2025-08-22T06:52:01.910958"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.6000000000000001,
+        "relevance": 1.0,
+        "completeness": 0.4
+      },
+      "issue_category": "general",
+      "client_info": {
+        "name": "Jamie",
+        "phone": "Unknown",
+        "key": "Jamie_Unknown"
+      },
+      "source_conversation": "conv_182_2025-04-15_17-44-26"
+    },
+    {
+      "input_scenario": "Client says: So the title that we have has Karen's name on it though, Karen Carpenter",
+      "expected_response": "So let me see if I can get these closing documents and then I will send them over to you",
+      "conversation_context": {
+        "client_name": "Jamie",
+        "conversation_position": 74,
+        "total_segments": 280,
+        "conversation_quality": 0.8875,
+        "timestamp": "2025-08-22T06:52:01.911032"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.4,
+        "relevance": 0.14285714285714285,
+        "completeness": 0.4
+      },
+      "issue_category": "general",
+      "client_info": {
+        "name": "Jamie",
+        "phone": "Unknown",
+        "key": "Jamie_Unknown"
+      },
+      "source_conversation": "conv_182_2025-04-15_17-44-26"
+    },
+    {
+      "input_scenario": "Client says: Since there is no power there, that will have to be paid up front to start that service",
+      "expected_response": "When you are able, will you send me an e-mail so I can have that account number, please? Yes, ma'am, I'll send that",
+      "conversation_context": {
+        "client_name": "For",
+        "conversation_position": 94,
+        "total_segments": 114,
+        "conversation_quality": 0.8525,
+        "timestamp": "2025-08-22T06:52:01.912928"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.4,
+        "relevance": 0.375,
+        "completeness": 0.4
+      },
+      "issue_category": "general",
+      "client_info": {
+        "name": "For",
+        "phone": "4053676318",
+        "key": "For_4053676318"
+      },
+      "source_conversation": "conv_183_2025-04-15_16-21-03"
+    },
+    {
+      "input_scenario": "Client says: And that's what so that's what our first guy said",
+      "expected_response": "That's what I figured",
+      "conversation_context": {
+        "client_name": "Going",
+        "conversation_position": 28,
+        "total_segments": 62,
+        "conversation_quality": 0.86896,
+        "timestamp": "2025-08-22T06:52:01.915762"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0,
+        "relevance": 0.5,
+        "completeness": 0.4
+      },
+      "issue_category": "general",
+      "client_info": {
+        "name": "Going",
+        "phone": "Unknown",
+        "key": "Going_Unknown"
+      },
+      "source_conversation": "conv_186_2025-04-15_14-04-20"
+    },
+    {
+      "input_scenario": "Client says: Look at all the E around the house",
+      "expected_response": "what I mean? Okay, yeah, yeah, I'll give them a heads up on that for sure",
+      "conversation_context": {
+        "client_name": "Jamie",
+        "conversation_position": 31,
+        "total_segments": 37,
+        "conversation_quality": 0.8775,
+        "timestamp": "2025-08-22T06:52:01.921432"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.2,
+        "relevance": 0.0,
+        "completeness": 0.4
+      },
+      "issue_category": "general",
+      "client_info": {
+        "name": "Jamie",
+        "phone": "Unknown",
+        "key": "Jamie_Unknown"
+      },
+      "source_conversation": "conv_193_2025-04-09_19-37-14"
+    },
+    {
+      "input_scenario": "Client says: It smells more a bunch of cat litter that, , cat pee, cat litter that kind of just set and didn't ever get cleaned up and so it might take a little bit to get the smell out, but",
+      "expected_response": "But yeah, definitely, I mean, as soon as I find out, I'm still waiting back to hear on if they Let me say if we're professionally clean, so I'll let",
+      "conversation_context": {
+        "client_name": "Sorry",
+        "conversation_position": 49,
+        "total_segments": 59,
+        "conversation_quality": 0.8106800000000001,
+        "timestamp": "2025-08-22T06:52:01.924035"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.4,
+        "relevance": 0.24242424242424243,
+        "completeness": 0.4
+      },
+      "issue_category": "general",
+      "client_info": {
+        "name": "Sorry",
+        "phone": "Unknown",
+        "key": "Sorry_Unknown"
+      },
+      "source_conversation": "conv_194_2025-04-09_19-05-45"
+    },
+    {
+      "input_scenario": "Client says: Yeah, well, and that is also true",
+      "expected_response": "Yeah, well, I think I'll have to send someone by to replace that box",
+      "conversation_context": {
+        "client_name": "Jamie",
+        "conversation_position": 32,
+        "total_segments": 92,
+        "conversation_quality": 0.9,
+        "timestamp": "2025-08-22T06:52:01.929024"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.2,
+        "relevance": 0.8571428571428571,
+        "completeness": 0.4
+      },
+      "issue_category": "general",
+      "client_info": {
+        "name": "Jamie",
+        "phone": "Unknown",
+        "key": "Jamie_Unknown"
+      },
+      "source_conversation": "conv_198_2025-04-03_18-47-01"
+    },
+    {
+      "input_scenario": "Client says: You can only, I don't remember the limit, but there's only so many times you can enter a code before it kicks you out of there",
+      "expected_response": "Yeah, well, I think I'll have to send someone by to replace that box",
+      "conversation_context": {
+        "client_name": "Jamie",
+        "conversation_position": 33,
+        "total_segments": 92,
+        "conversation_quality": 0.9,
+        "timestamp": "2025-08-22T06:52:01.929104"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.2,
+        "relevance": 0.08695652173913043,
+        "completeness": 0.4
+      },
+      "issue_category": "general",
+      "client_info": {
+        "name": "Jamie",
+        "phone": "Unknown",
+        "key": "Jamie_Unknown"
+      },
+      "source_conversation": "conv_198_2025-04-03_18-47-01"
+    },
+    {
+      "input_scenario": "Client says: It'll be good for the next hour",
+      "expected_response": "Okay, yeah, let me, I'll go ahead and I'll send you one",
+      "conversation_context": {
+        "client_name": "Jamie",
+        "conversation_position": 67,
+        "total_segments": 92,
+        "conversation_quality": 0.9,
+        "timestamp": "2025-08-22T06:52:01.929173"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.4,
+        "relevance": 0.0,
+        "completeness": 0.4
+      },
+      "issue_category": "general",
+      "client_info": {
+        "name": "Jamie",
+        "phone": "Unknown",
+        "key": "Jamie_Unknown"
+      },
+      "source_conversation": "conv_198_2025-04-03_18-47-01"
+    },
+    {
+      "input_scenario": "Client says: If you can send me one, I'll be at the house at Johnson in 5 minutes",
+      "expected_response": "Okay, yeah, let me, I'll go ahead and I'll send you one",
+      "conversation_context": {
+        "client_name": "Jamie",
+        "conversation_position": 68,
+        "total_segments": 92,
+        "conversation_quality": 0.9,
+        "timestamp": "2025-08-22T06:52:01.929229"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.4,
+        "relevance": 0.4,
+        "completeness": 0.4
+      },
+      "issue_category": "general",
+      "client_info": {
+        "name": "Jamie",
+        "phone": "Unknown",
+        "key": "Jamie_Unknown"
+      },
+      "source_conversation": "conv_198_2025-04-03_18-47-01"
+    },
+    {
+      "input_scenario": "Client says: Well, then let me text this over to you and it will get you in if you're over there",
+      "expected_response": "So I'll send this to you and then if you have any questions or anything that if you want to talk about what your next steps are then just give me a call back",
+      "conversation_context": {
+        "client_name": "Jamie",
+        "conversation_position": 77,
+        "total_segments": 92,
+        "conversation_quality": 0.9,
+        "timestamp": "2025-08-22T06:52:01.929307"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.4,
+        "relevance": 0.8235294117647058,
+        "completeness": 0.4
+      },
+      "issue_category": "general",
+      "client_info": {
+        "name": "Jamie",
+        "phone": "Unknown",
+        "key": "Jamie_Unknown"
+      },
+      "source_conversation": "conv_198_2025-04-03_18-47-01"
+    },
+    {
+      "input_scenario": "Client says: Okay, so can you e-mail me a copy of her driver's license? Of her driver's license? Yes",
+      "expected_response": "Yeah, do I just send it to that same e-mail that I emailed the first time? No, I'll go ahead and I'll send you an e-mail and then you can just respond to that e-mail with a copy of her driver's license",
+      "conversation_context": {
+        "client_name": "Jamie",
+        "conversation_position": 18,
+        "total_segments": 30,
+        "conversation_quality": 0.83,
+        "timestamp": "2025-08-22T06:52:01.930988"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.2,
+        "relevance": 1.0,
+        "completeness": 0.4
+      },
+      "issue_category": "general",
+      "client_info": {
+        "name": "Jamie",
+        "phone": "Unknown",
+        "key": "Jamie_Unknown"
+      },
+      "source_conversation": "conv_200_2025-04-03_15-33-56"
+    },
+    {
+      "input_scenario": "Client says: I was going to see if you were wanting to go ahead and reschedule that tour",
+      "expected_response": "When is the earliest I could do it, Jamie? Yeah",
+      "conversation_context": {
+        "client_name": "Jamie",
+        "conversation_position": 6,
+        "total_segments": 37,
+        "conversation_quality": 0.9375,
+        "timestamp": "2025-08-22T06:52:01.932701"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0,
+        "relevance": 0.13333333333333333,
+        "completeness": 0.4
+      },
+      "issue_category": "general",
+      "client_info": {
+        "name": "Jamie",
+        "phone": "Unknown",
+        "key": "Jamie_Unknown"
+      },
+      "source_conversation": "conv_202_2025-04-03_15-27-41"
+    },
+    {
+      "input_scenario": "Client says: Okay, so I had a tour earlier this week and they didn't seem to have any issues with the lockbox at all",
+      "expected_response": "So if you have any issues while you're there, just let me know and I'll see if I can get you",
+      "conversation_context": {
+        "client_name": "Jamie",
+        "conversation_position": 29,
+        "total_segments": 37,
+        "conversation_quality": 0.9375,
+        "timestamp": "2025-08-22T06:52:01.932785"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.6000000000000001,
+        "relevance": 0.5454545454545454,
+        "completeness": 0.4
+      },
+      "issue_category": "move",
+      "client_info": {
+        "name": "Jamie",
+        "phone": "Unknown",
+        "key": "Jamie_Unknown"
+      },
+      "source_conversation": "conv_202_2025-04-03_15-27-41"
+    },
+    {
+      "input_scenario": "Client says: I'm not sure when they are set to finish it though",
+      "expected_response": "So I don't know, maybe you're applying for others or how the refund looks since it was it Cash App that you paid through? Now, I'll send my MasterCard",
+      "conversation_context": {
+        "client_name": "Jamie",
+        "conversation_position": 5,
+        "total_segments": 21,
+        "conversation_quality": 0.8775,
+        "timestamp": "2025-08-22T06:52:01.936954"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.2,
+        "relevance": 0.18181818181818182,
+        "completeness": 0.4
+      },
+      "issue_category": "general",
+      "client_info": {
+        "name": "Jamie",
+        "phone": "Unknown",
+        "key": "Jamie_Unknown"
+      },
+      "source_conversation": "conv_208_2025-03-31_19-38-52"
+    },
+    {
+      "input_scenario": "Client says: Well, you said something to me about sending the money back from the application? So on our end, it doesn't show that it pulled and I can send you a screenshot for it because it shows that we never even processed the card",
+      "expected_response": "So I don't know, maybe you're applying for others or how the refund looks since it was it Cash App that you paid through? Now, I'll send my MasterCard",
+      "conversation_context": {
+        "client_name": "Jamie",
+        "conversation_position": 6,
+        "total_segments": 21,
+        "conversation_quality": 0.8775,
+        "timestamp": "2025-08-22T06:52:01.937061"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.5,
+        "response_quality": 0.2,
+        "relevance": 0.4444444444444444,
+        "completeness": 0.4
+      },
+      "issue_category": "maintenance",
+      "client_info": {
+        "name": "Jamie",
+        "phone": "Unknown",
+        "key": "Jamie_Unknown"
+      },
+      "source_conversation": "conv_208_2025-03-31_19-38-52"
+    },
+    {
+      "input_scenario": "Client says: It said it took on March the 13th, and it says the application",
+      "expected_response": "Okay yeah and I can I'll send you the screenshot and you you may need to to contact your card and see if they are still holding it for some reason Because there isn't anything to refund on our end since we never processed your application",
+      "conversation_context": {
+        "client_name": "Jamie",
+        "conversation_position": 9,
+        "total_segments": 21,
+        "conversation_quality": 0.8775,
+        "timestamp": "2025-08-22T06:52:01.937152"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.4,
+        "relevance": 1.0,
+        "completeness": 0.4
+      },
+      "issue_category": "general",
+      "client_info": {
+        "name": "Jamie",
+        "phone": "Unknown",
+        "key": "Jamie_Unknown"
+      },
+      "source_conversation": "conv_208_2025-03-31_19-38-52"
+    },
+    {
+      "input_scenario": "Client says: Please do that",
+      "expected_response": "Okay, yeah, yeah, I'll just give you a call when it's finished and see if you're still in the market then",
+      "conversation_context": {
+        "client_name": "Jamie",
+        "conversation_position": 15,
+        "total_segments": 21,
+        "conversation_quality": 0.8775,
+        "timestamp": "2025-08-22T06:52:01.937217"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.4,
+        "relevance": 0.0,
+        "completeness": 0.4
+      },
+      "issue_category": "move",
+      "client_info": {
+        "name": "Jamie",
+        "phone": "Unknown",
+        "key": "Jamie_Unknown"
+      },
+      "source_conversation": "conv_208_2025-03-31_19-38-52"
+    },
+    {
+      "input_scenario": "Client says: All they would do is just turn my gas off and then I wouldn't be able to cook or have water",
+      "expected_response": "So let me, let me see about calling this new guy and see when they can, if they can't get over pretty quickly, then I'll just call around and see who I can get out the fastest",
+      "conversation_context": {
+        "client_name": "Just",
+        "conversation_position": 19,
+        "total_segments": 27,
+        "conversation_quality": 0.89,
+        "timestamp": "2025-08-22T06:52:01.940417"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.8,
+        "relevance": 0.47619047619047616,
+        "completeness": 0.4
+      },
+      "issue_category": "general",
+      "client_info": {
+        "name": "Just",
+        "phone": "Unknown",
+        "key": "Just_Unknown"
+      },
+      "source_conversation": "conv_211_2025-03-31_18-00-05"
+    },
+    {
+      "input_scenario": "Hey, I tell you, I'm feeling it too",
+      "expected_response": "I figured I'd better call you than text you back and forth",
+      "conversation_context": {
+        "client_name": "Jamie",
+        "conversation_position": 3,
+        "total_segments": 78,
+        "conversation_quality": 0.8625,
+        "timestamp": "2025-08-22T06:52:01.942616"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.2,
+        "relevance": 0.25,
+        "completeness": 0.4
+      },
+      "issue_category": "general",
+      "client_info": {
+        "name": "Jamie",
+        "phone": "Unknown",
+        "key": "Jamie_Unknown"
+      },
+      "source_conversation": "conv_212_2025-03-31_15-56-02"
+    },
+    {
+      "input_scenario": "Client says: I would just feel sick paying that to be in this location, so",
+      "expected_response": "Secondly, this guy next door in 28 has been moved out for about a month, right? I can see inside of his house, as far as the kitchen back here, just 'cause the blinds are all ****** **",
+      "conversation_context": {
+        "client_name": "Jamie",
+        "conversation_position": 11,
+        "total_segments": 78,
+        "conversation_quality": 0.8625,
+        "timestamp": "2025-08-22T06:52:01.942709"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.2,
+        "relevance": 0.6153846153846154,
+        "completeness": 0.4
+      },
+      "issue_category": "general",
+      "client_info": {
+        "name": "Jamie",
+        "phone": "Unknown",
+        "key": "Jamie_Unknown"
+      },
+      "source_conversation": "conv_212_2025-03-31_15-56-02"
+    },
+    {
+      "input_scenario": "Client says: And they're anticipating just sticking with the same contract that I had, unless I call them and let them know",
+      "expected_response": "Okay, yeah, yeah, let me ask if that's something that they want to do or if they want to go ahead",
+      "conversation_context": {
+        "client_name": "Jamie",
+        "conversation_position": 67,
+        "total_segments": 78,
+        "conversation_quality": 0.8625,
+        "timestamp": "2025-08-22T06:52:01.942809"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.2,
+        "relevance": 0.23529411764705882,
+        "completeness": 0.4
+      },
+      "issue_category": "maintenance",
+      "client_info": {
+        "name": "Jamie",
+        "phone": "Unknown",
+        "key": "Jamie_Unknown"
+      },
+      "source_conversation": "conv_212_2025-03-31_15-56-02"
+    },
+    {
+      "input_scenario": "Client says: But that was just every two weeks, 40 bucks, so",
+      "expected_response": "Okay, yeah, yeah, let me ask if that's something that they want to do or if they want to go ahead",
+      "conversation_context": {
+        "client_name": "Jamie",
+        "conversation_position": 68,
+        "total_segments": 78,
+        "conversation_quality": 0.8625,
+        "timestamp": "2025-08-22T06:52:01.942870"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.2,
+        "relevance": 0.2,
+        "completeness": 0.4
+      },
+      "issue_category": "general",
+      "client_info": {
+        "name": "Jamie",
+        "phone": "Unknown",
+        "key": "Jamie_Unknown"
+      },
+      "source_conversation": "conv_212_2025-03-31_15-56-02"
+    },
+    {
+      "input_scenario": "Client says: They're in the mornings when we get up now, they're , and we have a whole bunch of little bitty baby ones",
+      "expected_response": "Yeah, yeah, let me let me see if I can find someone else in the area who might be able to help us out and then I'll call you and give you a heads up of who I find and what company we're going to go with",
+      "conversation_context": {
+        "client_name": "Jamie",
+        "conversation_position": 21,
+        "total_segments": 28,
+        "conversation_quality": 0.9375,
+        "timestamp": "2025-08-22T06:52:01.943897"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.8,
+        "relevance": 0.5714285714285714,
+        "completeness": 0.4
+      },
+      "issue_category": "general",
+      "client_info": {
+        "name": "Jamie",
+        "phone": "Unknown",
+        "key": "Jamie_Unknown"
+      },
+      "source_conversation": "conv_213_2025-03-28_14-53-49"
+    },
+    {
+      "input_scenario": "Client says: So I believe that they have maybe support or someone you can call to kind of walk you through that process",
+      "expected_response": "So I'll just do this and then if I don't, if I don't figure it out, I'll send in the ticket",
+      "conversation_context": {
+        "client_name": "Jamie",
+        "conversation_position": 19,
+        "total_segments": 26,
+        "conversation_quality": 0.805,
+        "timestamp": "2025-08-22T06:52:01.945530"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.2,
+        "relevance": 0.21052631578947367,
+        "completeness": 0.4
+      },
+      "issue_category": "general",
+      "client_info": {
+        "name": "Jamie",
+        "phone": "Unknown",
+        "key": "Jamie_Unknown"
+      },
+      "source_conversation": "conv_215_2025-03-27_15-36-54"
+    },
+    {
+      "input_scenario": "Client says: So while I have you here, I'm going to go ahead and send you an e-mail",
+      "expected_response": "I'll send it just to you, because we do need pay stubs",
+      "conversation_context": {
+        "client_name": "Going",
+        "conversation_position": 29,
+        "total_segments": 71,
+        "conversation_quality": 0.89002,
+        "timestamp": "2025-08-22T06:52:01.946926"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.2,
+        "relevance": 0.26666666666666666,
+        "completeness": 0.4
+      },
+      "issue_category": "general",
+      "client_info": {
+        "name": "Going",
+        "phone": "Unknown",
+        "key": "Going_Unknown"
+      },
+      "source_conversation": "conv_216_2025-03-27_14-57-56"
+    },
+    {
+      "input_scenario": "Client says: So I know it gives you guys a spot for files, but it does never pull through",
+      "expected_response": "So I'll send you an e-mail separately",
+      "conversation_context": {
+        "client_name": "Going",
+        "conversation_position": 33,
+        "total_segments": 71,
+        "conversation_quality": 0.89002,
+        "timestamp": "2025-08-22T06:52:01.946993"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.2,
+        "relevance": 0.25,
+        "completeness": 0.4
+      },
+      "issue_category": "general",
+      "client_info": {
+        "name": "Going",
+        "phone": "Unknown",
+        "key": "Going_Unknown"
+      },
+      "source_conversation": "conv_216_2025-03-27_14-57-56"
+    },
+    {
+      "input_scenario": "Client says: So we actually use a",
+      "expected_response": "Okay, I'll send that in the e-mail too",
+      "conversation_context": {
+        "client_name": "Going",
+        "conversation_position": 41,
+        "total_segments": 71,
+        "conversation_quality": 0.89002,
+        "timestamp": "2025-08-22T06:52:01.947044"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.2,
+        "relevance": 0.0,
+        "completeness": 0.4
+      },
+      "issue_category": "maintenance",
+      "client_info": {
+        "name": "Going",
+        "phone": "Unknown",
+        "key": "Going_Unknown"
+      },
+      "source_conversation": "conv_216_2025-03-27_14-57-56"
+    },
+    {
+      "input_scenario": "Client says: So I just hate to give you a time frame if when I don't have anything from them",
+      "expected_response": "Okay, well, in the meantime, I will go ahead and e-mail you my pay stub and you just let me know if you need anything else and just keep me updated",
+      "conversation_context": {
+        "client_name": "Jamie",
+        "conversation_position": 41,
+        "total_segments": 49,
+        "conversation_quality": 0.93242,
+        "timestamp": "2025-08-22T06:52:01.948324"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.2,
+        "relevance": 0.5882352941176471,
+        "completeness": 0.4
+      },
+      "issue_category": "general",
+      "client_info": {
+        "name": "Jamie",
+        "phone": "Unknown",
+        "key": "Jamie_Unknown"
+      },
+      "source_conversation": "conv_217_2025-03-25_18-55-31"
+    },
+    {
+      "input_scenario": "Client says: Would you to enroll your account to paperless billing, ma'am? Yes, we'll go ahead, please",
+      "expected_response": "Alright, and I highly suggest you to grab your pen and paper because I will give it to you, your new account number, okay? Okay, yeah, I'm ready",
+      "conversation_context": {
+        "client_name": "Jane",
+        "conversation_position": 42,
+        "total_segments": 65,
+        "conversation_quality": 0.8159799999999999,
+        "timestamp": "2025-08-22T06:52:01.952367"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0,
+        "relevance": 0.5333333333333333,
+        "completeness": 0.4
+      },
+      "issue_category": "maintenance",
+      "client_info": {
+        "name": "Jane",
+        "phone": "3826638269",
+        "key": "Jane_3826638269"
+      },
+      "source_conversation": "conv_221_2025-03-24_18-18-17"
+    },
+    {
+      "input_scenario": "Client says: And also, would you to enroll your account or set up your account through AutoPay? No, no, thank you",
+      "expected_response": "Alright, and I highly suggest you to grab your pen and paper because I will give it to you, your new account number, okay? Okay, yeah, I'm ready",
+      "conversation_context": {
+        "client_name": "Jane",
+        "conversation_position": 43,
+        "total_segments": 65,
+        "conversation_quality": 0.8159799999999999,
+        "timestamp": "2025-08-22T06:52:01.952453"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0,
+        "relevance": 0.625,
+        "completeness": 0.4
+      },
+      "issue_category": "maintenance",
+      "client_info": {
+        "name": "Jane",
+        "phone": "3826638269",
+        "key": "Jane_3826638269"
+      },
+      "source_conversation": "conv_221_2025-03-24_18-18-17"
+    },
+    {
+      "input_scenario": "Client says: We do require pay stubs so we can verify your income",
+      "expected_response": "So I'll send you over an e-mail and you can respond to that with your payment information",
+      "conversation_context": {
+        "client_name": "Jamie",
+        "conversation_position": 18,
+        "total_segments": 27,
+        "conversation_quality": 0.865,
+        "timestamp": "2025-08-22T06:52:01.956797"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.2,
+        "relevance": 0.6,
+        "completeness": 0.4
+      },
+      "issue_category": "general",
+      "client_info": {
+        "name": "Jamie",
+        "phone": "Unknown",
+        "key": "Jamie_Unknown"
+      },
+      "source_conversation": "conv_226_2025-03-24_15-59-36"
+    },
+    {
+      "input_scenario": "Client says: I didn't know something when I went to go shut the garage door",
+      "expected_response": "All right, then we'll go ahead and then put in a maintenance order for it and I can reach out to the garage door people and see when they can get out there",
+      "conversation_context": {
+        "client_name": "Really",
+        "conversation_position": 6,
+        "total_segments": 23,
+        "conversation_quality": 0.8775,
+        "timestamp": "2025-08-22T06:52:01.958958"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.2,
+        "relevance": 1.0,
+        "completeness": 0.4
+      },
+      "issue_category": "general",
+      "client_info": {
+        "name": "Really",
+        "phone": "Unknown",
+        "key": "Really_Unknown"
+      },
+      "source_conversation": "conv_228_2025-03-24_15-55-20"
+    },
+    {
+      "input_scenario": "Client says: 95, so yeah, just shy of that $1,000 mark",
+      "expected_response": "Okay, yeah, I definitely want it if I can, , because I can definitely pay that easily",
+      "conversation_context": {
+        "client_name": "Jamie",
+        "conversation_position": 24,
+        "total_segments": 51,
+        "conversation_quality": 0.94604,
+        "timestamp": "2025-08-22T06:52:01.961757"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.2,
+        "relevance": 0.4444444444444444,
+        "completeness": 0.4
+      },
+      "issue_category": "general",
+      "client_info": {
+        "name": "Jamie",
+        "phone": "Unknown",
+        "key": "Jamie_Unknown"
+      },
+      "source_conversation": "conv_230_2025-03-20_18-50-31"
+    },
+    {
+      "input_scenario": "Client says: She never could get a hold of you and I live across, I'm across the street from Liberty Baptist Church",
+      "expected_response": "Okay, yeah, give me one second and let me get my pen running",
+      "conversation_context": {
+        "client_name": "Jamie",
+        "conversation_position": 3,
+        "total_segments": 6,
+        "conversation_quality": 0.7475,
+        "timestamp": "2025-08-22T06:52:01.964146"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.2,
+        "relevance": 0.2,
+        "completeness": 0.4
+      },
+      "issue_category": "maintenance",
+      "client_info": {
+        "name": "Jamie",
+        "phone": "Unknown",
+        "key": "Jamie_Unknown"
+      },
+      "source_conversation": "conv_233_2025-03-20_18-07-29"
+    },
+    {
+      "input_scenario": "Client says: I didn't have any trouble getting the one for Delta and we looked at it and we do it",
+      "expected_response": "Okay, yeah, let me see",
+      "conversation_context": {
+        "client_name": "Her",
+        "conversation_position": 62,
+        "total_segments": 117,
+        "conversation_quality": 0.9125,
+        "timestamp": "2025-08-22T06:52:01.966039"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.2,
+        "relevance": 0.0,
+        "completeness": 0.4
+      },
+      "issue_category": "general",
+      "client_info": {
+        "name": "Her",
+        "phone": "Unknown",
+        "key": "Her_Unknown"
+      },
+      "source_conversation": "conv_234_2025-03-20_17-55-11"
+    },
+    {
+      "input_scenario": "Client says: It's a little bit small and so we wanted to check out the Johnson House to see if it was a better fit for us",
+      "expected_response": "Okay, yeah, let me see",
+      "conversation_context": {
+        "client_name": "Her",
+        "conversation_position": 63,
+        "total_segments": 117,
+        "conversation_quality": 0.9125,
+        "timestamp": "2025-08-22T06:52:01.966105"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.2,
+        "relevance": 0.08695652173913043,
+        "completeness": 0.4
+      },
+      "issue_category": "payment",
+      "client_info": {
+        "name": "Her",
+        "phone": "Unknown",
+        "key": "Her_Unknown"
+      },
+      "source_conversation": "conv_234_2025-03-20_17-55-11"
+    },
+    {
+      "input_scenario": "Client says: I don't know if the application was already sent over or if I needed to put one in",
+      "expected_response": "No, so this is Jamie, but if Amy turned in the application already, then that is good too",
+      "conversation_context": {
+        "client_name": "Miracle",
+        "conversation_position": 14,
+        "total_segments": 44,
+        "conversation_quality": 0.7825,
+        "timestamp": "2025-08-22T06:52:01.968416"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0,
+        "relevance": 0.5,
+        "completeness": 0.4
+      },
+      "issue_category": "general",
+      "client_info": {
+        "name": "Miracle",
+        "phone": "Unknown",
+        "key": "Miracle_Unknown"
+      },
+      "source_conversation": "conv_237_2025-03-20_15-42-34"
+    },
+    {
+      "input_scenario": "Client says: I haven't heard anything back about the heater",
+      "expected_response": "Okay, let me call Henry really quick and see what is going on and then I'll give you a call right back",
+      "conversation_context": {
+        "client_name": "Jamie",
+        "conversation_position": 3,
+        "total_segments": 8,
+        "conversation_quality": 0.7475,
+        "timestamp": "2025-08-22T06:52:01.969862"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.6000000000000001,
+        "relevance": 0.25,
+        "completeness": 0.4
+      },
+      "issue_category": "maintenance",
+      "client_info": {
+        "name": "Jamie",
+        "phone": "Unknown",
+        "key": "Jamie_Unknown"
+      },
+      "source_conversation": "conv_239_2025-03-20_13-54-29"
+    },
+    {
+      "input_scenario": "Client says: So I just wanted to make sure that you got that balance taken care of",
+      "expected_response": "Okay, yeah, I can go ahead and pay it",
+      "conversation_context": {
+        "client_name": "Good",
+        "conversation_position": 4,
+        "total_segments": 19,
+        "conversation_quality": 0.8775,
+        "timestamp": "2025-08-22T06:52:01.970955"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.2,
+        "relevance": 0.14285714285714285,
+        "completeness": 0.4
+      },
+      "issue_category": "general",
+      "client_info": {
+        "name": "Good",
+        "phone": "Unknown",
+        "key": "Good_Unknown"
+      },
+      "source_conversation": "conv_240_2025-03-14_18-13-39"
+    },
+    {
+      "input_scenario": "Client says: We can't release the keys until you have a zero balance on the account",
+      "expected_response": "Okay, yeah, I can go ahead and pay it",
+      "conversation_context": {
+        "client_name": "Good",
+        "conversation_position": 5,
+        "total_segments": 19,
+        "conversation_quality": 0.8775,
+        "timestamp": "2025-08-22T06:52:01.971080"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.2,
+        "relevance": 0.0,
+        "completeness": 0.4
+      },
+      "issue_category": "maintenance",
+      "client_info": {
+        "name": "Good",
+        "phone": "Unknown",
+        "key": "Good_Unknown"
+      },
+      "source_conversation": "conv_240_2025-03-14_18-13-39"
+    },
+    {
+      "input_scenario": "Client says: So if you don't mind me asking, what was that last name that you went by before? Okay, I wonder if maybe legally it is still that, so maybe that's why the system was saying it wasn't accurate",
+      "expected_response": "Okay, well let me, yeah, no, that might have been the issue",
+      "conversation_context": {
+        "client_name": "Jamie",
+        "conversation_position": 20,
+        "total_segments": 41,
+        "conversation_quality": 0.92949,
+        "timestamp": "2025-08-22T06:52:01.980599"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.2,
+        "relevance": 0.1935483870967742,
+        "completeness": 0.4
+      },
+      "issue_category": "maintenance",
+      "client_info": {
+        "name": "Jamie",
+        "phone": "Unknown",
+        "key": "Jamie_Unknown"
+      },
+      "source_conversation": "conv_249_2025-03-10_13-57-01"
+    },
+    {
+      "input_scenario": "Client says: And do you have any pets? I do not",
+      "expected_response": "com, so you would just create a no pet profile, but we have the flyer that has a link to our portal directly, so I'll send that to you in this e-mail as well, so you can have a copy of that",
+      "conversation_context": {
+        "client_name": "Jamie",
+        "conversation_position": 26,
+        "total_segments": 41,
+        "conversation_quality": 0.92949,
+        "timestamp": "2025-08-22T06:52:01.980695"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.2,
+        "relevance": 0.5,
+        "completeness": 0.4
+      },
+      "issue_category": "general",
+      "client_info": {
+        "name": "Jamie",
+        "phone": "Unknown",
+        "key": "Jamie_Unknown"
+      },
+      "source_conversation": "conv_249_2025-03-10_13-57-01"
+    },
+    {
+      "input_scenario": "Client says: For sure, I want to give you the opportunity to get your stuff out because they just come and change locks and you don't have any more access to the property whatsoever",
+      "expected_response": "So I did want to give you that option beforehand, but I'll call you about this time tomorrow",
+      "conversation_context": {
+        "client_name": "Reading",
+        "conversation_position": 39,
+        "total_segments": 55,
+        "conversation_quality": 0.86699,
+        "timestamp": "2025-08-22T06:52:01.984834"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.4,
+        "relevance": 0.37037037037037035,
+        "completeness": 0.4
+      },
+      "issue_category": "maintenance",
+      "client_info": {
+        "name": "Reading",
+        "phone": "Unknown",
+        "key": "Reading_Unknown"
+      },
+      "source_conversation": "conv_254_2025-03-05_20-45-39"
+    },
+    {
+      "input_scenario": "Client says: GORDONSMAIL 44 at Gmail",
+      "expected_response": "I'll send you an e-mail to that e-mail with a password reset",
+      "conversation_context": {
+        "client_name": "Jamie",
+        "conversation_position": 35,
+        "total_segments": 64,
+        "conversation_quality": 0.9282900000000001,
+        "timestamp": "2025-08-22T06:52:01.988271"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.2,
+        "relevance": 0.0,
+        "completeness": 0.4
+      },
+      "issue_category": "general",
+      "client_info": {
+        "name": "Jamie",
+        "phone": "Unknown",
+        "key": "Jamie_Unknown"
+      },
+      "source_conversation": "conv_258_2025-03-04_20-47-48"
+    },
+    {
+      "input_scenario": "Client says: All right, well, good deal",
+      "expected_response": "Okay, yeah, I will for sure",
+      "conversation_context": {
+        "client_name": "Getting",
+        "conversation_position": 54,
+        "total_segments": 61,
+        "conversation_quality": 0.75545,
+        "timestamp": "2025-08-22T06:52:01.991586"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0,
+        "relevance": 0.0,
+        "completeness": 0.4
+      },
+      "issue_category": "general",
+      "client_info": {
+        "name": "Getting",
+        "phone": "Unknown",
+        "key": "Getting_Unknown"
+      },
+      "source_conversation": "conv_261_2025-03-04_19-18-49"
+    },
+    {
+      "input_scenario": "Client says: Yep, if you have any issues, just give me a call or have the Have whoever you get a hold of give me a call",
+      "expected_response": "Okay, yeah, I will for sure",
+      "conversation_context": {
+        "client_name": "Getting",
+        "conversation_position": 55,
+        "total_segments": 61,
+        "conversation_quality": 0.75545,
+        "timestamp": "2025-08-22T06:52:01.991642"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0,
+        "relevance": 0.0,
+        "completeness": 0.4
+      },
+      "issue_category": "general",
+      "client_info": {
+        "name": "Getting",
+        "phone": "Unknown",
+        "key": "Getting_Unknown"
+      },
+      "source_conversation": "conv_261_2025-03-04_19-18-49"
+    },
+    {
+      "input_scenario": "Client says: And kind of let what went on to court",
+      "expected_response": "Okay, yeah, that sounds great",
+      "conversation_context": {
+        "client_name": "Jamie",
+        "conversation_position": 73,
+        "total_segments": 79,
+        "conversation_quality": 0.81736,
+        "timestamp": "2025-08-22T06:52:01.992887"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0,
+        "relevance": 0.0,
+        "completeness": 0.4
+      },
+      "issue_category": "general",
+      "client_info": {
+        "name": "Jamie",
+        "phone": "Unknown",
+        "key": "Jamie_Unknown"
+      },
+      "source_conversation": "conv_262_2025-03-04_16-34-54"
+    },
+    {
+      "input_scenario": "Client says: All right, what's the best e-mail for you? Okay, it's Amanda dot ROBISON 888@gmail",
+      "expected_response": "I'll send you over an e-mail",
+      "conversation_context": {
+        "client_name": "Jamie",
+        "conversation_position": 15,
+        "total_segments": 26,
+        "conversation_quality": 0.925,
+        "timestamp": "2025-08-22T06:52:01.994146"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.2,
+        "relevance": 0.14285714285714285,
+        "completeness": 0.4
+      },
+      "issue_category": "general",
+      "client_info": {
+        "name": "Jamie",
+        "phone": "Unknown",
+        "key": "Jamie_Unknown"
+      },
+      "source_conversation": "conv_264_2025-02-28_17-53-19"
+    },
+    {
+      "input_scenario": "Client says: 3133 at Gmail",
+      "expected_response": "Okay, I'll shoot you an e-mail and I'll send you over the link and then if you want to schedule a tour, , we can we can do all of that and get you set up",
+      "conversation_context": {
+        "client_name": "Jamie",
+        "conversation_position": 33,
+        "total_segments": 48,
+        "conversation_quality": 0.9515199999999999,
+        "timestamp": "2025-08-22T06:52:01.995151"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.4,
+        "relevance": 0.0,
+        "completeness": 0.4
+      },
+      "issue_category": "general",
+      "client_info": {
+        "name": "Jamie",
+        "phone": "Unknown",
+        "key": "Jamie_Unknown"
+      },
+      "source_conversation": "conv_265_2025-02-28_17-03-11"
+    },
+    {
+      "input_scenario": "Client says: Yeah, absolutely",
+      "expected_response": "I'll send you an e-mail so you can have mine, and then we can, if you're interested, we can talk about those next steps",
+      "conversation_context": {
+        "client_name": "Jamie",
+        "conversation_position": 41,
+        "total_segments": 48,
+        "conversation_quality": 0.9515199999999999,
+        "timestamp": "2025-08-22T06:52:01.995211"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.2,
+        "relevance": 0.0,
+        "completeness": 0.4
+      },
+      "issue_category": "general",
+      "client_info": {
+        "name": "Jamie",
+        "phone": "Unknown",
+        "key": "Jamie_Unknown"
+      },
+      "source_conversation": "conv_265_2025-02-28_17-03-11"
+    },
+    {
+      "input_scenario": "Client says: You can send me an e-mail as well, , if you want to, if you do want to move forward",
+      "expected_response": "I'll send you an e-mail so you can have mine, and then we can, if you're interested, we can talk about those next steps",
+      "conversation_context": {
+        "client_name": "Jamie",
+        "conversation_position": 42,
+        "total_segments": 48,
+        "conversation_quality": 0.9515199999999999,
+        "timestamp": "2025-08-22T06:52:01.995270"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.2,
+        "relevance": 0.75,
+        "completeness": 0.4
+      },
+      "issue_category": "move",
+      "client_info": {
+        "name": "Jamie",
+        "phone": "Unknown",
+        "key": "Jamie_Unknown"
+      },
+      "source_conversation": "conv_265_2025-02-28_17-03-11"
+    },
+    {
+      "input_scenario": "Client says: Wondering about the new proposal for the new lease and we need to get the exterminator out here",
+      "expected_response": "Oh, okay, yeah, we can definitely, I'll give them a call today",
+      "conversation_context": {
+        "client_name": "Jamie",
+        "conversation_position": 4,
+        "total_segments": 22,
+        "conversation_quality": 0.95,
+        "timestamp": "2025-08-22T06:52:01.997827"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.4,
+        "relevance": 0.13333333333333333,
+        "completeness": 0.4
+      },
+      "issue_category": "move",
+      "client_info": {
+        "name": "Jamie",
+        "phone": "Unknown",
+        "key": "Jamie_Unknown"
+      },
+      "source_conversation": "conv_268_2025-02-24_18-34-02"
+    },
+    {
+      "input_scenario": "Client says: These roaches are getting bad",
+      "expected_response": "Oh, okay, yeah, we can definitely, I'll give them a call today",
+      "conversation_context": {
+        "client_name": "Jamie",
+        "conversation_position": 5,
+        "total_segments": 22,
+        "conversation_quality": 0.95,
+        "timestamp": "2025-08-22T06:52:01.997883"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.4,
+        "relevance": 0.0,
+        "completeness": 0.4
+      },
+      "issue_category": "maintenance",
+      "client_info": {
+        "name": "Jamie",
+        "phone": "Unknown",
+        "key": "Jamie_Unknown"
+      },
+      "source_conversation": "conv_268_2025-02-24_18-34-02"
+    },
+    {
+      "input_scenario": "Client says: So about how much are you wanting to spend? So our rent right now is I think 925, so maybe 825 or something",
+      "expected_response": "Yeah, so, and it's always something I can bring up to my supervisor, but I'll give you a heads up",
+      "conversation_context": {
+        "client_name": "Jamie",
+        "conversation_position": 10,
+        "total_segments": 45,
+        "conversation_quality": 0.92688,
+        "timestamp": "2025-08-22T06:52:01.999659"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.4,
+        "relevance": 0.36363636363636365,
+        "completeness": 0.4
+      },
+      "issue_category": "payment",
+      "client_info": {
+        "name": "Jamie",
+        "phone": "Unknown",
+        "key": "Jamie_Unknown"
+      },
+      "source_conversation": "conv_270_2025-02-24_17-53-42"
+    },
+    {
+      "input_scenario": "Client says: I was going to see if we could go down on our rent 50 bucks or something, but I know that's not your call",
+      "expected_response": "Yeah, so, and it's always something I can bring up to my supervisor, but I'll give you a heads up",
+      "conversation_context": {
+        "client_name": "Jamie",
+        "conversation_position": 11,
+        "total_segments": 45,
+        "conversation_quality": 0.92688,
+        "timestamp": "2025-08-22T06:52:01.999736"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.4,
+        "relevance": 0.25,
+        "completeness": 0.4
+      },
+      "issue_category": "payment",
+      "client_info": {
+        "name": "Jamie",
+        "phone": "Unknown",
+        "key": "Jamie_Unknown"
+      },
+      "source_conversation": "conv_270_2025-02-24_17-53-42"
+    },
+    {
+      "input_scenario": "Client says: Well, I emailed it to you",
+      "expected_response": "Okay, yeah, let me, okay, let me try one more time",
+      "conversation_context": {
+        "client_name": "Jamie",
+        "conversation_position": 11,
+        "total_segments": 77,
+        "conversation_quality": 0.89935,
+        "timestamp": "2025-08-22T06:52:02.001216"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.2,
+        "relevance": 0.0,
+        "completeness": 0.4
+      },
+      "issue_category": "general",
+      "client_info": {
+        "name": "Jamie",
+        "phone": "Unknown",
+        "key": "Jamie_Unknown"
+      },
+      "source_conversation": "conv_271_2025-02-24_16-37-21"
+    },
+    {
+      "input_scenario": "Client says: I emailed a link for each specific pet and then I also shared it with y'all's realty page on there",
+      "expected_response": "Okay, yeah, let me, okay, let me try one more time",
+      "conversation_context": {
+        "client_name": "Jamie",
+        "conversation_position": 12,
+        "total_segments": 77,
+        "conversation_quality": 0.89935,
+        "timestamp": "2025-08-22T06:52:02.001283"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.2,
+        "relevance": 0.0,
+        "completeness": 0.4
+      },
+      "issue_category": "maintenance",
+      "client_info": {
+        "name": "Jamie",
+        "phone": "Unknown",
+        "key": "Jamie_Unknown"
+      },
+      "source_conversation": "conv_271_2025-02-24_16-37-21"
+    },
+    {
+      "input_scenario": "Client says: Yes, absolutely",
+      "expected_response": "Okay, yeah, yeah, let me figure out, I said, gotta just wait for my contractor",
+      "conversation_context": {
+        "client_name": "Jamie",
+        "conversation_position": 68,
+        "total_segments": 77,
+        "conversation_quality": 0.89935,
+        "timestamp": "2025-08-22T06:52:02.001350"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.2,
+        "relevance": 0.0,
+        "completeness": 0.4
+      },
+      "issue_category": "general",
+      "client_info": {
+        "name": "Jamie",
+        "phone": "Unknown",
+        "key": "Jamie_Unknown"
+      },
+      "source_conversation": "conv_271_2025-02-24_16-37-21"
+    },
+    {
+      "input_scenario": "Client says: So we're willing to do the deposit once we get everything figured out",
+      "expected_response": "Okay, yeah, yeah, let me figure out, I said, gotta just wait for my contractor",
+      "conversation_context": {
+        "client_name": "Jamie",
+        "conversation_position": 69,
+        "total_segments": 77,
+        "conversation_quality": 0.89935,
+        "timestamp": "2025-08-22T06:52:02.001407"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.2,
+        "relevance": 0.0,
+        "completeness": 0.4
+      },
+      "issue_category": "general",
+      "client_info": {
+        "name": "Jamie",
+        "phone": "Unknown",
+        "key": "Jamie_Unknown"
+      },
+      "source_conversation": "conv_271_2025-02-24_16-37-21"
+    },
+    {
+      "input_scenario": "Client says: I'm not sure if he was",
+      "expected_response": "Yeah, and the map I can't tell for sure, but yeah, I'll I will give him a call and I will give him your phone number 'cause since he's out there, then that may, and then, okay",
+      "conversation_context": {
+        "client_name": "Jamie",
+        "conversation_position": 17,
+        "total_segments": 23,
+        "conversation_quality": 0.925,
+        "timestamp": "2025-08-22T06:52:02.008540"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.6000000000000001,
+        "relevance": 0.0,
+        "completeness": 0.4
+      },
+      "issue_category": "general",
+      "client_info": {
+        "name": "Jamie",
+        "phone": "Unknown",
+        "key": "Jamie_Unknown"
+      },
+      "source_conversation": "conv_279_2025-02-17_18-14-48"
+    },
+    {
+      "input_scenario": "Client says: So I give them a heads up",
+      "expected_response": "But I'll call her and let her know what's going on",
+      "conversation_context": {
+        "client_name": "Pretty",
+        "conversation_position": 28,
+        "total_segments": 34,
+        "conversation_quality": 0.865,
+        "timestamp": "2025-08-22T06:52:02.011868"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.4,
+        "relevance": 0.0,
+        "completeness": 0.4
+      },
+      "issue_category": "general",
+      "client_info": {
+        "name": "Pretty",
+        "phone": "Unknown",
+        "key": "Pretty_Unknown"
+      },
+      "source_conversation": "conv_284_2025-02-07_17-54-12"
+    },
+    {
+      "input_scenario": "Client says: What is it? The lease renewal offer, you'll get an e-mail with that offer at some point next week",
+      "expected_response": "And then we'll just, if we accept it, we just fill it out? Yes, so if you accept it, you'll just e-mail back saying you accept, and then I'll send you guys a new lease to sign",
+      "conversation_context": {
+        "client_name": "Jamie",
+        "conversation_position": 6,
+        "total_segments": 35,
+        "conversation_quality": 0.8775,
+        "timestamp": "2025-08-22T06:52:02.013484"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.2,
+        "relevance": 0.3157894736842105,
+        "completeness": 0.4
+      },
+      "issue_category": "move",
+      "client_info": {
+        "name": "Jamie",
+        "phone": "Unknown",
+        "key": "Jamie_Unknown"
+      },
+      "source_conversation": "conv_286_2025-02-07_15-46-29"
+    },
+    {
+      "input_scenario": "Client says: Those haven't been sent out yet",
+      "expected_response": "And then we'll just, if we accept it, we just fill it out? Yes, so if you accept it, you'll just e-mail back saying you accept, and then I'll send you guys a new lease to sign",
+      "conversation_context": {
+        "client_name": "Jamie",
+        "conversation_position": 7,
+        "total_segments": 35,
+        "conversation_quality": 0.8775,
+        "timestamp": "2025-08-22T06:52:02.013574"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.2,
+        "relevance": 0.0,
+        "completeness": 0.4
+      },
+      "issue_category": "general",
+      "client_info": {
+        "name": "Jamie",
+        "phone": "Unknown",
+        "key": "Jamie_Unknown"
+      },
+      "source_conversation": "conv_286_2025-02-07_15-46-29"
+    },
+    {
+      "input_scenario": "Client says: At the tone, please record your message",
+      "expected_response": "Hey Emily this is Jamie with Milan Properties just wanted to call and touch base received a notice from pet screening that they were waiting on a response for you and so not exactly sure what they're needing but sounds they might be missing some information on your pet profile so just wanted to let so you could check up on that",
+      "conversation_context": {
+        "client_name": "Jamie",
+        "conversation_position": 2,
+        "total_segments": 6,
+        "conversation_quality": 0.685,
+        "timestamp": "2025-08-22T06:52:02.015807"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.2,
+        "relevance": 0.2857142857142857,
+        "completeness": 0.4
+      },
+      "issue_category": "move",
+      "client_info": {
+        "name": "Jamie",
+        "phone": "405-367-6318",
+        "key": "Jamie_405-367-6318"
+      },
+      "source_conversation": "conv_289_2025-02-06_17-08-40"
+    },
+    {
+      "input_scenario": "Client says: I've got to reactivate the account",
+      "expected_response": "Okay, yeah, that sounds good",
+      "conversation_context": {
+        "client_name": "Jamie",
+        "conversation_position": 33,
+        "total_segments": 43,
+        "conversation_quality": 0.925,
+        "timestamp": "2025-08-22T06:52:02.022789"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0,
+        "relevance": 0.0,
+        "completeness": 0.4
+      },
+      "issue_category": "maintenance",
+      "client_info": {
+        "name": "Jamie",
+        "phone": "4154179568",
+        "key": "Jamie_4154179568"
+      },
+      "source_conversation": "conv_297_2025-02-03_20-07-57"
+    },
+    {
+      "input_scenario": "Client says: And what was your name? Is that Alfonso Cano? A-L-F-O-N-S-O",
+      "expected_response": "Okay, well then let me, yeah, I'll get this passed over to her",
+      "conversation_context": {
+        "client_name": "Janie",
+        "conversation_position": 14,
+        "total_segments": 22,
+        "conversation_quality": 0.7925,
+        "timestamp": "2025-08-22T06:52:02.026553"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.4,
+        "relevance": 0.0,
+        "completeness": 0.4
+      },
+      "issue_category": "general",
+      "client_info": {
+        "name": "Janie",
+        "phone": "405-439-7157",
+        "key": "Janie_405-439-7157"
+      },
+      "source_conversation": "conv_302_2025-01-30_17-26-08"
+    },
+    {
+      "input_scenario": "Client says: So So I figure it's just got to be just in that well tube",
+      "expected_response": "Umm I know we have someone who's worked on well before, so I'll send them a message and see if they're able to get that checked out and then I'll I'll let what they find",
+      "conversation_context": {
+        "client_name": "Jamie",
+        "conversation_position": 16,
+        "total_segments": 25,
+        "conversation_quality": 0.7925,
+        "timestamp": "2025-08-22T06:52:02.029903"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.2,
+        "relevance": 0.8333333333333334,
+        "completeness": 0.4
+      },
+      "issue_category": "general",
+      "client_info": {
+        "name": "Jamie",
+        "phone": "Unknown",
+        "key": "Jamie_Unknown"
+      },
+      "source_conversation": "conv_307_2025-01-28_20-28-30"
+    },
+    {
+      "input_scenario": "Client says: Well, then I'll see",
+      "expected_response": "Umm I know we have someone who's worked on well before, so I'll send them a message and see if they're able to get that checked out and then I'll I'll let what they find",
+      "conversation_context": {
+        "client_name": "Jamie",
+        "conversation_position": 17,
+        "total_segments": 25,
+        "conversation_quality": 0.7925,
+        "timestamp": "2025-08-22T06:52:02.029986"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.2,
+        "relevance": 1.0,
+        "completeness": 0.4
+      },
+      "issue_category": "general",
+      "client_info": {
+        "name": "Jamie",
+        "phone": "Unknown",
+        "key": "Jamie_Unknown"
+      },
+      "source_conversation": "conv_307_2025-01-28_20-28-30"
+    },
+    {
+      "input_scenario": "Client says: So I can, there's a couple of the used shops that have maybe have the part",
+      "expected_response": "I can go see if I can find it or or have them just replace the oven or the stove",
+      "conversation_context": {
+        "client_name": "Jamie",
+        "conversation_position": 11,
+        "total_segments": 25,
+        "conversation_quality": 0.865,
+        "timestamp": "2025-08-22T06:52:02.031339"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.2,
+        "relevance": 0.42857142857142855,
+        "completeness": 0.4
+      },
+      "issue_category": "general",
+      "client_info": {
+        "name": "Jamie",
+        "phone": "Unknown",
+        "key": "Jamie_Unknown"
+      },
+      "source_conversation": "conv_309_2025-01-24_15-07-11"
+    },
+    {
+      "input_scenario": "Client says: It is 588-0065",
+      "expected_response": "If it's simple, I can, I'll just yeah, go ahead",
+      "conversation_context": {
+        "client_name": "Jamie",
+        "conversation_position": 13,
+        "total_segments": 28,
+        "conversation_quality": 0.865,
+        "timestamp": "2025-08-22T06:52:02.036325"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.4,
+        "relevance": 0.0,
+        "completeness": 0.4
+      },
+      "issue_category": "general",
+      "client_info": {
+        "name": "Jamie",
+        "phone": "Unknown",
+        "key": "Jamie_Unknown"
+      },
+      "source_conversation": "conv_317_2025-01-20_19-31-41"
+    },
+    {
+      "input_scenario": "Client says: So you should be able to to log in and delete that payment information and then put new one in",
+      "expected_response": "If you can't, let me know and I'll see if I can log in as you and do it",
+      "conversation_context": {
+        "client_name": "Still",
+        "conversation_position": 22,
+        "total_segments": 28,
+        "conversation_quality": 0.805,
+        "timestamp": "2025-08-22T06:52:02.043466"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.6000000000000001,
+        "relevance": 0.47058823529411764,
+        "completeness": 0.4
+      },
+      "issue_category": "payment",
+      "client_info": {
+        "name": "Still",
+        "phone": "Unknown",
+        "key": "Still_Unknown"
+      },
+      "source_conversation": "conv_325_2025-01-07_21-11-18"
+    },
+    {
+      "input_scenario": "Client says: It is Whirlpool",
+      "expected_response": "Awesome, I will umm I'll update them with this information",
+      "conversation_context": {
+        "client_name": "Be",
+        "conversation_position": 5,
+        "total_segments": 13,
+        "conversation_quality": 0.8175,
+        "timestamp": "2025-08-22T06:52:02.065152"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.2,
+        "relevance": 0.0,
+        "completeness": 0.4
+      },
+      "issue_category": "general",
+      "client_info": {
+        "name": "Be",
+        "phone": "Unknown",
+        "key": "Be_Unknown"
+      },
+      "source_conversation": "conv_358_2024-12-05_18-25-10"
+    },
+    {
+      "input_scenario": "Client says: OK, I've got it here",
+      "expected_response": "So I'll send you an e-mail so I'll get started on your application, but we do need pay stubs and I just want to make sure that you saw the pet screening information on there",
+      "conversation_context": {
+        "client_name": "Jamie",
+        "conversation_position": 14,
+        "total_segments": 21,
+        "conversation_quality": 0.8275,
+        "timestamp": "2025-08-22T06:52:02.071560"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.2,
+        "relevance": 0.0,
+        "completeness": 0.4
+      },
+      "issue_category": "general",
+      "client_info": {
+        "name": "Jamie",
+        "phone": "Unknown",
+        "key": "Jamie_Unknown"
+      },
+      "source_conversation": "conv_369_2024-11-26_16-46-23"
+    },
+    {
+      "input_scenario": "Client says: Or that backside door",
+      "expected_response": "Umm, yeah, let me, I will send you over to my contractor",
+      "conversation_context": {
+        "client_name": "Jamie",
+        "conversation_position": 17,
+        "total_segments": 34,
+        "conversation_quality": 0.9,
+        "timestamp": "2025-08-22T06:52:02.079326"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.2,
+        "relevance": 0.0,
+        "completeness": 0.4
+      },
+      "issue_category": "maintenance",
+      "client_info": {
+        "name": "Jamie",
+        "phone": "Unknown",
+        "key": "Jamie_Unknown"
+      },
+      "source_conversation": "conv_378_2024-11-19_15-46-24"
+    },
+    {
+      "input_scenario": "Client says: What the window that's closer towards the laundry room He broke one 1 little spot on the window",
+      "expected_response": "I didn't he said I asked him if I need to put a maintenance request and he goes no he's I'll get it fixed but",
+      "conversation_context": {
+        "client_name": "Jamie",
+        "conversation_position": 7,
+        "total_segments": 31,
+        "conversation_quality": 0.72,
+        "timestamp": "2025-08-22T06:52:02.081053"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.2,
+        "relevance": 0.125,
+        "completeness": 0.4
+      },
+      "issue_category": "general",
+      "client_info": {
+        "name": "Jamie",
+        "phone": "Unknown",
+        "key": "Jamie_Unknown"
+      },
+      "source_conversation": "conv_380_2024-11-14_20-34-29"
+    },
+    {
+      "input_scenario": "Client says: So absolutely if you'll",
+      "expected_response": "And I said, do I need to put a maintenance request in? He goes no, he's , I'll get it fixed",
+      "conversation_context": {
+        "client_name": "Jamie",
+        "conversation_position": 26,
+        "total_segments": 31,
+        "conversation_quality": 0.72,
+        "timestamp": "2025-08-22T06:52:02.081116"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.2,
+        "relevance": 0.0,
+        "completeness": 0.4
+      },
+      "issue_category": "general",
+      "client_info": {
+        "name": "Jamie",
+        "phone": "Unknown",
+        "key": "Jamie_Unknown"
+      },
+      "source_conversation": "conv_380_2024-11-14_20-34-29"
+    },
+    {
+      "input_scenario": "Client says: And can I ask them the day it happens? I was at home when it happened, scared me",
+      "expected_response": "And I said, do I need to put a maintenance request in? He goes no, he's , I'll get it fixed",
+      "conversation_context": {
+        "client_name": "Jamie",
+        "conversation_position": 27,
+        "total_segments": 31,
+        "conversation_quality": 0.72,
+        "timestamp": "2025-08-22T06:52:02.081171"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.2,
+        "relevance": 0.375,
+        "completeness": 0.4
+      },
+      "issue_category": "general",
+      "client_info": {
+        "name": "Jamie",
+        "phone": "Unknown",
+        "key": "Jamie_Unknown"
+      },
+      "source_conversation": "conv_380_2024-11-14_20-34-29"
+    },
+    {
+      "input_scenario": "Client says: Oh, I got a real quick question I had",
+      "expected_response": "I can actually replace probably 3 steps with this board",
+      "conversation_context": {
+        "client_name": "Jamie",
+        "conversation_position": 3,
+        "total_segments": 21,
+        "conversation_quality": 0.7925,
+        "timestamp": "2025-08-22T06:52:02.082888"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.2,
+        "relevance": 0.25,
+        "completeness": 0.4
+      },
+      "issue_category": "general",
+      "client_info": {
+        "name": "Jamie",
+        "phone": "Unknown",
+        "key": "Jamie_Unknown"
+      },
+      "source_conversation": "conv_383_2024-11-13_19-27-42"
+    },
+    {
+      "input_scenario": "Client says: Thank you for checking",
+      "expected_response": "OK, alright, I'll holler at you later, alright? Alright, sounds good",
+      "conversation_context": {
+        "client_name": "Jamie",
+        "conversation_position": 17,
+        "total_segments": 21,
+        "conversation_quality": 0.7925,
+        "timestamp": "2025-08-22T06:52:02.082939"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.2,
+        "relevance": 0.5,
+        "completeness": 0.4
+      },
+      "issue_category": "payment",
+      "client_info": {
+        "name": "Jamie",
+        "phone": "Unknown",
+        "key": "Jamie_Unknown"
+      },
+      "source_conversation": "conv_383_2024-11-13_19-27-42"
+    },
+    {
+      "input_scenario": "Client says: Just wanted to call and touch base",
+      "expected_response": "And then without, suppose I need it, I'll send you an e-mail",
+      "conversation_context": {
+        "client_name": "Jamie",
+        "conversation_position": 5,
+        "total_segments": 31,
+        "conversation_quality": 0.95,
+        "timestamp": "2025-08-22T06:52:02.087953"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.2,
+        "relevance": 0.2857142857142857,
+        "completeness": 0.4
+      },
+      "issue_category": "general",
+      "client_info": {
+        "name": "Jamie",
+        "phone": "Unknown",
+        "key": "Jamie_Unknown"
+      },
+      "source_conversation": "conv_394_2024-11-11_16-59-58"
+    },
+    {
+      "input_scenario": "Client says: I was gonna let I do need an application for Dominic as well",
+      "expected_response": "And then without, suppose I need it, I'll send you an e-mail",
+      "conversation_context": {
+        "client_name": "Jamie",
+        "conversation_position": 6,
+        "total_segments": 31,
+        "conversation_quality": 0.95,
+        "timestamp": "2025-08-22T06:52:02.088004"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.2,
+        "relevance": 0.5714285714285714,
+        "completeness": 0.4
+      },
+      "issue_category": "general",
+      "client_info": {
+        "name": "Jamie",
+        "phone": "Unknown",
+        "key": "Jamie_Unknown"
+      },
+      "source_conversation": "conv_394_2024-11-11_16-59-58"
+    },
+    {
+      "input_scenario": "Client says: This is Ryan",
+      "expected_response": "Yeah, I figured it out",
+      "conversation_context": {
+        "client_name": "Ryan",
+        "conversation_position": 0,
+        "total_segments": 24,
+        "conversation_quality": 0.8775,
+        "timestamp": "2025-08-22T06:52:02.089627"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0,
+        "relevance": 0.0,
+        "completeness": 0.4
+      },
+      "issue_category": "general",
+      "client_info": {
+        "name": "Ryan",
+        "phone": "Unknown",
+        "key": "Ryan_Unknown"
+      },
+      "source_conversation": "conv_396_2024-11-05_20-58-43"
+    },
+    {
+      "input_scenario": "Hey there's any code enforcement? May I help you? Hey, , good morning",
+      "expected_response": "This is Jamie with Nolan Properties, umm, returning a call in regards to 1211 E Margaret",
+      "conversation_context": {
+        "client_name": "Jamie",
+        "conversation_position": 0,
+        "total_segments": 22,
+        "conversation_quality": 0.865,
+        "timestamp": "2025-08-22T06:52:02.100896"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.2,
+        "relevance": 0.0,
+        "completeness": 0.4
+      },
+      "issue_category": "emergency",
+      "client_info": {
+        "name": "Jamie",
+        "phone": "Unknown",
+        "key": "Jamie_Unknown"
+      },
+      "source_conversation": "conv_412_2024-10-09_14-47-22"
+    },
+    {
+      "input_scenario": "Client says: That's not something that would readily pop up for me",
+      "expected_response": "Umm, let me make sure I have your e-mail address and then I can look at that and I'll shoot you an e-mail",
+      "conversation_context": {
+        "client_name": "Jamie",
+        "conversation_position": 10,
+        "total_segments": 21,
+        "conversation_quality": 0.925,
+        "timestamp": "2025-08-22T06:52:02.103042"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.6000000000000001,
+        "relevance": 0.36363636363636365,
+        "completeness": 0.4
+      },
+      "issue_category": "general",
+      "client_info": {
+        "name": "Jamie",
+        "phone": "Unknown",
+        "key": "Jamie_Unknown"
+      },
+      "source_conversation": "conv_416_2024-09-30_17-10-49"
+    },
+    {
+      "input_scenario": "Client says: I'd have to do some math on that one",
+      "expected_response": "Umm, let me make sure I have your e-mail address and then I can look at that and I'll shoot you an e-mail",
+      "conversation_context": {
+        "client_name": "Jamie",
+        "conversation_position": 11,
+        "total_segments": 21,
+        "conversation_quality": 0.925,
+        "timestamp": "2025-08-22T06:52:02.103097"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.6000000000000001,
+        "relevance": 0.4444444444444444,
+        "completeness": 0.4
+      },
+      "issue_category": "general",
+      "client_info": {
+        "name": "Jamie",
+        "phone": "Unknown",
+        "key": "Jamie_Unknown"
+      },
+      "source_conversation": "conv_416_2024-09-30_17-10-49"
+    },
+    {
+      "input_scenario": "Client says: So he moved",
+      "expected_response": "OK, yeah, if you'll send me pictures so I can look at them and then I will, I'll send them over to the owner and see if he has any thoughts and see what he what he wants to do, how he wants to handle that",
+      "conversation_context": {
+        "client_name": "Jamie",
+        "conversation_position": 15,
+        "total_segments": 27,
+        "conversation_quality": 0.875,
+        "timestamp": "2025-08-22T06:52:02.108164"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.4,
+        "relevance": 1.0,
+        "completeness": 0.4
+      },
+      "issue_category": "move",
+      "client_info": {
+        "name": "Jamie",
+        "phone": "Unknown",
+        "key": "Jamie_Unknown"
+      },
+      "source_conversation": "conv_422_2024-09-17_16-04-00"
+    },
+    {
+      "input_scenario": "Client says: Oh yeah, I was calling about the air conditioning",
+      "expected_response": "OK, alright, give me one second, let me call him really quick and I'll give you a call right back",
+      "conversation_context": {
+        "client_name": "Was",
+        "conversation_position": 2,
+        "total_segments": 5,
+        "conversation_quality": 0.6749999999999999,
+        "timestamp": "2025-08-22T06:52:02.118727"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.6000000000000001,
+        "relevance": 0.0,
+        "completeness": 0.4
+      },
+      "issue_category": "maintenance",
+      "client_info": {
+        "name": "Was",
+        "phone": "Unknown",
+        "key": "Was_Unknown"
+      },
+      "source_conversation": "conv_440_2024-08-28_16-50-19"
+    },
+    {
+      "input_scenario": "Client says: Oh, you didn't hear anything? No, I haven't",
+      "expected_response": "OK, alright, give me one second, let me call him really quick and I'll give you a call right back",
+      "conversation_context": {
+        "client_name": "Was",
+        "conversation_position": 3,
+        "total_segments": 5,
+        "conversation_quality": 0.6749999999999999,
+        "timestamp": "2025-08-22T06:52:02.118782"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.6000000000000001,
+        "relevance": 0.25,
+        "completeness": 0.4
+      },
+      "issue_category": "general",
+      "client_info": {
+        "name": "Was",
+        "phone": "Unknown",
+        "key": "Was_Unknown"
+      },
+      "source_conversation": "conv_440_2024-08-28_16-50-19"
+    },
+    {
+      "input_scenario": "Client says: No, they wouldn't have known",
+      "expected_response": "Yeah, let me, I can find out",
+      "conversation_context": {
+        "client_name": "Jamie",
+        "conversation_position": 15,
+        "total_segments": 22,
+        "conversation_quality": 0.925,
+        "timestamp": "2025-08-22T06:52:02.120474"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.4,
+        "relevance": 0.0,
+        "completeness": 0.4
+      },
+      "issue_category": "general",
+      "client_info": {
+        "name": "Jamie",
+        "phone": "Unknown",
+        "key": "Jamie_Unknown"
+      },
+      "source_conversation": "conv_443_2024-08-27_23-05-54"
+    },
+    {
+      "input_scenario": "Client says: So if you need to call, you can reach me here",
+      "expected_response": "As soon as we get down there and confirm yes or no, I'll call you back and let",
+      "conversation_context": {
+        "client_name": "This",
+        "conversation_position": 22,
+        "total_segments": 26,
+        "conversation_quality": 0.8525,
+        "timestamp": "2025-08-22T06:52:02.121154"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.4,
+        "relevance": 0.2,
+        "completeness": 0.4
+      },
+      "issue_category": "maintenance",
+      "client_info": {
+        "name": "This",
+        "phone": "Unknown",
+        "key": "This_Unknown"
+      },
+      "source_conversation": "conv_444_2024-08-27_21-40-08"
+    },
+    {
+      "input_scenario": "Client says: I hadn't heard anything on if you were planning",
+      "expected_response": "OK, that's why I figured I'd give you a call",
+      "conversation_context": {
+        "client_name": "Terrible",
+        "conversation_position": 5,
+        "total_segments": 21,
+        "conversation_quality": 0.7325,
+        "timestamp": "2025-08-22T06:52:02.125123"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.2,
+        "relevance": 0.4444444444444444,
+        "completeness": 0.4
+      },
+      "issue_category": "general",
+      "client_info": {
+        "name": "Terrible",
+        "phone": "Unknown",
+        "key": "Terrible_Unknown"
+      },
+      "source_conversation": "conv_449_2024-08-26_17-34-59"
+    },
+    {
+      "input_scenario": "Client says: And then he was gonna put in, he was gonna send that a report to his boss and then his boss was supposed to send it to you guys",
+      "expected_response": "Umm, so I'll send him a message",
+      "conversation_context": {
+        "client_name": "Just",
+        "conversation_position": 10,
+        "total_segments": 28,
+        "conversation_quality": 0.84,
+        "timestamp": "2025-08-22T06:52:02.126052"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.2,
+        "relevance": 0.2222222222222222,
+        "completeness": 0.4
+      },
+      "issue_category": "general",
+      "client_info": {
+        "name": "Just",
+        "phone": "Unknown",
+        "key": "Just_Unknown"
+      },
+      "source_conversation": "conv_450_2024-08-26_17-23-20"
+    },
+    {
+      "input_scenario": "Client says: OK well I'll follow up because I hadn't heard anything from him",
+      "expected_response": "Umm, so I'll send him a message",
+      "conversation_context": {
+        "client_name": "Just",
+        "conversation_position": 11,
+        "total_segments": 28,
+        "conversation_quality": 0.84,
+        "timestamp": "2025-08-22T06:52:02.126104"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.2,
+        "relevance": 0.3333333333333333,
+        "completeness": 0.4
+      },
+      "issue_category": "general",
+      "client_info": {
+        "name": "Just",
+        "phone": "Unknown",
+        "key": "Just_Unknown"
+      },
+      "source_conversation": "conv_450_2024-08-26_17-23-20"
+    },
+    {
+      "input_scenario": "Client says: So I'll see if he can umm come at the same time as Cameron so we can do all both of those at the same time",
+      "expected_response": "And and will Cameron come on Friday for the repair? Yeah, if he, umm, I'll see if he has some time available in his schedule",
+      "conversation_context": {
+        "client_name": "Jamie",
+        "conversation_position": 9,
+        "total_segments": 20,
+        "conversation_quality": 0.925,
+        "timestamp": "2025-08-22T06:52:02.129253"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.4,
+        "relevance": 0.8,
+        "completeness": 0.4
+      },
+      "issue_category": "general",
+      "client_info": {
+        "name": "Jamie",
+        "phone": "Unknown",
+        "key": "Jamie_Unknown"
+      },
+      "source_conversation": "conv_455_2024-08-23_14-46-25"
+    },
+    {
+      "input_scenario": "Client says: And then I will see if Cameron can come and look at those repairs to evaluate umm, So see if they can both come 8:00 AM Monday if that works for you",
+      "expected_response": "And and will Cameron come on Friday for the repair? Yeah, if he, umm, I'll see if he has some time available in his schedule",
+      "conversation_context": {
+        "client_name": "Jamie",
+        "conversation_position": 10,
+        "total_segments": 20,
+        "conversation_quality": 0.925,
+        "timestamp": "2025-08-22T06:52:02.129333"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.4,
+        "relevance": 0.6153846153846154,
+        "completeness": 0.4
+      },
+      "issue_category": "maintenance",
+      "client_info": {
+        "name": "Jamie",
+        "phone": "Unknown",
+        "key": "Jamie_Unknown"
+      },
+      "source_conversation": "conv_455_2024-08-23_14-46-25"
+    },
+    {
+      "input_scenario": "Client says: OK, sounds good",
+      "expected_response": "I'll let them know and I'll see if they can, , make it out there first thing on a Monday and then I'll see what Cameron's schedule is, , for the rest of the week for Friday repairs",
+      "conversation_context": {
+        "client_name": "Jamie",
+        "conversation_position": 15,
+        "total_segments": 20,
+        "conversation_quality": 0.925,
+        "timestamp": "2025-08-22T06:52:02.129411"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.4,
+        "relevance": 0.0,
+        "completeness": 0.4
+      },
+      "issue_category": "general",
+      "client_info": {
+        "name": "Jamie",
+        "phone": "Unknown",
+        "key": "Jamie_Unknown"
+      },
+      "source_conversation": "conv_455_2024-08-23_14-46-25"
+    },
+    {
+      "input_scenario": "Hey, this is Eric leaving a message",
+      "expected_response": "I'll call you back again",
+      "conversation_context": {
+        "client_name": "Eric",
+        "conversation_position": 0,
+        "total_segments": 11,
+        "conversation_quality": 0.89,
+        "timestamp": "2025-08-22T06:52:02.133256"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.4,
+        "relevance": 0.0,
+        "completeness": 0.4
+      },
+      "issue_category": "general",
+      "client_info": {
+        "name": "Eric",
+        "phone": "405-367-6318",
+        "key": "Eric_405-367-6318"
+      },
+      "source_conversation": "conv_462_2024-08-22_14-22-32"
+    },
+    {
+      "input_scenario": "Client says: Just cuz I mean it was and I understand the reversal, but is due due on the 1st",
+      "expected_response": "So I will I'll check with our accounting",
+      "conversation_context": {
+        "client_name": "James",
+        "conversation_position": 19,
+        "total_segments": 23,
+        "conversation_quality": 0.8025,
+        "timestamp": "2025-08-22T06:52:02.134935"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.2,
+        "relevance": 0.11764705882352941,
+        "completeness": 0.4
+      },
+      "issue_category": "general",
+      "client_info": {
+        "name": "James",
+        "phone": "Unknown",
+        "key": "James_Unknown"
+      },
+      "source_conversation": "conv_465_2024-08-21_13-49-56"
+    },
+    {
+      "input_scenario": "Client says: And then right now I'm getting a new bank account and everything, so the money's gonna be safe in there until the reversal comes back for that",
+      "expected_response": "Well, yeah, I'll keep an eye on if anything does reverse, I will",
+      "conversation_context": {
+        "client_name": "Steven",
+        "conversation_position": 13,
+        "total_segments": 22,
+        "conversation_quality": 0.83,
+        "timestamp": "2025-08-22T06:52:02.140663"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.2,
+        "relevance": 0.0,
+        "completeness": 0.4
+      },
+      "issue_category": "maintenance",
+      "client_info": {
+        "name": "Steven",
+        "phone": "Unknown",
+        "key": "Steven_Unknown"
+      },
+      "source_conversation": "conv_474_2024-08-14_14-20-41"
+    },
+    {
+      "input_scenario": "Client says: OK, awesome",
+      "expected_response": "Well, yeah, I'll keep an eye on if anything does reverse, I will",
+      "conversation_context": {
+        "client_name": "Steven",
+        "conversation_position": 14,
+        "total_segments": 22,
+        "conversation_quality": 0.83,
+        "timestamp": "2025-08-22T06:52:02.140828"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.2,
+        "relevance": 0.0,
+        "completeness": 0.4
+      },
+      "issue_category": "general",
+      "client_info": {
+        "name": "Steven",
+        "phone": "Unknown",
+        "key": "Steven_Unknown"
+      },
+      "source_conversation": "conv_474_2024-08-14_14-20-41"
+    },
+    {
+      "input_scenario": "Client says: Yeah, absolutely",
+      "expected_response": "Yeah, I'll send you an invoice",
+      "conversation_context": {
+        "client_name": "Jamie",
+        "conversation_position": 21,
+        "total_segments": 32,
+        "conversation_quality": 0.925,
+        "timestamp": "2025-08-22T06:52:02.146070"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.2,
+        "relevance": 1.0,
+        "completeness": 0.4
+      },
+      "issue_category": "general",
+      "client_info": {
+        "name": "Jamie",
+        "phone": "Unknown",
+        "key": "Jamie_Unknown"
+      },
+      "source_conversation": "conv_480_2024-08-12_16-18-21"
+    },
+    {
+      "input_scenario": "Client says: And if you will go ahead and I don't have anything in our QuickBooks for that first one, you could resend that first one over to us so we can look at that",
+      "expected_response": "Yeah, I'll send you an invoice",
+      "conversation_context": {
+        "client_name": "Jamie",
+        "conversation_position": 22,
+        "total_segments": 32,
+        "conversation_quality": 0.925,
+        "timestamp": "2025-08-22T06:52:02.146132"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.2,
+        "relevance": 0.07142857142857142,
+        "completeness": 0.4
+      },
+      "issue_category": "general",
+      "client_info": {
+        "name": "Jamie",
+        "phone": "Unknown",
+        "key": "Jamie_Unknown"
+      },
+      "source_conversation": "conv_480_2024-08-12_16-18-21"
+    },
+    {
+      "input_scenario": "Client says: Please record your message when you have finished recording",
+      "expected_response": "Hey good morning this is Jamie with non properties",
+      "conversation_context": {
+        "client_name": "Jamie",
+        "conversation_position": 2,
+        "total_segments": 10,
+        "conversation_quality": 0.685,
+        "timestamp": "2025-08-22T06:52:02.147179"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0,
+        "relevance": 0.0,
+        "completeness": 0.4
+      },
+      "issue_category": "move",
+      "client_info": {
+        "name": "Jamie",
+        "phone": "405-367-6318",
+        "key": "Jamie_405-367-6318"
+      },
+      "source_conversation": "conv_482_2024-08-12_14-23-31"
+    },
+    {
+      "input_scenario": "Client says: I don't care",
+      "expected_response": "Well, I'll call you and or I'll text you and let when I'll be here",
+      "conversation_context": {
+        "client_name": "Here",
+        "conversation_position": 11,
+        "total_segments": 16,
+        "conversation_quality": 0.7925,
+        "timestamp": "2025-08-22T06:52:02.147763"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.4,
+        "relevance": 0.0,
+        "completeness": 0.4
+      },
+      "issue_category": "general",
+      "client_info": {
+        "name": "Here",
+        "phone": "Unknown",
+        "key": "Here_Unknown"
+      },
+      "source_conversation": "conv_483_2024-08-09_17-08-31"
+    },
+    {
+      "input_scenario": "Client says: Well, let me, umm, let me try and call him really quick and see if maybe he has any sort of update for me and then I'll, I'll shoot you an e-mail and let what he says",
+      "expected_response": "But let me, I'll try and call him and see if I can get any sort of update from him today",
+      "conversation_context": {
+        "client_name": "Jamie",
+        "conversation_position": 20,
+        "total_segments": 30,
+        "conversation_quality": 0.95,
+        "timestamp": "2025-08-22T06:52:02.151662"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.8,
+        "relevance": 0.8387096774193549,
+        "completeness": 0.4
+      },
+      "issue_category": "general",
+      "client_info": {
+        "name": "Jamie",
+        "phone": "Unknown",
+        "key": "Jamie_Unknown"
+      },
+      "source_conversation": "conv_491_2024-08-06_18-01-09"
+    },
+    {
+      "input_scenario": "Client says: Umm, and then if he, if he says we're good to go, then we'll either way, we'll go from there",
+      "expected_response": "But let me, I'll try and call him and see if I can get any sort of update from him today",
+      "conversation_context": {
+        "client_name": "Jamie",
+        "conversation_position": 21,
+        "total_segments": 30,
+        "conversation_quality": 0.95,
+        "timestamp": "2025-08-22T06:52:02.151730"
+      },
+      "quality_metrics": {
+        "input_clarity": 0.8,
+        "response_quality": 0.8,
+        "relevance": 0.35294117647058826,
+        "completeness": 0.4
+      },
+      "issue_category": "general",
+      "client_info": {
+        "name": "Jamie",
+        "phone": "Unknown",
+        "key": "Jamie_Unknown"
+      },
+      "source_conversation": "conv_491_2024-08-06_18-01-09"
+    }
+  ]
+}

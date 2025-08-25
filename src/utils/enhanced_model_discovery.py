@@ -69,6 +69,8 @@ class EnhancedModelDiscovery:
         # Determine model type
         if "jamie" in model_lower:
             model_type = "jamie"
+        elif "vapipmv1" in model_lower:
+            model_type = "vapi-pm"
         elif "property-manager" in model_lower:
             model_type = "property-manager"
         elif "llama3" in model_lower:
@@ -95,6 +97,8 @@ class EnhancedModelDiscovery:
             base_model = "codellama:7b"
         elif "phi" in model_lower:
             base_model = "phi3:latest"
+        elif "vapipmv1" in model_lower:
+            base_model = "llama2:7b"
         else:
             base_model = "unknown"
         
@@ -178,6 +182,8 @@ class EnhancedModelDiscovery:
         
         if model_type == "jamie":
             return f"AI property manager trained on real conversations, based on {base_model}"
+        elif model_type == "vapi-pm":
+            return f"Professional property management assistant for Nolen Properties, handles tenant inquiries, maintenance requests, and complaints"
         elif model_type == "property-manager":
             return f"Property management AI model based on {base_model}"
         elif model_type == "llama3":
@@ -193,6 +199,10 @@ class EnhancedModelDiscovery:
         if model["is_jamie_model"]:
             return True
         
+        # Show VAPI PM models specifically
+        if "vapipmv1" in model["name"].lower():
+            return True
+        
         # Show base models for comparison
         if model["is_base_model"]:
             return True
@@ -204,6 +214,10 @@ class EnhancedModelDiscovery:
         """Determine if model should be auto-preloaded"""
         # Auto-preload the latest jamie model
         if model["is_jamie_model"] and "v" in model["name"]:
+            return True
+        
+        # Auto-preload VAPI PM models
+        if "vapipmv1" in model["name"].lower():
             return True
         
         # Auto-preload base models

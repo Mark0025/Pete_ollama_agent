@@ -133,3 +133,48 @@ input[type="text"] {
     border-radius: 4px;
     margin: 5px 0;
 }
+
+/* Jamie Test Cases Styling */
+.jamie-test-case {
+    cursor: pointer;
+    padding: 8px;
+    margin: 3px 0;
+    background: #f8f4ff;
+    border: 1px solid #e0d4ff;
+    border-radius: 4px;
+    font-size: 11px;
+    transition: background-color 0.2s;
+}
+
+.jamie-test-case:hover {
+    background: #f0e8ff;
+    border-color: #d0b8ff;
+}
+
+.test-category {
+    display: inline-block;
+    background: #6c5ce7;
+    color: white;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-size: 10px;
+    font-weight: bold;
+    margin-right: 8px;
+    text-transform: uppercase;
+}
+
+#jamieTestCasesContainer {
+    border: 1px solid #e0d4ff;
+    border-radius: 4px;
+    background: #fdfdff;
+    padding: 10px;
+}
+
+#jamieTestCasesStats {
+    background: #e3f2fd;
+    border: 1px solid #90caf9;
+    border-radius: 4px;
+    padding: 8px;
+    font-size: 11px;
+    color: #1565c0;
+}

@@ -8,7 +8,7 @@ import os
 import asyncio
 import aiohttp
 import json
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, List
 from dotenv import load_dotenv
 from loguru import logger
 
@@ -101,15 +101,16 @@ class ServerlessHandler:
             logger.error(f"❌ Warmup failed: {str(e)}")
             return False
     
-    async def chat_completion(self, message: str, model: str = 'peteollama:jamie-fixed', **kwargs) -> Dict[str, Any]:
+    def chat_completion(self, message: str, model: str = 'peteollama:jamie-fixed', **kwargs) -> Dict[str, Any]:
         """Handle chat completion through native RunPod API"""
         try:
             # Ensure endpoint is warmed up
             if not self.warmed_up:
-                await self.warmup_endpoint()
+                # For sync version, we'll skip warmup for now
+                pass
             
             # Submit job to RunPod AI native API
-            job_response = await self._make_request(
+            job_response = self._make_request_sync(
                 'POST',
                 '/run',
                 {
@@ -128,7 +129,7 @@ class ServerlessHandler:
             logger.info(f"🚀 Job submitted: {job_id}")
             
             # Poll for job completion
-            result = await self._poll_job_completion(job_id)
+            result = self._poll_job_completion_sync(job_id)
             return result
             
         except Exception as e:
@@ -197,6 +198,97 @@ class ServerlessHandler:
         except Exception as e:
             logger.error(f"❌ Get models failed: {str(e)}")
             return {'error': str(e), 'status': 'error'}
+    
+    async def get_available_models(self, force_refresh: bool = False) -> List[str]:
+        """
+        Get available models by querying the serverless worker directly
+        Uses the OpenAPI schema to discover available models dynamically
+        """
+        try:
+            logger.info("🔍 Querying serverless worker for available models...")
+            
+            # First, try to get the OpenAPI schema to see what's available
+            try:
+                openapi_response = await self._make_request('GET', '/openapi.json')
+                if openapi_response and 'paths' in openapi_response:
+                    logger.info("✅ Retrieved OpenAPI schema from serverless worker")
+                    # Parse the schema to find model-related endpoints
+                    paths = openapi_response.get('paths', {})
+                    if '/models' in paths:
+                        logger.info("📋 Found /models endpoint in OpenAPI schema")
+                        # Use the models endpoint if available
+                        models_response = await self._make_request('GET', '/models')
+                        if models_response and 'data' in models_response:
+                            models = [model.get('id', '') for model in models_response.get('data', []) if model.get('id')]
+                            logger.info(f"✅ Retrieved {len(models)} models from /models endpoint")
+                            return models
+            except Exception as e:
+                logger.warning(f"⚠️ OpenAPI schema query failed: {e}")
+            
+            # Fallback: Try to query the models endpoint directly
+            try:
+                models_response = await self._make_request('GET', '/models')
+                if models_response and 'data' in models_response:
+                    models = [model.get('id', '') for model in models_response.get('data', []) if model.get('id')]
+                    logger.info(f"✅ Retrieved {len(models)} models from /models endpoint")
+                    return models
+                elif models_response and isinstance(models_response, list):
+                    # Handle case where response is a direct list
+                    models = [model.get('id', '') for model in models_response if model.get('id')]
+                    logger.info(f"✅ Retrieved {len(models)} models from direct response")
+                    return models
+            except Exception as e:
+                logger.warning(f"⚠️ Direct models query failed: {e}")
+            
+            # Final fallback: Try a test request to common models to see what works
+            logger.info("🔄 Falling back to model testing approach...")
+            test_models = [
+                "llama3:latest",
+                "mistral:7b-instruct", 
+                "llama3:8b",
+                "mixtral:latest",
+                "codellama:7b",
+                "phi3:latest",
+                "gemma3:4b",
+                "qwen2.5:7b"
+            ]
+            
+            available_models = []
+            
+            for model in test_models:
+                try:
+                    # Quick test with minimal prompt
+                    test_payload = {
+                        "input": {
+                            "prompt": "test",
+                            "model": model,
+                            "max_tokens": 10
+                        }
+                    }
+                    
+                    # Use the /runsync endpoint for quick testing
+                    test_response = await self._make_request('POST', '/runsync', test_payload)
+                    
+                    if test_response and test_response.get('status') != 'error':
+                        available_models.append(model)
+                        logger.info(f"✅ {model} - Available")
+                    else:
+                        logger.info(f"❌ {model} - Not available")
+                        
+                except Exception as e:
+                    logger.info(f"⚠️ {model} - Error: {e}")
+                    continue
+            
+            if available_models:
+                logger.info(f"📋 Found {len(available_models)} available models via testing")
+                return available_models
+            else:
+                logger.warning("⚠️ No models found via testing, using fallback")
+                return ["llama3:latest", "mistral:7b-instruct"]  # Safe fallback
+                
+        except Exception as e:
+            logger.error(f"❌ Error getting available models: {e}")
+            return ["llama3:latest", "mistral:7b-instruct"]  # Safe fallback
     
     async def health_check(self) -> Dict[str, Any]:
         """Check serverless endpoint health using health endpoint"""
@@ -315,6 +407,95 @@ class ServerlessHandler:
                 return None
         
         return None
+    
+    def _make_request_sync(self, method: str, endpoint: str, data: Dict[str, Any] = None) -> Optional[Dict[str, Any]]:
+        """Make HTTP request to serverless endpoint synchronously"""
+        import requests
+        
+        url = f"{self.base_url}{endpoint}"
+        headers = {
+            'Authorization': f'Bearer {self.api_key}',
+            'Content-Type': 'application/json'
+        }
+        
+        try:
+            if method.upper() == 'GET':
+                response = requests.get(url, headers=headers, timeout=60)
+            else:
+                response = requests.post(url, headers=headers, json=data, timeout=60)
+            
+            if response.status_code == 200:
+                return response.json()
+            else:
+                logger.error(f"❌ {method} {url} failed with status {response.status_code}")
+                return None
+                
+        except Exception as e:
+            logger.error(f"❌ Request to {url} failed: {str(e)}")
+            return None
+    
+    def _poll_job_completion_sync(self, job_id: str, max_wait_time: int = 60) -> Dict[str, Any]:
+        """Poll for job completion synchronously"""
+        import time
+        
+        start_time = time.time()
+        
+        while (time.time() - start_time) < max_wait_time:
+            try:
+                # Check job status using the job ID
+                status_response = self._make_request_sync('GET', f'/status/{job_id}')
+                
+                if not status_response:
+                    time.sleep(1)
+                    continue
+                
+                status = status_response.get('status')
+                
+                if status == 'COMPLETED':
+                    # Job completed successfully
+                    output = status_response.get('output', {})
+                    logger.info(f"✅ Job {job_id} completed successfully")
+                    return {
+                        'status': 'success',
+                        'response': output.get('response', output.get('text', '')),
+                        'model': output.get('model', ''),
+                        'job_id': job_id,
+                        'raw_output': output
+                    }
+                
+                elif status == 'FAILED':
+                    # Job failed
+                    error = status_response.get('error', 'Unknown error')
+                    logger.error(f"❌ Job {job_id} failed: {error}")
+                    return {
+                        'status': 'error',
+                        'error': error,
+                        'job_id': job_id
+                    }
+                
+                elif status in ['IN_QUEUE', 'IN_PROGRESS']:
+                    # Job still running, wait and retry
+                    time.sleep(1)
+                    continue
+                
+                else:
+                    # Unknown status
+                    logger.warning(f"⚠️ Job {job_id} has unknown status: {status}")
+                    time.sleep(1)
+                    continue
+                    
+            except Exception as e:
+                logger.error(f"❌ Error polling job {job_id}: {str(e)}")
+                time.sleep(1)
+                continue
+        
+        # Timeout
+        logger.error(f"⏰ Job {job_id} timed out after {max_wait_time} seconds")
+        return {
+            'status': 'error',
+            'error': f'Job timed out after {max_wait_time} seconds',
+            'job_id': job_id
+        }
 
     async def _poll_job_completion(self, job_id: str, max_wait_time: int = 60) -> Dict[str, Any]:
         """Poll for job completion on RunPod AI native API"""

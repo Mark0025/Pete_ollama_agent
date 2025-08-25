@@ -12,13 +12,24 @@ from typing import Dict, List, Optional, Any, Iterable
 from pathlib import Path
 import sys
 
-# Import our working RunPod handler
-# Try multiple paths for different deployment environments
+# Load environment variables
 try:
-    from runpod_handler import pete_handler
+    from dotenv import load_dotenv
+    load_dotenv()
+    print("✅ ModelManager: Environment variables loaded")
 except ImportError:
-    sys.path.insert(0, str(Path(__file__).parent.parent.parent))
-    from runpod_handler import pete_handler
+    print("⚠️ ModelManager: dotenv not available")
+except Exception as e:
+    print(f"⚠️ ModelManager: Error loading environment: {e}")
+
+# Import RunPod module (but don't initialize yet)
+try:
+    import runpod
+    RUNPOD_AVAILABLE = True
+    print("✅ RunPod module imported successfully")
+except ImportError:
+    print("⚠️ RunPod module not available")
+    RUNPOD_AVAILABLE = False
 
 # Import OpenRouter handler for provider switching
 try:
@@ -104,6 +115,9 @@ class ModelManager:
         # Initialize provider handlers
         self.openrouter_handler = None  # Lazy load
         self._current_provider = None  # Cache for current provider
+        
+        # RunPod client (lazy initialized)
+        self._runpod_endpoint = None
     
     def _get_similarity_analyzer(self):
         """Lazy load the conversation similarity analyzer"""
@@ -116,6 +130,226 @@ class ModelManager:
                 print(f"⚠️ Failed to load similarity analyzer: {e}")
                 self.similarity_analyzer = None
         return self.similarity_analyzer
+    
+    def _get_runpod_endpoint(self):
+        """Lazy load the RunPod endpoint with fresh environment variables"""
+        if self._runpod_endpoint is None and RUNPOD_AVAILABLE:
+            try:
+                # Get fresh environment variables
+                runpod_api_key = os.getenv('RUNPOD_API_KEY')
+                runpod_endpoint_id = os.getenv('RUNPOD_SERVERLESS_ENDPOINT')
+                
+                print(f"🔍 DEBUG - Fresh RUNPOD_API_KEY: {runpod_api_key[:10] if runpod_api_key else 'None'}...")
+                print(f"🔍 DEBUG - Fresh RUNPOD_ENDPOINT_ID: {runpod_endpoint_id}")
+                
+                if not runpod_api_key:
+                    print("❌ RUNPOD_API_KEY not found in environment")
+                    return None
+                elif not runpod_endpoint_id:
+                    print("❌ RUNPOD_SERVERLESS_ENDPOINT not found in environment")
+                    return None
+                else:
+                    # Set the API key BEFORE creating endpoint
+                    runpod.api_key = runpod_api_key
+                    print(f"✅ RunPod API key set: {runpod_api_key[:10]}...")
+                    
+                    # Create endpoint with error handling
+                    self._runpod_endpoint = runpod.Endpoint(runpod_endpoint_id)
+                    print(f"✅ RunPod endpoint object created: {runpod_endpoint_id}")
+                    
+                    # Test endpoint availability with a simple health check
+                    try:
+                        print(f"🔍 Testing endpoint availability...")
+                        # Try to get endpoint status or health
+                        health_result = self._runpod_endpoint.health()
+                        print(f"✅ Endpoint health check passed: {health_result}")
+                    except Exception as health_error:
+                        print(f"⚠️ Endpoint health check failed: {health_error}")
+                        print(f"ℹ️ This might be normal - endpoint may not support health checks")
+                    
+            except Exception as e:
+                print(f"⚠️ RunPod client initialization error: {e}")
+                print(f"ℹ️ This could mean the endpoint doesn't exist or isn't accessible")
+                return None
+        
+        return self._runpod_endpoint
+    
+    def _runpod_stream_completion(self, runpod_endpoint, runpod_input: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+        """Get complete response from RunPod using streaming to avoid truncation
+        
+        Follows official RunPod docs pattern:
+        1. Submit async job to /run endpoint to get job ID
+        2. Use /stream/{job_id} endpoint for incremental streamed results
+        3. Poll /status/{job_id} for final completion if needed
+        """
+        try:
+            from utils.logger import logger
+            import time
+            
+            # Step 1: Submit async job to /run endpoint
+            logger.info(f"🚀 Submitting async job to RunPod /run endpoint...")
+            job_response = runpod_endpoint.run(runpod_input)
+            
+            if not job_response:
+                logger.error("❌ No response from RunPod /run endpoint")
+                return None
+            
+            # Extract job ID from response - RunPod Job object has job_id attribute
+            job_id = None
+            if isinstance(job_response, dict):
+                job_id = job_response.get('id')
+            elif hasattr(job_response, 'job_id'):
+                job_id = job_response.job_id
+                logger.info(f"🎉 Successfully extracted job_id: {job_id}")
+            elif hasattr(job_response, 'id'):
+                job_id = job_response.id
+            elif isinstance(job_response, str):
+                job_id = job_response  # Sometimes job ID is returned directly
+            else:
+                logger.warning(f"⚠️ Unknown job response format: {type(job_response)}")
+            
+            if not job_id:
+                logger.error(f"❌ No job ID found in response: {job_response}")
+                return None
+                
+            logger.info(f"✅ Job submitted successfully - Job ID: {job_id}")
+            
+            # Step 2: Stream results from /stream/{job_id} endpoint
+            complete_response = ""
+            updates_received = 0
+            max_stream_time = 60  # 60 seconds max for streaming
+            stream_start = time.time()
+            last_update_length = 0
+            
+            try:
+                logger.info(f"📡 Starting stream from job.stream()...")
+                
+                for stream_update in job_response.stream():
+                    # Check timeout
+                    if (time.time() - stream_start) > max_stream_time:
+                        logger.warning(f"⏰ Stream timeout after {max_stream_time}s, checking final status...")
+                        break
+                    
+                    if not stream_update:
+                        continue
+                    
+                    updates_received += 1
+                    logger.debug(f"📥 Stream update #{updates_received}: {type(stream_update)} - {str(stream_update)[:200]}")
+                    
+                    # Parse stream update based on RunPod response format
+                    current_text = ""
+                    job_status = None
+                    
+                    if isinstance(stream_update, dict):
+                        # Check for job status
+                        job_status = stream_update.get('status')
+                        
+                        # Extract text from various possible locations
+                        if 'output' in stream_update:
+                            output = stream_update['output']
+                            if isinstance(output, dict) and 'text' in output:
+                                text_data = output['text']
+                                current_text = text_data[0] if isinstance(text_data, list) else text_data
+                            elif isinstance(output, str):
+                                current_text = output
+                        elif 'text' in stream_update:
+                            text_data = stream_update['text']
+                            current_text = text_data[0] if isinstance(text_data, list) else text_data
+                    elif isinstance(stream_update, str):
+                        current_text = stream_update
+                    
+                    # Update complete response by accumulating new text
+                    if current_text:
+                        # For RunPod streaming, each update contains the next token to append
+                        if isinstance(current_text, str) and current_text not in complete_response:
+                            # Check if this is a new token to append
+                            if len(current_text.strip()) > 0:
+                                complete_response += current_text
+                                logger.debug(f"🔤 Accumulated token: '{current_text}' - Total length: {len(complete_response)}")
+                        
+                        if updates_received % 5 == 0:  # Log every 5 updates
+                            logger.info(f"📈 Update #{updates_received}: {len(complete_response)} chars")
+                    
+                    # Check for completion status
+                    if job_status == 'COMPLETED':
+                        logger.info(f"✅ Job completed via stream - Final length: {len(complete_response)} chars")
+                        break
+                    elif job_status == 'FAILED':
+                        error_msg = stream_update.get('error', 'Unknown error')
+                        logger.error(f"❌ Job failed via stream: {error_msg}")
+                        return None
+                        
+                logger.info(f"📊 Streaming finished - Updates: {updates_received}, Response length: {len(complete_response)}")
+                
+            except Exception as stream_error:
+                logger.warning(f"⚠️ Streaming failed: {stream_error}")
+                logger.info(f"🔄 Falling back to status polling...")
+            
+            # Step 3: Final status check if we don't have a complete response
+            if not complete_response or len(complete_response.strip()) == 0:
+                logger.info(f"🔍 Checking final job status via /status/{job_id}...")
+                
+                max_status_checks = 30  # 30 seconds max for status polling
+                status_check_start = time.time()
+                
+                while (time.time() - status_check_start) < max_status_checks:
+                    try:
+                        status_response = job_response.status()
+                        
+                        if status_response:
+                            job_status = status_response.get('status')
+                            logger.debug(f"📋 Status check: {job_status}")
+                            
+                            if job_status == 'COMPLETED':
+                                # Extract final result
+                                output = status_response.get('output', {})
+                                if 'text' in output:
+                                    text_data = output['text']
+                                    complete_response = text_data[0] if isinstance(text_data, list) else text_data
+                                    logger.info(f"✅ Final result via status: {len(complete_response)} chars")
+                                    break
+                                else:
+                                    logger.warning(f"⚠️ Status shows COMPLETED but no text in output: {output}")
+                                    
+                            elif job_status == 'FAILED':
+                                error_msg = status_response.get('error', 'Unknown error')
+                                logger.error(f"❌ Job failed via status: {error_msg}")
+                                return None
+                                
+                            elif job_status in ['IN_QUEUE', 'IN_PROGRESS']:
+                                logger.debug(f"⏳ Job still running: {job_status}")
+                                
+                        time.sleep(1)  # Wait 1 second between status checks
+                        
+                    except Exception as status_error:
+                        logger.warning(f"⚠️ Status check failed: {status_error}")
+                        time.sleep(1)
+            
+            # Return result if we have a response
+            if complete_response and len(complete_response.strip()) > 0:
+                response_length = len(complete_response)
+                logger.info(f"🎉 RunPod streaming SUCCESS - Length: {response_length} chars")
+                logger.info(f"📄 Preview: {complete_response[:150]}{'...' if response_length > 150 else ''}")
+                
+                return {
+                    "status": "success",
+                    "response": complete_response.strip(),
+                    "model": runpod_input.get('model', 'unknown'),
+                    "provider": "runpod_streaming",
+                    "input_tokens": 0,  # RunPod doesn't always provide these
+                    "output_tokens": len(complete_response.split()),  # Approximate
+                    "job_id": job_id,
+                    "updates_received": updates_received
+                }
+            else:
+                logger.error(f"❌ No valid response after streaming and status checks")
+                return None
+                
+        except Exception as e:
+            from utils.logger import logger
+            logger.error(f"❌ RunPod streaming error: {str(e)}")
+            logger.error(f"📍 Error type: {type(e).__name__}")
+            return None
     
     def _get_openrouter_handler(self):
         """Lazy load the OpenRouter handler"""
@@ -156,12 +390,47 @@ class ModelManager:
                 print(f"⚠️ Fallback failed: {e2}, defaulting to ollama")
                 return 'ollama'
     
+    def _determine_provider_from_model(self, model_name: str) -> str:
+        """Determine which provider should handle this model based on model name patterns"""
+        if not model_name:
+            return self._get_current_provider()
+        
+        # Check if this is an Ollama model (local models)
+        if ':' in model_name and not model_name.startswith(('openai/', 'anthropic/', 'meta/')):
+            # Check if Ollama is available and has this model
+            try:
+                from src.vapi.services.provider_service import ProviderService
+                provider_service = ProviderService()
+                ollama_models = provider_service._get_actual_ollama_models()
+                if ollama_models and model_name in ollama_models:
+                    return 'ollama'
+            except Exception as e:
+                print(f"⚠️ Could not check Ollama availability: {e}")
+        
+        # Check if this is a RunPod model (serverless models)
+        if model_name in ['llama3:latest', 'mistral:7b-instruct', 'llama3:8b', 'mixtral:latest']:
+            # For RunPod models, assume they're available since we can't do async calls here
+            # The actual availability check happens in the routing logic
+            return 'runpod'
+        
+        # Check if this is an OpenRouter model
+        if model_name.startswith(('openai/', 'anthropic/', 'meta/', 'google/')):
+            return 'openrouter'
+        
+        # Default to OpenRouter for unknown models
+        return 'openrouter'
+    
     def _route_to_provider(self, prompt: str, model_name: str = None, **kwargs) -> Dict[str, Any]:
-        """Route request to appropriate provider based on settings"""
-        provider = self._get_current_provider()
+        """Route request to appropriate provider based on model name and availability"""
+        # Determine provider from model name instead of system config
+        provider = self._determine_provider_from_model(model_name)
+        
+        # Enhanced logging to show actual routing decision
+        from utils.logger import logger
+        logger.info(f"🚀 ROUTING REQUEST - Provider: {provider}, Requested Model: {model_name}")
+        logger.info(f"📝 Prompt length: {len(prompt)} chars")
         
         if provider == 'openrouter':
-            from utils.logger import logger
             logger.info(f"🌐 ROUTING TO OPENROUTER")
             logger.info(f"🎯 Requested model: {model_name}")
             logger.info(f"📝 Prompt length: {len(prompt)} chars")
@@ -188,24 +457,172 @@ class ModelManager:
                 return result
             else:
                 logger.warning(f"⚠️ OpenRouter not available, falling back to RunPod")
-                return pete_handler.chat_completion(prompt, model=model_name, **kwargs)
+                # Fallback to our RunPod client instead of old pete_handler
+                runpod_endpoint = self._get_runpod_endpoint()
+                if runpod_endpoint:
+                    try:
+                        logger.info(f"🚀 OpenRouter fallback to RunPod client for model: {model_name}")
+                        
+                        runpod_input = {
+                            "prompt": prompt,
+                            "model": model_name,
+                            "max_tokens": kwargs.get('max_tokens', 2048),
+                            "temperature": kwargs.get('temperature', 0.7)
+                        }
+                        
+                        if 'stop' in kwargs:
+                            runpod_input['stop'] = kwargs['stop']
+                        
+                        result = runpod_endpoint.run_sync(runpod_input, timeout=60)
+                        
+                        if result and 'text' in result:
+                            response_text = result['text'][0] if isinstance(result['text'], list) else result['text']
+                            logger.info(f"✅ RunPod OpenRouter fallback successful - Length: {len(response_text)} chars")
+                            
+                            return {
+                                "status": "success",
+                                "response": response_text,
+                                "model": model_name,
+                                "provider": "runpod_openrouter_fallback",
+                                "input_tokens": result.get('input_tokens', 0),
+                                "output_tokens": result.get('output_tokens', 0)
+                            }
+                        else:
+                            logger.error(f"❌ RunPod OpenRouter fallback response invalid: {result}")
+                            return {"status": "error", "error": "Invalid fallback response from RunPod"}
+                            
+                    except Exception as e:
+                        logger.error(f"❌ RunPod OpenRouter fallback failed: {e}")
+                        return {"status": "error", "error": f"RunPod OpenRouter fallback error: {str(e)}"}
+                else:
+                    logger.error("❌ RunPod endpoint not available for OpenRouter fallback")
+                    return {"status": "error", "error": "RunPod not configured for fallback"}
         
         elif provider == 'ollama':
-            print(f"🏠 Routing to Ollama")
+            logger.info(f"🏠 ROUTING TO OLLAMA - Model: {model_name}")
             # Try local Ollama first
             try:
                 result = self._ollama_completion(prompt, model_name, **kwargs)
                 if result.get('status') == 'success':
+                    logger.info(f"✅ Ollama response completed - Model: {result.get('model', 'unknown')}, Provider: {result.get('model', 'unknown')}, Provider: {result.get('provider', 'ollama')}")
                     return result
             except Exception as e:
-                print(f"⚠️ Ollama failed: {e}, falling back to RunPod")
+                logger.warning(f"⚠️ Ollama failed: {e}, falling back to RunPod")
             
             # Fallback to RunPod if Ollama fails
-            return pete_handler.chat_completion(prompt, model=model_name, **kwargs)
+            logger.info(f"🔄 FALLBACK TO RUNPOD - Original model: {model_name}")
+            
+            # Use official RunPod client for fallback
+            runpod_endpoint = self._get_runpod_endpoint()
+            if runpod_endpoint:
+                try:
+                    logger.info(f"🚀 Fallback to RunPod client for model: {model_name}")
+                    
+                    runpod_input = {
+                        "prompt": prompt,
+                        "model": model_name,
+                        "max_tokens": kwargs.get('max_tokens', 2048),
+                        "temperature": kwargs.get('temperature', 0.7)
+                    }
+                    
+                    if 'stop' in kwargs:
+                        runpod_input['stop'] = kwargs['stop']
+                    
+                    result = runpod_endpoint.run_sync(runpod_input, timeout=60)
+                    
+                    if result and 'text' in result:
+                        response_text = result['text'][0] if isinstance(result['text'], list) else result['text']
+                        logger.info(f"✅ RunPod fallback successful - Length: {len(response_text)} chars")
+                        
+                        return {
+                            "status": "success",
+                            "response": response_text,
+                            "model": model_name,
+                            "provider": "runpod_fallback",
+                            "input_tokens": result.get('input_tokens', 0),
+                            "output_tokens": result.get('output_tokens', 0)
+                        }
+                    else:
+                        logger.error(f"❌ RunPod fallback response invalid: {result}")
+                        return {"status": "error", "error": "Invalid fallback response from RunPod"}
+                        
+                except Exception as e:
+                    logger.error(f"❌ RunPod fallback failed: {e}")
+                    return {"status": "error", "error": f"RunPod fallback error: {str(e)}"}
+            else:
+                logger.error("❌ RunPod endpoint not available for fallback")
+                return {"status": "error", "error": "RunPod not configured"}
         
         else:  # runpod or default
-            print(f"☁️ Routing to RunPod")
-            return pete_handler.chat_completion(prompt, model=model_name, **kwargs)
+            logger.info(f"☁️ ROUTING TO RUNPOD - Model: {model_name}")
+            
+            # Use official RunPod client
+            runpod_endpoint = self._get_runpod_endpoint()
+            if runpod_endpoint:
+                try:
+                    logger.info(f"🚀 Using official RunPod client for model: {model_name}")
+                    
+                    # Debug: Check current API key
+                    current_api_key = runpod.api_key
+                    logger.info(f"🔍 DEBUG - Current RunPod API key: {current_api_key[:10] if current_api_key else 'None'}...")
+                    
+                    # Prepare the input for RunPod
+                    runpod_input = {
+                        "prompt": prompt,
+                        "model": model_name,
+                        "max_tokens": kwargs.get('max_tokens', 2048),
+                        "temperature": kwargs.get('temperature', 0.7)
+                    }
+                    
+                    # Add stop sequences if provided
+                    if 'stop' in kwargs:
+                        runpod_input['stop'] = kwargs['stop']
+                    
+                    logger.info(f"🔍 DEBUG - RunPod input: {runpod_input}")
+                    logger.info(f"🔍 DEBUG - About to call runpod_endpoint.run_sync()")
+                    
+                    # Try streaming first for complete responses, fallback to sync if needed
+                    logger.info(f"📡 Attempting RunPod streaming for complete response...")
+                    try:
+                        streaming_result = self._runpod_stream_completion(runpod_endpoint, runpod_input)
+                        if streaming_result and streaming_result.get('status') == 'success':
+                            logger.info(f"✅ RunPod streaming successful - Length: {len(streaming_result.get('response', ''))} chars")
+                            return streaming_result
+                        else:
+                            logger.warning(f"⚠️ RunPod streaming failed or returned no result")
+                    except Exception as stream_error:
+                        logger.warning(f"⚠️ RunPod streaming exception: {stream_error}")
+                    
+                    # Fallback to sync method if streaming fails
+                    logger.info(f"🔄 Falling back to RunPod sync method")
+                    try:
+                        result = runpod_endpoint.run_sync(runpod_input, timeout=60)
+                        
+                        if result and 'text' in result:
+                            response_text = result['text'][0] if isinstance(result['text'], list) else result['text']
+                            logger.info(f"✅ RunPod sync response successful - Length: {len(response_text)} chars")
+                            
+                            return {
+                                "status": "success",
+                                "response": response_text,
+                                "model": model_name,
+                                "provider": "runpod_sync",
+                                "input_tokens": result.get('input_tokens', 0),
+                                "output_tokens": result.get('output_tokens', 0)
+                            }
+                        else:
+                            logger.error(f"❌ RunPod sync response invalid: {result}")
+                            return {"status": "error", "error": "Invalid response from RunPod sync"}
+                    except Exception as sync_error:
+                        logger.error(f"❌ RunPod sync also failed: {sync_error}")
+                        return {"status": "error", "error": f"Both streaming and sync failed: {sync_error}"}
+                        
+                except Exception as e:
+                    logger.error(f"❌ RunPod request failed: {e}")
+                    return {"status": "error", "error": f"RunPod error: {str(e)}"}
+            else:
+                logger.error("❌ RunPod endpoint not available")
+                return {"status": "error", "error": "RunPod not configured"}
     
     def _map_to_openrouter_model(self, ollama_model: str) -> str:
         """Map Ollama model names to OpenRouter model names"""
@@ -273,8 +690,8 @@ class ModelManager:
         try:
             # First check if RunPod proxy is available
             try:
-                # If pete_handler is imported, we have RunPod serverless capability
-                if 'pete_handler' in globals() or 'pete_handler' in sys.modules:
+                # If RunPod is available, we have RunPod serverless capability
+                if RUNPOD_AVAILABLE:
                     print("🚀 Serverless mode detected via RunPod")
                     return True
             except Exception as proxy_error:
@@ -285,8 +702,8 @@ class ModelManager:
             return response.status_code == 200
         except Exception as e:
             print(f"Model availability check failed: {e}")
-            # Still return True if we have pete_handler available
-            return 'pete_handler' in globals() or 'pete_handler' in sys.modules
+            # Still return True if we have RunPod available
+            return RUNPOD_AVAILABLE
     
     def list_models(self) -> List[Dict[str, Any]]:
         """List available models"""

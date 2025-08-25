@@ -15,6 +15,19 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 import uvicorn
 
+# Load environment variables from .env file
+try:
+    from dotenv import load_dotenv
+    # Load from project root
+    env_path = Path(__file__).parent.parent.parent / ".env"
+    if env_path.exists():
+        load_dotenv(env_path)
+        print(f"✅ Loaded environment variables from {env_path}")
+    else:
+        print(f"⚠️ .env file not found at {env_path}")
+except ImportError:
+    print("⚠️ python-dotenv not installed, environment variables may not load")
+
 # Add src to path for imports
 sys.path.insert(0, str(Path(__file__).parent.parent))
 

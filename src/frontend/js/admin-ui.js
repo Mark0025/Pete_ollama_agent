@@ -259,6 +259,128 @@ document.getElementById('runAllTests').onclick = async () => {
     appendTest(`<div class="success"><strong>🎉 All tests completed!</strong></div>`);
 };
 
+// ===== JAMIE TEST CASES FUNCTIONS =====
+
+// Global variable to store loaded test cases
+let jamieTestCases = [];
+
+// Load Jamie test cases from the API
+document.getElementById('loadJamieTestCases').onclick = async () => {
+    try {
+        const response = await fetch('/admin/test-cases/latest');
+        const result = await response.json();
+        
+        const container = document.getElementById('jamieTestCasesContainer');
+        const listDiv = document.getElementById('jamieTestCasesList');
+        const statsDiv = document.getElementById('jamieTestCasesStats');
+        
+        if (result.success) {
+            jamieTestCases = result.test_cases;
+            
+            // Show stats
+            const categories = result.categories || {};
+            const categoryText = Object.entries(categories)
+                .map(([cat, count]) => `${cat}: ${count}`)
+                .join(', ');
+            
+            statsDiv.innerHTML = `📊 Loaded ${result.total} test cases from ${result.file} | Categories: ${categoryText}`;
+            statsDiv.style.display = 'block';
+            
+            // Display first 20 test cases as clickable options
+            let html = '<div style="font-size:12px;margin-bottom:10px;font-weight:bold;">Click any test case to use it:</div>';
+            
+            const displayCases = jamieTestCases.slice(0, 20);
+            displayCases.forEach((testCase, index) => {
+                const scenario = testCase.input_scenario || 'No scenario';
+                const category = testCase.issue_category || 'general';
+                const preview = scenario.length > 80 ? scenario.substring(0, 80) + '...' : scenario;
+                
+                html += `<div class="test-case jamie-test-case" 
+                            onclick="setTestMessage('${scenario.replace(/'/g, "\\'")}')"
+                            title="Category: ${category}">
+                            <span class="test-category">[${category}]</span> ${preview}
+                         </div>`;
+            });
+            
+            if (jamieTestCases.length > 20) {
+                html += `<div style="font-size:11px;color:#666;margin-top:10px;">Showing first 20 of ${jamieTestCases.length} test cases</div>`;
+            }
+            
+            listDiv.innerHTML = html;
+            container.style.display = 'block';
+            
+        } else {
+            statsDiv.innerHTML = `❌ Error loading test cases: ${result.error}`;
+            statsDiv.style.display = 'block';
+        }
+    } catch (e) {
+        document.getElementById('jamieTestCasesStats').innerHTML = `❌ Network error: ${e.message}`;
+        document.getElementById('jamieTestCasesStats').style.display = 'block';
+    }
+};
+
+// Run random tests from Jamie test cases
+document.getElementById('runRandomTests').onclick = async () => {
+    const count = parseInt(document.getElementById('randomTestCount').value) || 5;
+    
+    if (jamieTestCases.length === 0) {
+        // Load test cases first
+        alert('Loading test cases first...');
+        await document.getElementById('loadJamieTestCases').onclick();
+        
+        // Wait a moment for loading
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        
+        if (jamieTestCases.length === 0) {
+            appendTest(`<div class="error">❌ Failed to load Jamie test cases</div>`);
+            return;
+        }
+    }
+    
+    try {
+        // Get random test cases from the API
+        const response = await fetch(`/admin/test-cases/random/${count}`);
+        const result = await response.json();
+        
+        if (result.success) {
+            const randomTests = result.test_cases;
+            
+            appendTest(`<h3>🎲 Running ${randomTests.length} random Jamie test cases on ${modelSelect.value}</h3>`);
+            appendTest(`<div style="background:#e3f2fd;padding:8px;border-radius:4px;margin:5px 0;font-size:12px;">🤖 Using real property management scenarios from Jamie processor</div>`);
+            
+            for (let i = 0; i < randomTests.length; i++) {
+                const testCase = randomTests[i];
+                const scenario = testCase.input_scenario || 'No scenario';
+                const category = testCase.issue_category || 'general';
+                const expectedResponse = testCase.expected_response || 'No expected response';
+                
+                // Set the test message
+                testMessage.value = scenario;
+                
+                // Add test case context
+                appendTest(`<div style="background:#fff3cd;padding:8px;border-radius:4px;margin:5px 0;font-size:11px;">
+                    <strong>📋 Test Case ${i + 1}:</strong><br>
+                    <strong>Category:</strong> ${category}<br>
+                    <strong>Expected Response Preview:</strong> ${expectedResponse.substring(0, 100)}...
+                </div>`);
+                
+                // Run the test
+                await document.getElementById('runTest').onclick();
+                
+                // Brief pause between tests
+                await new Promise(r => setTimeout(r, 1500));
+            }
+            
+            appendTest(`<div class="success"><strong>🎉 All ${randomTests.length} Jamie test cases completed!</strong></div>`);
+            
+        } else {
+            appendTest(`<div class="error">❌ Error getting random test cases: ${result.error}</div>`);
+        }
+    } catch (e) {
+        appendTest(`<div class="error">❌ Network error getting random test cases: ${e.message}</div>`);
+    }
+};
+
 // Model selection handler - load model when changed
 modelSelect.onchange = async () => {
     const selectedModel = modelSelect.value;

@@ -110,7 +110,15 @@ class VAPIRouter:
                     jamie_models = [m for m in ui_models if m.is_jamie_model]
                     model_to_use = jamie_models[0].name if jamie_models else "llama3:latest"
                 
-                logger.info(f"🗣️ VAPI Chat Completion - Model: {model_to_use}, Message: {current_message[:50]}...")
+                # Get current provider from system config for comprehensive logging
+                try:
+                    from src.config.system_config import system_config
+                    current_provider = system_config.config.default_provider
+                    logger.info(f"🗣️ VAPI Chat Completion - Provider: {current_provider}, Model: {model_to_use}")
+                    logger.info(f"📝 Message: {current_message[:50]}...")
+                except Exception as e:
+                    logger.warning(f"Could not get provider info: {e}")
+                    logger.info(f"🗣️ VAPI Chat Completion - Model: {model_to_use}, Message: {current_message[:50]}...")
                 
                 # Generate AI response using the model manager
                 ai_response = self.model_manager.generate_response(
@@ -122,14 +130,28 @@ class VAPIRouter:
                 end_time = time.time()
                 duration_ms = int((end_time - start_time) * 1000)
                 
-                # Log the interaction for training data
-                self._store_vapi_interaction({
-                    'messages': [msg.dict() for msg in request.messages],
-                    'model_used': model_to_use,
-                    'response': ai_response,
-                    'duration_ms': duration_ms,
-                    'timestamp': datetime.now().isoformat()
-                })
+                # Get actual provider and model info for comprehensive logging
+                try:
+                    from src.config.system_config import system_config
+                    actual_provider = system_config.config.default_provider
+                    logger.info(f"✅ VAPI Chat Completion completed - Provider: {actual_provider}, Model: {model_to_use}")
+                    logger.info(f"⏱️ Duration: {duration_ms}ms, Response length: {len(ai_response)} chars")
+                except Exception as e:
+                    logger.warning(f"Could not get provider info for logging: {e}")
+                    logger.info(f"✅ VAPI Chat Completion completed - {duration_ms}ms, Model: {model_to_use}")
+                
+                # Log the interaction for training data with provider info
+                try:
+                    self._store_vapi_interaction({
+                        'messages': [msg.dict() for msg in request.messages],
+                        'model_used': model_to_use,
+                        'provider_used': actual_provider if 'actual_provider' in locals() else 'unknown',
+                        'response': ai_response,
+                        'duration_ms': duration_ms,
+                        'timestamp': datetime.now().isoformat()
+                    })
+                except Exception as e:
+                    logger.warning(f"Could not store interaction: {e}")
                 
                 # Create OpenAI-compatible response
                 chat_response = VAPIChatResponse(
@@ -151,7 +173,6 @@ class VAPIRouter:
                     }
                 )
                 
-                logger.info(f"✅ VAPI Chat Completion successful - {duration_ms}ms, Model: {model_to_use}")
                 return chat_response
                 
             except Exception as e:
@@ -358,6 +379,115 @@ class VAPIRouter:
                         "action": "continue_conversation"
                     }
                 }
+            
+            # Handle website search function
+            elif function_name == 'search_website' or function_name == 'api_request_tool':
+                website = parameters.get('website', '')
+                
+                if not website:
+                    return {
+                        "result": {
+                            "response": "I need a website URL to search for rental properties. Please provide a website.",
+                            "action": "continue_conversation"
+                        }
+                    }
+                
+                logger.info(f"🔍 Searching website: {website}")
+                
+                try:
+                    # Import DuckDuckGo search
+                    from duckduckgo_search import DDGS
+                    
+                    # Try multiple search strategies
+                    search_queries = [
+                        f"site:{website} rental properties available",
+                        f"site:{website} apartments rent",
+                        f"{website} rental listings",
+                        f"properties for rent {website.split('//')[1] if '//' in website else website}"
+                    ]
+                    
+                    all_results = []
+                    
+                    # Search with multiple strategies
+                    for query in search_queries:
+                        try:
+                            with DDGS() as ddgs:
+                                results = list(ddgs.text(query, max_results=3))
+                                for result in results:
+                                    if result not in all_results:
+                                        all_results.append(result)
+                        except Exception as search_error:
+                            logger.warning(f"Search query failed: {query} - {search_error}")
+                            continue
+                    
+                    if all_results:
+                        # Format results for voice response
+                        domain = website.replace('https://', '').replace('http://', '').split('/')[0]
+                        response = f"I found {len(all_results)} listings related to {domain}. "
+                        
+                        # Add top 3 results with key details
+                        for i, result in enumerate(all_results[:3], 1):
+                            title = result.get('title', 'Property listing')
+                            snippet = result.get('body', '')
+                            
+                            # Extract rent info if available
+                            import re
+                            rent_match = re.search(r'\$[\d,]+', snippet)
+                            bed_match = re.search(r'(\d+)\s*(?:bed|br|bedroom)', snippet.lower())
+                            
+                            response += f"{i}. {title[:50]}{'...' if len(title) > 50 else ''}. "
+                            
+                            if rent_match or bed_match:
+                                details = []
+                                if rent_match:
+                                    details.append(f"Rent {rent_match.group()}")
+                                if bed_match:
+                                    details.append(f"{bed_match.group(1)} bedroom")
+                                response += f"{', '.join(details)}. "
+                        
+                        response += "Would you like more details about any of these properties?"
+                        
+                        logger.info(f"✅ Search successful: {len(all_results)} results for {website}")
+                        
+                        return {
+                            "result": {
+                                "response": response,
+                                "action": "continue_conversation"
+                            }
+                        }
+                    else:
+                        # Fallback: general area search
+                        domain = website.replace('https://', '').replace('http://', '').split('/')[0]
+                        fallback_query = f"rental properties apartments {domain}"
+                        
+                        try:
+                            with DDGS() as ddgs:
+                                fallback_results = list(ddgs.text(fallback_query, max_results=3))
+                                
+                            if fallback_results:
+                                response = f"I couldn't find specific listings on {domain}, but I found {len(fallback_results)} rental resources in the area. "
+                                response += "These might help you find available properties. Would you like me to search for more specific criteria?"
+                            else:
+                                response = f"I wasn't able to find current rental listings for {domain}. The website might not have publicly searchable content, or there may not be available properties right now. I recommend contacting them directly for the most up-to-date availability."
+                                
+                        except Exception:
+                            response = f"I'm having trouble accessing rental information for {domain} right now. I recommend visiting their website directly or calling them for current availability."
+                        
+                        return {
+                            "result": {
+                                "response": response,
+                                "action": "continue_conversation"
+                            }
+                        }
+                        
+                except Exception as e:
+                    logger.error(f"❌ Website search error: {str(e)}")
+                    return {
+                        "result": {
+                            "response": "I'm having trouble searching for rental properties right now. Please try again in a moment, or I can help you with other property management questions.",
+                            "action": "continue_conversation"
+                        }
+                    }
             
             else:
                 return {

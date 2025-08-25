@@ -8,8 +8,10 @@ Provides full control over caching, providers, and models from a single interfac
 """
 
 from fastapi import APIRouter, HTTPException, Depends
+from fastapi.responses import HTMLResponse
 from typing import Dict, Any, Optional
 from pydantic import BaseModel
+from pathlib import Path
 from utils.logger import logger
 
 # Import the system config manager
@@ -52,6 +54,21 @@ class SystemConfigUpdate(BaseModel):
 def create_system_config_router() -> APIRouter:
     """Create the system configuration router"""
     router = APIRouter(prefix="/admin/system-config", tags=["System Configuration"])
+    
+    @router.get("/ui", response_class=HTMLResponse)
+    async def system_config_ui():
+        """Serve the system configuration UI"""
+        try:
+            html_file = Path(__file__).parent.parent.parent / "frontend" / "html" / "system-config-ui.html"
+            if html_file.exists():
+                with open(html_file, 'r') as f:
+                    content = f.read()
+                return HTMLResponse(content=content)
+            else:
+                return HTMLResponse(content="<h1>System Config UI</h1><p>System config UI not found</p>")
+        except Exception as e:
+            logger.error(f"Error loading system config UI: {e}")
+            return HTMLResponse(content="<h1>System Config UI</h1><p>Error loading system config UI</p>")
     
     @router.get("/")
     async def get_system_config():

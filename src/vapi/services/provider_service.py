@@ -29,12 +29,19 @@ class ProviderService:
         self.valid_providers = ["ollama", "runpod", "openrouter"]
     
     async def get_personas_for_provider(self, provider: str) -> List[Persona]:
-        """Get personas for the specified provider"""
+        """Get personas for the specified provider - respecting system configuration"""
         try:
+            # Check if provider is enabled in system configuration
+            if not self._is_provider_enabled(provider):
+                logger.warning(f"Provider {provider} is disabled in system configuration")
+                return []
+            
             if provider == 'openrouter':
                 return await self._get_openrouter_personas()
-            elif provider in ['ollama', 'runpod']:
+            elif provider == 'ollama':
                 return await self._get_ollama_personas()
+            elif provider == 'runpod':
+                return await self._get_runpod_personas()
             else:
                 logger.warning(f"Unknown provider {provider}, defaulting to Ollama")
                 return await self._get_ollama_personas()
@@ -42,59 +49,173 @@ class ProviderService:
             logger.error(f"Error getting personas for provider {provider}: {e}")
             return self._get_fallback_personas()
     
-    async def _get_ollama_personas(self) -> List[Persona]:
-        """Get Ollama model personas"""
-        # Refresh models from ollama list first
-        model_settings.refresh_from_ollama()
-        
-        # Get only models that are enabled for UI display
-        ui_models = model_settings.get_ui_models()
-        
-        if not ui_models:
-            logger.warning("No models enabled for UI display")
-            return []
-        
-        persona_list = []
-        jamie_models = []
-        generic_models = []
-        
-        for model_config in ui_models:
-            model_data = PersonaModel(
-                name=model_config.name,
-                display_name=model_config.display_name,
-                description=model_config.description,
-                auto_preload=model_config.auto_preload,
-                type=getattr(model_config, 'type', 'unknown'),
-                base_model=getattr(model_config, 'base_model', 'unknown')
-            )
+    async def get_all_available_personas(self) -> List[Persona]:
+        """Get personas from all enabled providers - respecting system configuration"""
+        try:
+            all_personas = []
             
-            if model_config.is_jamie_model:
-                jamie_models.append(model_data)
+            # Get current default provider from system config
+            from src.config.system_config import system_config
+            current_provider = system_config.config.default_provider
+            
+            # Get personas for current provider first (priority)
+            if self._is_provider_enabled(current_provider):
+                current_personas = await self.get_personas_for_provider(current_provider)
+                all_personas.extend(current_personas)
+                logger.info(f"✅ Added {len(current_personas)} personas from current provider: {current_provider}")
+            
+            # Get personas from other enabled providers
+            for provider in ['openrouter', 'ollama', 'runpod']:
+                if provider != current_provider and self._is_provider_enabled(provider):
+                    try:
+                        provider_personas = await self.get_personas_for_provider(provider)
+                        all_personas.extend(provider_personas)
+                        logger.info(f"✅ Added {len(provider_personas)} personas from provider: {provider}")
+                    except Exception as e:
+                        logger.warning(f"⚠️ Failed to get personas from {provider}: {e}")
+                        continue
+            
+            if not all_personas:
+                logger.warning("⚠️ No personas available from any enabled provider, using fallback")
+                return self._get_fallback_personas()
+            
+            logger.info(f"🎯 Total personas available: {len(all_personas)} from enabled providers")
+            return all_personas
+            
+        except Exception as e:
+            logger.error(f"Error getting all available personas: {e}")
+            return self._get_fallback_personas()
+    
+    def _is_provider_enabled(self, provider: str) -> bool:
+        """Check if a provider is enabled in system configuration"""
+        try:
+            from src.config.system_config import system_config
+            
+            # Get provider config from system configuration
+            provider_config = system_config.get_provider_config(provider)
+            if provider_config:
+                enabled = provider_config.enabled
+                api_key_set = bool(provider_config.api_key) if hasattr(provider_config, 'api_key') else False
+                
+                # Provider must be enabled AND have API key (except Ollama which doesn't need one)
+                if provider == 'ollama':
+                    return enabled  # Ollama is local, no API key needed
+                else:
+                    return enabled and api_key_set
             else:
-                generic_models.append(model_data)
-        
-        # Create Jamie persona if we have Jamie models
-        if jamie_models:
-            persona_list.append(Persona(
-                name="Jamie (Property Manager)",
-                icon="/public/Jamie.png",
-                type="primary",
-                models=jamie_models,
-                description="Professional property manager AI trained on real conversations"
-            ))
-        
-        # Add generic models
-        for model in generic_models:
-            persona_list.append(Persona(
-                name=model.display_name,
-                icon="/public/pete.png",
-                type="generic",
-                models=[model],
-                description=model.description
-            ))
-        
-        logger.info(f"Serving {len(ui_models)} Ollama models to UI: {[m.name for m in ui_models]}")
-        return persona_list
+                logger.warning(f"Provider {provider} not found in system configuration")
+                return False
+                
+        except Exception as e:
+            logger.error(f"Error checking provider {provider} status: {e}")
+            return False
+    
+    async def _get_ollama_personas(self) -> List[Persona]:
+        """Get Ollama model personas using the new model controller"""
+        try:
+            # Try to use the new model controller first
+            from src.config.model_controller import model_controller
+            
+            if model_controller.is_control_enabled():
+                logger.info("📋 Using Model Controller for Ollama personas")
+                visible_models = model_controller.get_visible_models()
+                
+                if visible_models:
+                    # Convert to Persona format
+                    personas = []
+                    for model in visible_models:
+                        persona = Persona(
+                            name=model.get('display_name', model.get('name')),
+                            description=model.get('description', ''),
+                            type='primary' if model.get('priority', 999) <= 2 else 'secondary',
+                            models=[PersonaModel(
+                                name=model.get('name'),
+                                display_name=model.get('display_name', model.get('name')),
+                                description=model.get('description', ''),
+                                auto_preload=model.get('auto_preload', False),
+                                type=model.get('type', 'unknown'),
+                                base_model=model.get('base_model', 'unknown')
+                            )]
+                        )
+                        personas.append(persona)
+                    
+                    logger.info(f"📋 Model Controller: Created {len(personas)} personas from {len(visible_models)} visible models")
+                    return personas
+                else:
+                    logger.warning("📋 Model Controller: No visible models found")
+            
+            # Fallback to old method if controller is disabled or no models
+            logger.info("📋 Falling back to old Ollama personas method")
+            model_settings.refresh_from_ollama()
+            ui_models = model_settings.get_ui_models()
+            
+            if not ui_models:
+                logger.warning("No models enabled for UI display")
+                return []
+            
+            # Check which models are actually available in Ollama
+            available_models = await self._get_actual_ollama_models()
+            logger.info(f"📋 Ollama: {len(available_models)} models actually available")
+            
+            # Filter UI models to only show those that are actually available
+            filtered_models = []
+            for model_config in ui_models:
+                if model_config.name in available_models:
+                    filtered_models.append(model_config)
+                else:
+                    logger.info(f"⚠️ Model {model_config.name} configured but not available in Ollama")
+            
+            if not filtered_models:
+                logger.warning("No configured models are actually available in Ollama")
+                # Fallback to showing all configured models (old behavior)
+                filtered_models = ui_models
+            
+            # Process filtered models into personas
+            persona_list = []
+            jamie_models = []
+            generic_models = []
+            
+            for model_config in filtered_models:
+                model_data = PersonaModel(
+                    name=model_config.name,
+                    display_name=model_config.display_name,
+                    description=model_config.description,
+                    auto_preload=model_config.auto_preload,
+                    type=getattr(model_config, 'type', 'unknown'),
+                    base_model=getattr(model_config, 'base_model', 'unknown')
+                )
+                
+                if model_config.is_jamie_model:
+                    jamie_models.append(model_data)
+                else:
+                    generic_models.append(model_data)
+            
+            # Create Jamie persona if we have Jamie models
+            if jamie_models:
+                persona_list.append(Persona(
+                    name="Jamie (Property Manager)",
+                    icon="/public/Jamie.png",
+                    type="primary",
+                    models=jamie_models,
+                    description="Professional property manager AI trained on real conversations"
+                ))
+            
+            # Add generic models
+            for model in generic_models:
+                persona_list.append(Persona(
+                    name=model.display_name,
+                    icon="/public/pete.png",
+                    type="generic",
+                    models=[model],
+                    description=model.description
+                ))
+            
+            return persona_list
+            
+        except Exception as e:
+            logger.error(f"Error in _get_ollama_personas: {e}")
+            # Return fallback personas
+            return self._get_fallback_personas()
     
     async def _get_openrouter_personas(self) -> List[Persona]:
         """Get OpenRouter model personas - dynamically fetched from OpenRouter API"""
@@ -148,6 +269,137 @@ class ProviderService:
             logger.error(f"Error getting OpenRouter personas: {e}")
             # Return fallback personas instead of raising
             return self._get_fallback_openrouter_personas()
+    
+    async def _get_actual_ollama_models(self) -> List[str]:
+        """Check which models are actually available in Ollama (safe method)"""
+        try:
+            import requests
+            import os
+            
+            # Get Ollama host from environment
+            ollama_host = os.getenv('OLLAMA_HOST', 'localhost:11434')
+            
+            # Try to get actual model list from Ollama
+            try:
+                response = requests.get(f"http://{ollama_host}/api/tags", timeout=5)
+                if response.status_code == 200:
+                    data = response.json()
+                    models = [model['name'] for model in data.get('models', [])]
+                    logger.info(f"✅ Ollama: Successfully fetched {len(models)} available models")
+                    return models
+                else:
+                    logger.warning(f"⚠️ Ollama: API returned status {response.status_code}")
+                    return []
+            except requests.RequestException as e:
+                logger.warning(f"⚠️ Ollama: Could not connect to {ollama_host}: {e}")
+                return []
+            except Exception as e:
+                logger.warning(f"⚠️ Ollama: Error parsing response: {e}")
+                return []
+                
+        except Exception as e:
+            logger.warning(f"⚠️ Ollama: Error checking model availability: {e}")
+            return []
+    
+    async def _get_actual_runpod_models(self) -> List[str]:
+        """Get actual available RunPod models using the serverless handler's method"""
+        try:
+            logger.info("🔍 RunPod: Getting available models from serverless handler...")
+            
+            # Import and use the serverless handler's method
+            from src.serverless_handler import serverless_handler
+            
+            if hasattr(serverless_handler, 'get_available_models'):
+                available_models = await serverless_handler.get_available_models()
+                if available_models:
+                    logger.info(f"✅ RunPod: Serverless handler returned {len(available_models)} models")
+                    return available_models
+                else:
+                    logger.warning("⚠️ RunPod: Serverless handler returned no models, using fallback")
+            else:
+                logger.warning("⚠️ RunPod: Serverless handler missing get_available_models method, using fallback")
+            
+            # Fallback to known models if handler fails
+            return ["llama3:latest", "mistral:7b-instruct"]
+            
+        except Exception as e:
+            logger.warning(f"⚠️ RunPod: Error getting actual models: {e}")
+            # Safe fallback
+            return ["llama3:latest", "mistral:7b-instruct"]
+    
+    async def _get_runpod_personas(self) -> List[Persona]:
+        """Get RunPod model personas - using actual available models"""
+        try:
+            # Get actual available models from RunPod
+            available_models = await self._get_actual_runpod_models()
+            
+            if not available_models:
+                logger.warning("⚠️ RunPod: No models available, using fallback")
+                return self._get_fallback_runpod_personas()
+            
+            # Create persona list for RunPod
+            persona_list = []
+            
+            # Group models by type (all RunPod models are typically premium/cloud)
+            cloud_models = []
+            
+            for model_name in available_models:
+                model_data = PersonaModel(
+                    name=model_name,
+                    display_name=f"RunPod: {model_name}",
+                    description=f"Cloud-hosted {model_name} model via RunPod serverless",
+                    auto_preload=False,
+                    type="cloud",
+                    base_model=model_name.split(':')[0] if ':' in model_name else model_name
+                )
+                cloud_models.append(model_data)
+            
+            # Add cloud models persona
+            if cloud_models:
+                persona_list.append(Persona(
+                    name="RunPod Cloud Models",
+                    icon="/public/pete.png",
+                    type="premium",
+                    models=cloud_models,
+                    description="High-performance cloud models hosted on RunPod serverless infrastructure"
+                ))
+            
+            logger.info(f"Serving {len(available_models)} RunPod models to UI: {available_models}")
+            return persona_list
+            
+        except Exception as e:
+            logger.error(f"Error getting RunPod personas: {e}")
+            # Return fallback personas instead of raising
+            return self._get_fallback_runpod_personas()
+    
+    def _get_fallback_runpod_personas(self) -> List[Persona]:
+        """Get fallback RunPod personas when API is unavailable"""
+        fallback_models = [
+            PersonaModel(
+                name="llama3:latest",
+                display_name="RunPod: Llama 3 Latest",
+                description="Meta's Llama 3 model hosted on RunPod",
+                auto_preload=False,
+                type="cloud",
+                base_model="llama3"
+            ),
+            PersonaModel(
+                name="mistral:7b-instruct",
+                display_name="RunPod: Mistral 7B Instruct",
+                description="Mistral's 7B instruction-tuned model",
+                auto_preload=False,
+                type="cloud",
+                base_model="mistral"
+            )
+        ]
+        
+        return [Persona(
+            name="RunPod Models (Fallback)",
+            icon="/public/pete.png",
+            type="premium",
+            models=fallback_models,
+            description="RunPod models (using fallback data)"
+        )]
     
     async def _fetch_openrouter_models(self) -> List[PersonaModel]:
         """Fetch available models from OpenRouter API"""

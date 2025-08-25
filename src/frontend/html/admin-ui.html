@@ -18,6 +18,7 @@
             <a href="/admin" style="margin:0 15px;color:#007acc;text-decoration:none;font-weight:bold;">Dashboard</a>
             <a href="/admin/settings" style="margin:0 15px;color:#007acc;text-decoration:none;font-weight:bold;">Settings</a>
             <a href="/admin/stats" style="margin:0 15px;color:#007acc;text-decoration:none;font-weight:bold;">Stats</a>
+            <a href="/admin/system-config" style="margin:0 15px;color:#007acc;text-decoration:none;font-weight:bold;">⚙️ System Config</a>
             <a href="/ui" style="margin:0 15px;color:#007acc;text-decoration:none;font-weight:bold;">Main UI</a>
         </div>
 
@@ -81,6 +82,23 @@
                 <div class="test-case" onclick="setTestMessage(this.textContent)">The garbage disposal isn't working</div>
                 <div class="test-case" onclick="setTestMessage(this.textContent)">My neighbor is being too loud at night</div>
                 <div class="test-case" onclick="setTestMessage(this.textContent)">I need to pay my rent but the portal is down</div>
+            </div>
+
+            <div style="margin-bottom:15px">
+                <h4>🤖 Jamie Test Cases from Real Conversations:</h4>
+                <div style="background:#e3f2fd;padding:10px;border-radius:4px;margin-bottom:10px;">
+                    <p style="font-size:12px;margin:5px 0">333 test cases generated from 1,141 real property management conversations</p>
+                    <div style="display:flex;gap:10px;align-items:center;margin-top:10px;">
+                        <button id="loadJamieTestCases">📋 Load Test Cases</button>
+                        <button id="runRandomTests">🎲 Run 5 Random Tests</button>
+                        <input type="number" id="randomTestCount" value="5" min="1" max="50" style="width:60px">
+                        <span style="font-size:12px">random tests</span>
+                    </div>
+                    <div id="jamieTestCasesStats" style="font-size:11px;margin-top:8px;color:#666;display:none;"></div>
+                </div>
+                <div id="jamieTestCasesContainer" style="max-height:200px;overflow-y:auto;display:none;">
+                    <div id="jamieTestCasesList"></div>
+                </div>
             </div>
 
             <div id="testOutput"></div>

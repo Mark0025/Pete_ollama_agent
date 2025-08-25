@@ -35,6 +35,11 @@ class RunPodServerlessClient:
         print(f"🚀 RunPod Client initialized")
         print(f"📋 Endpoint ID: {self.endpoint_id}")
         print(f"🔑 API Key: {'✅ Set' if self.api_key else '❌ Missing'}")
+        
+        # Cache for available models
+        self._available_models = None
+        self._models_cache_time = 0
+        self._cache_duration = 300  # 5 minutes
 
     def submit_job(self, input_data: Dict[str, Any]) -> Optional[Dict[str, Any]]:
         """
@@ -63,6 +68,74 @@ class RunPodServerlessClient:
             print(f"❌ Error submitting job: {e}")
             if hasattr(e, 'response') and e.response:
                 print(f"📄 Response: {e.response.text}")
+            return None
+    
+    def get_available_models(self, force_refresh: bool = False) -> Optional[Dict[str, Any]]:
+        """
+        Get available models from RunPod serverless endpoint
+        Uses caching to avoid repeated API calls
+        """
+        import time
+        current_time = time.time()
+        
+        # Return cached models if still valid
+        if (not force_refresh and 
+            self._available_models and 
+            (current_time - self._models_cache_time) < self._cache_duration):
+            print(f"📋 Returning cached RunPod models ({len(self._available_models)} models)")
+            return self._available_models
+        
+        try:
+            print(f"🔍 Fetching available models from RunPod...")
+            
+            # Use the /runsync endpoint to test model availability
+            # This is more reliable than trying to get a model list
+            test_models = [
+                "llama3:latest",
+                "mistral:7b-instruct", 
+                "llama3:8b",
+                "mixtral:latest",
+                "codellama:7b",
+                "phi3:latest",
+                "gemma3:4b",
+                "qwen2.5:7b"
+            ]
+            
+            available_models = []
+            
+            for model in test_models:
+                try:
+                    # Quick test with minimal prompt
+                    test_payload = {
+                        "input": {
+                            "prompt": "test",
+                            "model": model,
+                            "max_tokens": 10
+                        }
+                    }
+                    
+                    url = f"{self.base_url}/{self.endpoint_id}/runsync"
+                    response = requests.post(url, headers=self.headers, json=test_payload, timeout=10)
+                    
+                    if response.status_code == 200:
+                        available_models.append(model)
+                        print(f"✅ {model} - Available")
+                    else:
+                        print(f"❌ {model} - Status {response.status_code}")
+                        
+                except Exception as e:
+                    print(f"⚠️ {model} - Error: {e}")
+                    continue
+            
+            # Cache the results
+            self._available_models = available_models
+            self._models_cache_time = current_time
+            
+            print(f"📋 RunPod: Found {len(available_models)} available models")
+            return available_models
+            
+        except Exception as e:
+            print(f"❌ Error getting RunPod models: {e}")
             return None
 
     def get_job_status(self, job_id: str) -> Optional[Dict[str, Any]]:
